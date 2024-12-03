@@ -1,11 +1,26 @@
 {
-  "name": "unroute",
-  "author": "Henry Mao",
-  "version": "0.0.1",
-  "description": "Unroute provides a simple way to connect your language model (LLM) to external [Model Context Protocols](https://modelcontextprotocol.io/), allowing it to interact with resources and tools.",
-  "main": "index.js",
+  "name": "@unroute/sdk",
+  "version": "1.0.0",
+  "description": "Connect language models to Model Context Protocols",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build"
   },
-  "license": "GPL-3.0-only"
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "openai": "^4.0.0",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "eventsource": "^2.0.2",
+    "@types/eventsource": "^1.1.15",
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.0.0"
+  }
 }

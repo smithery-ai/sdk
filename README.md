@@ -25,7 +25,10 @@ Unroute first requires you to create a connection to a set of MCPs. Each MCP is 
 ```typescript
 import unroute from "@unroute/sdk"
 const connection = await unroute.connect({
-  e2b: { E2B_API_KEY: "YOUR_API_KEY" },
+  e2b: { 
+    uri: "...",
+    env: { E2B_API_KEY: "YOUR_API_KEY" }
+  },
 })
 ```
 
@@ -36,7 +39,10 @@ import unroute from "@unroute/sdk"
 import { OpenAI } from "openai"
 
 const connection = await unroute.connect({
-  e2b: { E2B_API_KEY: "YOUR_API_KEY" },
+  e2b: { 
+    uri: "...",
+    env: { E2B_API_KEY: "YOUR_API_KEY" }
+  },
 })
 const client = connection.patch(new OpenAI())
 const response = await client.chat.completions.create({
@@ -56,10 +62,11 @@ import unroute from "@unroute/sdk"
 import { OpenAI } from "openai"
 
 const connection = await unroute.connect({
-  e2b: { E2B_API_KEY: "YOUR_API_KEY" },
-  exa: { EXA_API_KEY: "YOUR_API_KEY" },
+  e2b: { 
+    uri: "...",
+    env: { E2B_API_KEY: "YOUR_API_KEY" }
+  },
 })
-
 const client = connection.patch(new OpenAI())
 
 // Multi step tool execution
@@ -83,8 +90,10 @@ import unroute from "@unroute/sdk"
 import { OpenAI } from "openai"
 
 const connection = await unroute.connect({
-  e2b: { E2B_API_KEY: "YOUR_API_KEY" },
-  exa: { EXA_API_KEY: "YOUR_API_KEY" },
+  e2b: { 
+    uri: "...",
+    env: { E2B_API_KEY: "YOUR_API_KEY" }
+  },
 })
 const client = new OpenAI()
 
@@ -102,3 +111,18 @@ while (!isDone) {
   ;({ messages, isDone }) = connection.applyResponse(messages, response)
 }
 ```
+
+# Troubleshooting
+```
+Error: ReferenceError: EventSource is not defined
+```
+This event means you're trying to use EventSource API (which is typically used in the browser) from Node. You'll have to install the following to use it:
+```bash
+npm install eventsource
+npm install -D @types/eventsource
+```
+
+Patch the global EventSource object:
+```typescript
+import EventSource from "eventsource"
+global.EventSource = EventSource as any
