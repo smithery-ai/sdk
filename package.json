@@ -1,0 +1,11 @@
+{
+  "name": "unroute",
+  "author": "Henry Mao",
+  "version": "0.0.1",
+  "description": "Unroute provides a simple way to connect your language model (LLM) to external [Model Context Protocols](https://modelcontextprotocol.io/), allowing it to interact with resources and tools.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "GPL-3.0-only"
+}
