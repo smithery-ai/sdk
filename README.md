@@ -2,6 +2,8 @@
 
 Unroute allows you to easily connect language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing it to use resources and tools/functions without setting up JSON schemas for each tool.
 
+*This repository is work in progress.*
+
 **Key Features**
 
 - Connect to multiple MCPs with a single client

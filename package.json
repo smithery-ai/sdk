@@ -5,11 +5,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "npm run build"
+    "build": "tsc"
   },
   "license": "GPL-3.0-only",
+  "workspaces": [
+    "mcps/*"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.1",
     "openai": "^4.0.0",
@@ -21,6 +22,7 @@
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.7",
     "tsx": "^4.19.2",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@unroute/mcp-exa": "*"
   }
 }
