@@ -1,5 +1,5 @@
-import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js"
-import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types"
+import type { Transport } from "@modelcontextprotocol/sdk/shared/transport"
+import type { JSONRPCMessage } from "@modelcontextprotocol/sdk/types"
 
 /**
  * A transport that just forwards messages to another transport

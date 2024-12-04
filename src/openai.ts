@@ -1,20 +1,21 @@
-import { OpenAI } from "openai"
-import {
+import type { OpenAI } from "openai"
+import type {
+  ChatCompletionContentPartText,
   ChatCompletionTool,
   ChatCompletionToolMessageParam,
 } from "openai/resources"
 
-import { Connection } from "."
-import { Tools } from "./types"
+import type { Connection } from "."
+import type { Tools } from "./types"
 
 export class OpenAIHandler {
   constructor(private connection: Connection) {}
 
-  async listTools(strict: boolean = false): Promise<ChatCompletionTool[]> {
+  async listTools(strict = false): Promise<ChatCompletionTool[]> {
     return this.format(await this.connection.listTools(), strict)
   }
 
-  format(tools: Tools, strict: boolean = false): ChatCompletionTool[] {
+  format(tools: Tools, strict = false): ChatCompletionTool[] {
     return Object.entries(tools).flatMap(([mcpName, tools]) =>
       tools.map((tool) => ({
         type: "function",
@@ -43,15 +44,20 @@ export class OpenAIHandler {
     }
 
     const results = await this.connection.callTools(
-      toolCalls.map((toolCall) => ({
-        mcp: toolCall.function.name.split("_")[0],
-        name: toolCall.function.name.split("_")[1],
-        arguments: JSON.parse(toolCall.function.arguments),
-      }))
+      toolCalls.map((toolCall) => {
+        const splitPoint = toolCall.function.name.indexOf("_")
+        const mcp = toolCall.function.name.slice(0, splitPoint)
+        const name = toolCall.function.name.slice(splitPoint + 1)
+        return {
+          mcp,
+          name,
+          arguments: JSON.parse(toolCall.function.arguments),
+        }
+      })
     )
     return results.map((result, index) => ({
       role: "tool",
-      content: JSON.stringify(result),
+      content: result.content as ChatCompletionContentPartText[],
       tool_call_id: toolCalls[index].id,
     }))
   }

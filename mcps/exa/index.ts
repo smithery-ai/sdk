@@ -1,12 +1,11 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { Server } from "@modelcontextprotocol/sdk/server/index"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-  ProgressTokenSchema,
   RequestSchema,
   ResultSchema,
-  ToolSchema,
-} from "@modelcontextprotocol/sdk/types.js"
+  type ToolSchema,
+} from "@modelcontextprotocol/sdk/types"
 import Exa from "exa-js"
 import { omit } from "lodash"
 import { z } from "zod"
@@ -19,16 +18,14 @@ const SearchArgsSchema = z
     useAutoprompt: z
       .boolean()
       .optional()
-      .default(false)
       .describe(
-        "If true, your query will be converted to a Exa query. Default false. Neural or Auto search only."
+        "If true, your query will be converted to a Exa query. Default to 'false'. Neural or Auto search only."
       ),
     type: z
       .enum(["keyword", "neural", "auto"])
       .optional()
-      .default("neural")
       .describe(
-        "The Type of search, 'keyword', 'neural', or 'auto' (decides between keyword and neural). Default neural."
+        "The Type of search, 'keyword', 'neural', or 'auto' (decides between keyword and neural). Default to 'neural'."
       ),
     category: z
       .enum([
@@ -55,7 +52,7 @@ const SearchArgsSchema = z
       .max(10000)
       .optional()
       .default(10)
-      .describe("Number of search results to return. Default 10."),
+      .describe("Number of search results to return. Default to 10."),
     includeDomains: z
       .array(z.string())
       .optional()
@@ -160,24 +157,9 @@ const SearchArgsSchema = z
 
 type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
 
-const BaseRequestParamsSchema = z
-  .object({
-    _meta: z.optional(
-      z
-        .object({
-          /**
-           * If specified, the caller is requesting out-of-band progress notifications for this request (as represented by notifications/progress). The value of this parameter is an opaque token that will be attached to any subsequent notifications. The receiver is not obligated to provide these notifications.
-           */
-          progressToken: z.optional(ProgressTokenSchema),
-        })
-        .passthrough()
-    ),
-  })
-  .passthrough()
-
 export const AuthRequestSchema = RequestSchema.extend({
   method: z.literal("auth"),
-  params: BaseRequestParamsSchema.extend({
+  params: z.object({
     apiKey: z.string(),
   }),
 })

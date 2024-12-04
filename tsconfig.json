@@ -8,8 +8,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@unroute/mcp-e2b": ["mcps/e2b/src"],
+      "@unroute/mcp-exa": ["mcps/exa/src"]
+    }
   },
-  "include": ["src"],
+  "include": ["src", "mcps/**/*.ts", "examples/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

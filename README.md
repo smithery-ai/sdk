@@ -1,6 +1,6 @@
 # Unroute Typescript SDK
 
-Unroute allows you to easily connect language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing it to use resources and tools/functions without setting up JSON schemas for each tool.
+Unroute easily connects language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing you to build agentic flows that use resources and tools without being overwhelmed by JSON schemas.
 
 _This repository is work in progress._
 
