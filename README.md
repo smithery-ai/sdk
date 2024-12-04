@@ -2,7 +2,7 @@
 
 Unroute allows you to easily connect language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing it to use resources and tools/functions without setting up JSON schemas for each tool.
 
-*This repository is work in progress.*
+_This repository is work in progress._
 
 **Key Features**
 
@@ -20,111 +20,96 @@ npm install @unroute/sdk
 
 ## Usage
 
-In this example, we connect an LLM with the e2b code interpreter.
+In this example, we'll connect use OpenAI client with Exa search capabilities.
 
-Unroute first requires you to create a connection to a set of MCPs. Each MCP is identified by a unique identifier (e.g. "e2b", "exa"), and has a set of environment variables (depending on the MCP).
+```bash
+npm install @unroute/mcp-exa
+```
+
+The following code sets up OpenAI and connects to an Exa MCP server. In this case, we're running the server locally within the same process, so it's just a simple passthrough.
 
 ```typescript
-import unroute from "@unroute/sdk"
-const connection = await unroute.connect({
-  e2b: { 
-    uri: "...",
-    env: { E2B_API_KEY: "YOUR_API_KEY" }
+import { Connection } from "@unroute/sdk"
+import { OpenAIHandler } from "@unroute/sdk/openai"
+import * as exa from "@unroute/mcp-exa"
+import { OpenAI } from "openai"
+
+const openai = new OpenAI()
+const connection = await Connection.connect({
+  exa: {
+    server: exa.createServer(),
   },
+})
+await connection.auth("exa", {
+  apiKey: process.env.EXA_API_KEY,
 })
 ```
 
-Now the connection is set up, you can wrap your LLM client around the connection.
+Now you can make your LLM aware of the available tools from Exa.
 
 ```typescript
-import unroute from "@unroute/sdk"
-import { OpenAI } from "openai"
-
-const connection = await unroute.connect({
-  e2b: { 
-    uri: "...",
-    env: { E2B_API_KEY: "YOUR_API_KEY" }
-  },
-})
-const client = connection.patch(new OpenAI())
-const response = await client.chat.completions.create({
+// Create a handler
+const handler = new OpenAIHandler(connection)
+const response = await openai.chat.completions.create({
   model: "gpt-4o-mini",
-  messages: [{ role: "user", content: "What's 3+5?" }],
+  messages: [{ role: "user", content: "In 2024, did OpenAI release GPT-5?" }],
+  // Pass the tools to OpenAI call
+  tools: await handler.listTools(),
 })
+// Obtain the tool outputs as new messages
+const toolMessages = await handler.call(response)
 ```
 
-Your LLM will now be able to call the available tools in its completion and we'll automatically execute the tools before returning the response.
+Using this, you can easily enable your LLM to call tools and obtain the results.
 
-However, it's often the case where your LLM needs to call a tool, see its response, and continue processing output of the tool in order to give you a final response. In this case, you have to loop your LLM call and update your messages until the `isDone` property is set to `true`.
+However, it's often the case where your LLM needs to call a tool, see its response, and continue processing output of the tool in order to give you a final response.
 
-Here's a full example, which loops until the LLM has finished processing the tool response:
+In this case, you have to loop your LLM call and update your messages until there are no more toolMessages to continue.
 
-```typescript
-import unroute from "@unroute/sdk"
-import { OpenAI } from "openai"
-
-const connection = await unroute.connect({
-  e2b: { 
-    uri: "...",
-    env: { E2B_API_KEY: "YOUR_API_KEY" }
-  },
-})
-const client = connection.patch(new OpenAI())
-
-// Multi step tool execution
-let isDone = false
-let messages = [{ role: "user", content: "How old is Obama?" }]
-while (!isDone) {
-  const response = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages,
-  })
-  ;({ messages, isDone }) = connection.applyResponse(messages, response)
-}
-```
-
-## Fine-grained control
-
-You can opt-out of patching your LLM client, and instead use the following equivalent code:
+Example:
 
 ```typescript
-import unroute from "@unroute/sdk"
-import { OpenAI } from "openai"
-
-const connection = await unroute.connect({
-  e2b: { 
-    uri: "...",
-    env: { E2B_API_KEY: "YOUR_API_KEY" }
+let messages: ChatCompletionMessageParam[] = [
+  {
+    role: "user",
+    content:
+      "Deduce Obama's age in number of days. It's November 28, 2024 today. Search to ensure correctness.",
   },
-})
-const client = new OpenAI()
+]
+const handler = new OpenAIHandler(connection)
 
-// Multi step tool execution
-let isDone = false
-let messages = [{ role: "user", content: "How old is Obama?" }]
 while (!isDone) {
-  const response = await client.chat.completions.create({
+  const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages,
-    tools: await connection.getTools(),
+    tools: await handler.listTools(),
   })
-  const toolResponse = await connection.callTool(response)
-  isDone = toolResponse.isDone
-  ;({ messages, isDone }) = connection.applyResponse(messages, response)
+  // Handle tool calls
+  const toolMessages = await handler.call(response)
+
+  // Append new messages
+  messages.push(response.choices[0].message)
+  messages.push(...toolMessages)
+  isDone = toolMessages.length === 0
 }
 ```
 
 # Troubleshooting
+
 ```
 Error: ReferenceError: EventSource is not defined
 ```
+
 This event means you're trying to use EventSource API (which is typically used in the browser) from Node. You'll have to install the following to use it:
+
 ```bash
 npm install eventsource
 npm install -D @types/eventsource
 ```
 
 Patch the global EventSource object:
+
 ```typescript
 import EventSource from "eventsource"
 global.EventSource = EventSource as any
+```

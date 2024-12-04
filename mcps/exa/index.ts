@@ -2,6 +2,9 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ProgressTokenSchema,
+  RequestSchema,
+  ResultSchema,
   ToolSchema,
 } from "@modelcontextprotocol/sdk/types.js"
 import Exa from "exa-js"
@@ -157,75 +160,106 @@ const SearchArgsSchema = z
 
 type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
 
-export class ExaServer {
-  server: Server
-  constructor() {
-    this.server = new Server(
-      {
-        name: "exa",
-        version: "1.0.0",
+const BaseRequestParamsSchema = z
+  .object({
+    _meta: z.optional(
+      z
+        .object({
+          /**
+           * If specified, the caller is requesting out-of-band progress notifications for this request (as represented by notifications/progress). The value of this parameter is an opaque token that will be attached to any subsequent notifications. The receiver is not obligated to provide these notifications.
+           */
+          progressToken: z.optional(ProgressTokenSchema),
+        })
+        .passthrough()
+    ),
+  })
+  .passthrough()
+
+export const AuthRequestSchema = RequestSchema.extend({
+  method: z.literal("auth"),
+  params: BaseRequestParamsSchema.extend({
+    apiKey: z.string(),
+  }),
+})
+export const AuthResultSchema = ResultSchema.extend({})
+
+export function createServer() {
+  const server = new Server(
+    {
+      name: "exa",
+      version: "1.0.0",
+    },
+    {
+      capabilities: {
+        tools: {},
       },
-      {
-        capabilities: {
-          tools: {},
+    }
+  )
+
+  // Initialize Exa client
+  const globals = {
+    exa: null as Exa | null,
+  }
+
+  server.setRequestHandler(AuthRequestSchema, async (request) => {
+    const { apiKey } = request.params
+    globals.exa = new Exa(apiKey)
+    return {}
+  })
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => {
+    return {
+      tools: [
+        {
+          name: "search",
+          description: "Search the web using semantic queries.",
+          inputSchema: zodToJsonSchema(SearchArgsSchema) as ToolInput,
         },
+      ],
+    }
+  })
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    try {
+      const { name, arguments: args } = request.params
+
+      if (!globals.exa) {
+        throw new Error("Unrecoverable error: Not authenticated.")
       }
-    )
-    // Initialize Exa client
-    // TODO: allow client to authenticate
-    const exa = new Exa(process.env.EXA_API_KEY || "")
 
-    // Tool handlers
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      return {
-        tools: [
-          {
-            name: "exa_search",
-            description: "Search the web using natural language queries",
-            inputSchema: zodToJsonSchema(SearchArgsSchema) as ToolInput,
-          },
-        ],
-      }
-    })
-
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      try {
-        const { name, arguments: args } = request.params
-
-        switch (name) {
-          case "exa_search": {
-            const parsed = SearchArgsSchema.safeParse(args)
-            if (!parsed.success) {
-              throw new Error(
-                `Invalid arguments for exa_search: ${parsed.error}`
-              )
-            }
-
-            const results = await exa.search(
-              parsed.data.query,
-              omit(parsed.data, "query")
-            )
-            return {
-              content: [
-                {
-                  type: "text",
-                  text: JSON.stringify(results),
-                },
-              ],
-            }
+      switch (name) {
+        case "search": {
+          const parsed = SearchArgsSchema.safeParse(args)
+          if (!parsed.success) {
+            throw new Error(`Invalid arguments: ${parsed.error}`)
           }
 
-          default:
-            throw new Error(`Unknown tool: ${name}`)
+          const results = await globals.exa.search(
+            parsed.data.query,
+            omit(parsed.data, "query")
+          )
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(results),
+              },
+            ],
+          }
         }
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error)
-        return {
-          content: [{ type: "text", text: `Error: ${errorMessage}` }],
-          isError: true,
-        }
+
+        default:
+          throw new Error(`Unknown tool: ${name}`)
       }
-    })
-  }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      return {
+        content: [{ type: "text", text: `Error: ${errorMessage}` }],
+        isError: true,
+      }
+    }
+  })
+
+  return server
 }

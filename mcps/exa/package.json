@@ -2,7 +2,6 @@
   "name": "@unroute/mcp-exa",
   "version": "0.0.1",
   "author": "Henry Mao",
-  "main": "main.js",
   "type": "module",
   "bin": {
     "proxy": "dist/index.js"

@@ -1,18 +1,16 @@
-import { OpenAI } from "openai"
-import { ListToolsResponse, MCPConfig, UnrouteConnection } from "./types"
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
-import { v4 as uuidv4 } from "uuid"
 import { Tool } from "@modelcontextprotocol/sdk/types"
+import { v4 as uuidv4 } from "uuid"
+import { z } from "zod"
+import { ForwardTransport } from "./forward"
+import { isServerConfig, isURIConfig, MCPConfig, Tools } from "./types"
 
-class Unroute {
-  private mcps: Map<string, Client>
+export class Connection {
+  mcps: Map<string, Client> = new Map()
 
-  constructor() {
-    this.mcps = new Map()
-  }
-
-  async connect(config: MCPConfig): Promise<UnrouteConnection> {
+  static async connect(config: MCPConfig) {
+    const connection = new Connection()
     // Initialize MCPs with their respective configs
     await Promise.all(
       Object.entries(config).map(async ([mcpName, mcpConfig]) => {
@@ -25,88 +23,65 @@ class Unroute {
             capabilities: {},
           }
         )
-        await mcp.connect(new SSEClientTransport(new URL(mcpConfig.uri)))
-        this.mcps.set(mcpName, mcp)
+        if (isURIConfig(mcpConfig)) {
+          await mcp.connect(new SSEClientTransport(new URL(mcpConfig.url)))
+        } else if (isServerConfig(mcpConfig)) {
+          const server = mcpConfig.server
+          const clientTransport = new ForwardTransport()
+          const serverTransport = new ForwardTransport()
+          clientTransport.bind(serverTransport)
+          serverTransport.bind(clientTransport)
+
+          await server.connect(serverTransport)
+          await mcp.connect(clientTransport)
+        }
+        connection.mcps.set(mcpName, mcp)
       })
     )
-
-    return {
-      patch: this.patchOpenAI.bind(this),
-      getTools: this.listTools.bind(this),
-      callTool: this.callTool.bind(this),
-      applyResponse: this.applyResponse.bind(this),
-    }
+    return connection
   }
 
-  private patchOpenAI(client: OpenAI): OpenAI {
-    const originalCreate = client.chat.completions.create
-    const getTools = this.listTools.bind(this)
-
-    // @ts-ignore - We need to override the OpenAI client's create method
-    client.chat.completions.create = async function (params: any) {
-      const tools = await getTools()
-      const response = originalCreate.call(this, { tools, ...params })
-      return response
-    }
-
-    return client
+  async auth(mcpName: string, params: any) {
+    await this.mcps.get(mcpName)?.request(
+      {
+        method: "auth",
+        params,
+      },
+      z.object({}).passthrough()
+    )
   }
 
-  private toolsCache: Tool[] | null = null
+  // TODO: Invalidate cache on tool change
+  private toolsCache: Tools | null = null
 
-  private async listTools() {
+  async listTools(): Promise<Tools> {
     if (this.toolsCache === null) {
       this.toolsCache = (
         await Promise.all(
-          Array.from(this.mcps.values()).map(async (mcp) => {
+          Array.from(this.mcps.entries()).map(async ([name, mcp]) => {
             const capabilities = mcp.getServerCapabilities()
             if (!capabilities?.tools) return []
             const response = await mcp.listTools()
-            return response.tools
+            return { [name]: response.tools } as Tool
           })
         )
-      ).flat()
+      ).reduce((acc, curr) => ({ ...acc, ...curr }), {})
     }
     return this.toolsCache
   }
 
-  private async callTool(response: any) {
-    const toolCalls = response.choices[0]?.message?.tool_calls
-    if (!toolCalls) {
-      return { isDone: true, messages: [] }
-    }
-
-    const results = await Promise.all(
-      toolCalls.map(async (toolCall: any) => {
-        const [mcpName, toolName] = toolCall.function.name.split(".")
-        const mcp = this.mcps.get(mcpName)
+  async callTools(calls: { mcp: string; name: string; arguments: any }[]) {
+    return await Promise.all(
+      calls.map(async (call) => {
+        const mcp = this.mcps.get(call.mcp)
         if (!mcp) {
-          throw new Error(`MCP ${mcpName} not found`)
+          throw new Error(`MCP tool ${call.mcp} not found`)
         }
-        return mcp.callTool(toolName, JSON.parse(toolCall.function.arguments))
+        return mcp.callTool({
+          name: call.name,
+          arguments: call.arguments,
+        })
       })
     )
-
-    const messages = results.map((result, index) => ({
-      role: "tool",
-      content: JSON.stringify(result),
-      tool_call_id: toolCalls[index].id,
-    }))
-
-    return { isDone: false, messages }
-  }
-
-  private applyResponse(
-    messages: Array<{ role: string; content: string }>,
-    response: any
-  ) {
-    const newMessages = [...messages]
-    const assistantMessage = response.choices[0].message
-    newMessages.push(assistantMessage)
-
-    const isDone = !assistantMessage.tool_calls
-    return { messages: newMessages, isDone }
   }
 }
-
-export default new Unroute()
