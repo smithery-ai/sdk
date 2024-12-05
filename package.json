@@ -1,6 +1,6 @@
 {
   "name": "@unroute/sdk",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Connect language models to Model Context Protocols",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
