@@ -1,5 +1,5 @@
 import { Sandbox } from '@e2b/code-interpreter'
-import { Server } from '@modelcontextprotocol/sdk/server/index'
+import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import {
   CallToolRequestSchema,
   ErrorCode,
@@ -7,7 +7,7 @@ import {
   McpError,
   RequestSchema,
   ResultSchema,
-} from '@modelcontextprotocol/sdk/types'
+} from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 

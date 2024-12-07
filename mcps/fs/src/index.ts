@@ -1,9 +1,9 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index"
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import {
 	CallToolRequestSchema,
 	ListToolsRequestSchema,
 	ToolSchema,
-} from "@modelcontextprotocol/sdk/types"
+} from "@modelcontextprotocol/sdk/types.js"
 import { createTwoFilesPatch } from "diff"
 import fs from "node:fs/promises"
 import os from "node:os"
