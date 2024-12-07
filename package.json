@@ -1,30 +1,35 @@
 {
-  "name": "@unroute/sdk",
-  "version": "0.0.1",
-  "description": "Connect language models to Model Context Protocols",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc"
-  },
-  "license": "GPL-3.0-only",
-  "workspaces": [
-    "mcps/*"
-  ],
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.1",
-    "openai": "^4.0.0",
-    "uuid": "^11.0.3"
-  },
-  "devDependencies": {
-    "@types/eventsource": "^1.1.15",
-    "@types/node": "^20.0.0",
-    "@types/uuid": "^9.0.7",
-    "@unroute/mcp-e2b": "*",
-    "@unroute/mcp-exa": "*",
-    "dotenv": "^16.4.7",
-    "eventsource": "^2.0.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.0.0"
-  }
+	"name": "@unroute/sdk",
+	"version": "0.0.1",
+	"description": "Connect language models to Model Context Protocols",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": "./dist/index.js",
+		"./*": "./dist/*"
+	},
+	"scripts": {
+		"build": "rm -r dist && tsc"
+	},
+	"license": "GPL-3.0-only",
+	"workspaces": ["mcps/*"],
+	"dependencies": {
+		"@anthropic-ai/sdk": "^0.32.1",
+		"@modelcontextprotocol/sdk": "^1.0.3",
+		"openai": "^4.0.0",
+		"uuid": "^11.0.3"
+	},
+	"devDependencies": {
+		"@types/eventsource": "^1.1.15",
+		"@types/node": "^20.0.0",
+		"@types/uuid": "^9.0.7",
+		"@unroute/mcp-e2b": "*",
+		"@unroute/mcp-exa": "*",
+		"@unroute/mcp-fs": "*",
+		"dotenv": "^16.4.7",
+		"eventsource": "^2.0.2",
+		"tsx": "^4.19.2",
+		"typescript": "^5.0.0"
+	}
 }
