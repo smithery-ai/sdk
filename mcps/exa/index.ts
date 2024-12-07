@@ -12,7 +12,7 @@ import { z } from "zod"
 import { zodToJsonSchema } from "zod-to-json-schema"
 
 // Define schema for each tool
-const SearchArgsSchema = z
+export const SearchArgsSchema = z
   .object({
     query: z.string().describe("The query string."),
     useAutoprompt: z

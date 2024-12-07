@@ -1,7 +1,7 @@
 # Unroute Typescript SDK
 [![npm version](https://badge.fury.io/js/@unroute%2Fsdk.svg)](https://badge.fury.io/js/@unroute%2Fsdk)
 
-Unroute easily connects language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing you to build agentic flows that use resources and tools without being overwhelmed by JSON schemas.
+Unroute is a Typescript framework that easily connects language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing you to build agentic flows that use resources and tools without being overwhelmed by JSON schemas.
 
 ⚠️ _This repository is work in progress and in alpha. Not recommended for production use yet._ ⚠️
 

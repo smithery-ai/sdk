@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "author": "Henry Mao & E2B Team",
   "type": "module",
-  "bin": {
-    "e2b-mcp": "dist/index.js"
-  },
   "files": [
     "dist"
   ],

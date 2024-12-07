@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "author": "Henry Mao",
   "type": "module",
-  "bin": {
-    "proxy": "dist/index.js"
-  },
   "files": [
     "dist"
   ],

@@ -1,0 +1,26 @@
+{
+	"name": "@unroute/mcp-fs",
+	"version": "0.0.1",
+	"author": "Henry Mao & MCP Team",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc && shx chmod +x dist/*.js",
+		"watch": "tsc --watch"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.0.1",
+		"diff": "^5.1.0",
+		"zod": "^3.22.0",
+		"zod-to-json-schema": "^3.22.0"
+	},
+	"devDependencies": {
+		"@types/diff": "^6.0.0",
+		"@types/lodash": "^4.17.13",
+		"@types/node": "^20.11.0",
+		"shx": "^0.3.4",
+		"typescript": "^5.3.3"
+	}
+}
