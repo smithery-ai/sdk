@@ -3,7 +3,7 @@ import * as exa from "@unroute/mcp-exa"
 import dotenv from "dotenv"
 import EventSource from "eventsource"
 import { OpenAI } from "openai"
-import type { ChatCompletionMessageParam } from "openai/src/resources/index"
+import type { ChatCompletionMessageParam } from "openai/resources/chat/index"
 import { Connection } from "../src/index"
 import { OpenAIHandler } from "../src/openai"
 

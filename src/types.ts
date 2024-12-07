@@ -1,5 +1,5 @@
-import type { Server } from "@modelcontextprotocol/sdk/server/index"
-import type { FunctionParameters } from "openai/resources"
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import type { FunctionParameters } from "openai/resources/index.js"
 
 export type MCPConfig = Record<string, { server: Server } | { url: string }>
 

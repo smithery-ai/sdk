@@ -1,18 +1,22 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index"
-import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse"
+import { Client } from "@modelcontextprotocol/sdk/client/index.js"
+import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
 import {
 	CallToolResultSchema,
 	type Tool,
-} from "@modelcontextprotocol/sdk/types"
+} from "@modelcontextprotocol/sdk/types.js"
 import { v4 as uuidv4 } from "uuid"
 import { z } from "zod"
-import { ForwardTransport } from "./forward"
+import { ForwardTransport } from "./forward.js"
 import {
 	isServerConfig,
 	isURIConfig,
 	type MCPConfig,
 	type Tools,
-} from "./types"
+} from "./types.js"
+
+export { AnthropicHandler } from "./anthropic.js"
+export { OpenAIHandler } from "./openai.js"
+export type { Tools, MCPConfig } from "./types.js"
 
 export class Connection {
 	mcps: Map<string, Client> = new Map()

@@ -1,11 +1,11 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index"
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   RequestSchema,
   ResultSchema,
   type ToolSchema,
-} from "@modelcontextprotocol/sdk/types"
+} from "@modelcontextprotocol/sdk/types.js"
 import Exa from "exa-js"
 import { omit } from "lodash"
 import { z } from "zod"

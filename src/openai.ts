@@ -3,10 +3,10 @@ import type {
   ChatCompletionContentPartText,
   ChatCompletionTool,
   ChatCompletionToolMessageParam,
-} from "openai/resources"
+} from "openai/resources/index.js"
 
-import type { Connection } from "."
-import type { Tools } from "./types"
+import type { Connection } from "./index.js"
+import type { Tools } from "./types.js"
 
 export class OpenAIHandler {
   constructor(private connection: Connection) {}
