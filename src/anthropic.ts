@@ -1,4 +1,8 @@
-import type { Message, MessageParam } from "@anthropic-ai/sdk/resources/index"
+import type {
+	Message,
+	MessageParam,
+	Tool,
+} from "@anthropic-ai/sdk/resources/index.js"
 
 import type { Connection } from "./index.js"
 import type { Tools } from "./types.js"
@@ -6,20 +10,16 @@ import type { Tools } from "./types.js"
 export class AnthropicHandler {
 	constructor(private connection: Connection) {}
 
-	async listTools(strict = false): Promise<any[]> {
-		return this.format(await this.connection.listTools(), strict)
+	async listTools(): Promise<Tool[]> {
+		return this.format(await this.connection.listTools())
 	}
 
-	format(tools: Tools, strict = false): any[] {
+	format(tools: Tools): Tool[] {
 		return Object.entries(tools).flatMap(([mcpName, tools]) =>
 			tools.map((tool) => ({
-				type: "function",
-				function: {
-					name: `${mcpName}_${tool.name}`,
-					description: tool.description,
-					parameters: tool.inputSchema,
-					strict,
-				},
+				name: `${mcpName}_${tool.name}`,
+				input_schema: { ...tool.inputSchema, type: "object" },
+				description: tool.description,
 			})),
 		)
 	}
