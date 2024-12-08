@@ -10,7 +10,7 @@
 		"./*": "./dist/*"
 	},
 	"scripts": {
-		"build": "rm -r dist && tsc"
+		"build": "tsc"
 	},
 	"license": "GPL-3.0-only",
 	"workspaces": ["mcps/*"],
