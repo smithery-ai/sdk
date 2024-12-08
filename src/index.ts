@@ -6,13 +6,13 @@ import {
 } from "@modelcontextprotocol/sdk/types.js"
 import { v4 as uuidv4 } from "uuid"
 import { z } from "zod"
-import { ForwardTransport } from "./forward.js"
 import {
 	isServerConfig,
 	isURIConfig,
 	type MCPConfig,
 	type Tools,
 } from "./types.js"
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
 
 export { AnthropicHandler } from "./anthropic.js"
 export { OpenAIHandler } from "./openai.js"
@@ -39,10 +39,8 @@ export class Connection {
 					await mcp.connect(new SSEClientTransport(new URL(mcpConfig.url)))
 				} else if (isServerConfig(mcpConfig)) {
 					const server = mcpConfig.server
-					const clientTransport = new ForwardTransport()
-					const serverTransport = new ForwardTransport()
-					clientTransport.bind(serverTransport)
-					serverTransport.bind(clientTransport)
+					const [clientTransport, serverTransport] =
+						InMemoryTransport.createLinkedPair()
 
 					await server.connect(serverTransport)
 					await mcp.connect(clientTransport)
