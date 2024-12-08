@@ -1,0 +1,42 @@
+name: Publish to NPM
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build -ws --include-workspace-root
+      
+      - name: Check version and publish
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          PUBLISHED_VERSION=$(npm view @unroute/sdk version 2>/dev/null || echo "0.0.0")
+          if [ "$PACKAGE_VERSION" != "$PUBLISHED_VERSION" ]; then
+            echo "Publishing new version $PACKAGE_VERSION (current published version is $PUBLISHED_VERSION)"
+            npm publish --access public -ws --include-workspace-root
+          else
+            echo "Version $PACKAGE_VERSION is already published, skipping"
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

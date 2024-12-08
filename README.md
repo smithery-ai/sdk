@@ -116,3 +116,9 @@ Patch the global EventSource object:
 import EventSource from "eventsource"
 global.EventSource = EventSource as any
 ```
+
+# Contributing
+Version bumping:
+```sh
+npm version patch -ws --include-workspace-root
+```
