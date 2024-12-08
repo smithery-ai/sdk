@@ -1,6 +1,6 @@
 {
 	"name": "@unroute/sdk",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Connect language models to Model Context Protocols",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -13,7 +13,9 @@
 		"build": "rm -r dist && tsc"
 	},
 	"license": "GPL-3.0-only",
-	"workspaces": ["mcps/*"],
+	"workspaces": [
+		"mcps/*"
+	],
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
 		"@modelcontextprotocol/sdk": "^1.0.3",
