@@ -12,7 +12,6 @@ import { spawn } from "node:child_process"
 export const ExecuteCommandArgsSchema = z.object({
   command: z.string().describe("The command to execute"),
   args: z.array(z.string()).describe("Command arguments"),
-  purpose: z.string().describe("A very concise explanation of what this command will do"),
 })
 
 const ToolInputSchema = ToolSchema.shape.inputSchema
@@ -54,7 +53,7 @@ async function executeCommand(command: string, args: string[]): Promise<{stdout:
 export interface ShellServerOptions {
   allowedCommands?: string[]
   timeout?: number
-  approvalHandler?: (command: string, args: string[], purpose: string) => Promise<boolean>
+  approvalHandler?: (command: string, args: string[]) => Promise<boolean>
 }
 
 export function createServer(options: ShellServerOptions = {}) {
@@ -106,15 +105,15 @@ export function createServer(options: ShellServerOptions = {}) {
         throw new Error(`Invalid arguments: ${parsed.error}`)
       }
 
-      const { command, args: cmdArgs, purpose } = parsed.data
+      const { command, args: cmdArgs } = parsed.data
 
       // Validate command
       if (!ALLOWED_COMMANDS.has(command)) {
         throw new Error(`Command not allowed: ${command}`)
       }
 
-      // Get human approval with purpose
-      const approved = await approvalHandler(command, cmdArgs, purpose)
+      // Get human approval without purpose
+      const approved = await approvalHandler(command, cmdArgs)
       if (!approved) {
         return {
           content: [{ 

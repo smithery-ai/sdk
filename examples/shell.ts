@@ -9,7 +9,7 @@ import url from 'url'
 import readline from 'readline'
 
 // Utility for human approval
-async function getHumanApproval(command: string, args: string[], purpose: string): Promise<boolean> {
+async function getHumanApproval(command: string, args: string[]): Promise<boolean> {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -18,7 +18,6 @@ async function getHumanApproval(command: string, args: string[], purpose: string
   return new Promise((resolve) => {
     rl.question(
       `Command: ${command} ${args.join(' ')}\n` +  
-      `Purpose: ${purpose}\n` +
       `Approve? [y/N]: `,
       (answer) => {
         rl.close()
