@@ -164,7 +164,7 @@ export const ConfigRequestSchema = RequestSchema.extend({
 	method: z.literal("config"),
 	params: ConfigSchema,
 })
-export const AuthResultSchema = ResultSchema.extend({})
+export const ConfigResultSchema = ResultSchema.extend({})
 export type Config = z.infer<typeof ConfigSchema>
 
 export function createServer(config: Config = ConfigSchema.parse({})) {

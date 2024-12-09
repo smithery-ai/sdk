@@ -38,11 +38,10 @@ import { OpenAI } from "openai"
 const openai = new OpenAI()
 const connection = await Connection.connect({
   exa: {
-    server: exa.createServer(),
+    server: exa.createServer({
+      apiKey: process.env.EXA_API_KEY,
+    }),
   },
-})
-await connection.auth("exa", {
-  apiKey: process.env.EXA_API_KEY,
 })
 ```
 

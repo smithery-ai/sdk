@@ -52,16 +52,6 @@ export class Connection {
 		return connection
 	}
 
-	async auth(mcpName: string, params: any) {
-		await this.mcps.get(mcpName)?.request(
-			{
-				method: "auth",
-				params,
-			},
-			z.object({}).passthrough(),
-		)
-	}
-
 	// TODO: Invalidate cache on tool change
 	private toolsCache: Tools | null = null
 
