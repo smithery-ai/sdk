@@ -72,9 +72,7 @@ async function main() {
 }
 
 // Run the example
-if (require.main === module) {
-	main().catch((err) => {
-		console.error("Error:", err)
-		process.exit(1)
-	})
-}
+main().catch((err) => {
+	console.error("Error:", err)
+	process.exit(1)
+})
