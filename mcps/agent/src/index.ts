@@ -66,8 +66,9 @@ export const ConfigSchema = z.object({
 	model: z
 		.enum(["claude-3-5-sonnet-20241022"])
 		.optional()
-		.describe("The model to use. Default to 'claude-3-5-sonnet-20241022'."),
+		.describe("The model to use. Default to 'claude-3-5-sonnet-20241022."),
 	maxTokens: z.number().optional(),
+	timeout: z.number().optional(),
 })
 
 export const ConfigRequestSchema = RequestSchema.extend({
@@ -91,7 +92,7 @@ function cacheLastMessage(messages: PromptCachingBetaMessageParam[]) {
 }
 
 export function createServer(
-	mcpConfig: MCPConfig,
+	mcpConfig: Record<string, Server>,
 	config: Config = ConfigSchema.parse({}),
 ) {
 	const server = new Server(
@@ -184,14 +185,11 @@ export function createServer(
 
 						// Connect to MCPs
 						const connection = await Connection.connect(
-							config.recursive
-								? {
-										...mcpConfig,
-										// Recursively allows the agent to spawn new agents.
-										agent: { server },
-									}
-								: mcpConfig,
-						)
+							// Convert the mcpConfig entries into a format where each value is wrapped in an object with a 'server' key
+							Object.fromEntries(
+							  Object.entries(mcpConfig).map(([k, v]) => [k, { server: v }])
+							)
+						  )
 						try {
 							const handler = new AnthropicHandler(connection)
 							while (!isDone) {
