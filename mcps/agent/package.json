@@ -1,22 +1,23 @@
 {
-  "name": "@unroute/mcp-agent",
-  "version": "0.0.1",
-  "author": "Henry Mao",
-  "description": "Agent MCP for executing arbitrary tasks using LLM APIs",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "prepare": "npm run build"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.18.0",
-    "@modelcontextprotocol/sdk": "workspace:^",
-    "zod": "^3.22.4",
-    "zod-to-json-schema": "^3.22.3"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.4"
-  }
+	"name": "@unroute/mcp-agent",
+	"version": "0.0.2",
+	"author": "Henry Mao",
+	"description": "Agent MCP for executing arbitrary tasks using LLM APIs",
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc",
+    "watch": "tsc --watch"
+	},
+	"dependencies": {
+		"@anthropic-ai/sdk": "^0.32.1",
+		"@unroute/sdk": "file:../..",
+		"@modelcontextprotocol/sdk": "^1.0.3",
+		"zod": "^3.22.4",
+		"zod-to-json-schema": "^3.22.3"
+	},
+	"devDependencies": {
+		"typescript": "^5.0.4"
+	}
 }

@@ -97,4 +97,8 @@ export class Connection {
 			}),
 		)
 	}
+
+	async close() {
+		await Promise.all(Array.from(this.mcps.values()).map((mcp) => mcp.close()))
+	}
 }

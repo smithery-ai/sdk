@@ -1,22 +1,27 @@
+import Anthropic from "@anthropic-ai/sdk"
 import { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import {
 	CallToolRequestSchema,
 	ListToolsRequestSchema,
 	RequestSchema,
 	ResultSchema,
-	type ToolSchema,
 } from "@modelcontextprotocol/sdk/types.js"
-import Anthropic from "@anthropic-ai/sdk"
+import { type MCPConfig, ToolsSchema } from "@unroute/sdk/types.js"
 import { z } from "zod"
 import { zodToJsonSchema } from "zod-to-json-schema"
+// TODO: use polyfill for client side?
+import { EventEmitter } from "node:events"
 
+import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/resources/beta/prompt-caching/index.js"
+import { AnthropicHandler } from "@unroute/sdk/anthropic.js"
+import { Connection } from "../../../dist/index.js"
 // Define schemas for our tools
 export const RunArgsSchema = z.object({
-	instruction: z.string().describe("The instruction to execute. This is a prompt sent to a large language model. You will need to prompt in detail and ask specifically for a response from the model if needed."),
-	model: z
-		.enum(["claude-3-5-sonnet-20241022"])
-		.default("claude-3-5-sonnet-20241022")
-		.describe("The model to use. Default to 'claude-3-5-sonnet-20241022'."),
+	instruction: z
+		.string()
+		.describe(
+			"The instruction to execute. This is a prompt sent to a large language model. You will need to prompt in detail and ask specifically for a response from the model if needed.",
+		),
 })
 
 export const GetResultArgsSchema = z.object({
@@ -28,18 +33,40 @@ export const GetResultArgsSchema = z.object({
 		),
 })
 
-type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
-
-// Auth schema for API key
-export const AuthRequestSchema = RequestSchema.extend({
-	method: z.literal("auth"),
-	params: z.object({
-		apiKey: z.string(),
-	}),
+export const ConfigSchema = z.object({
+	apiKey: z.string().optional(),
+	model: z
+		.enum(["claude-3-5-sonnet-20241022"])
+		.optional()
+		.describe("The model to use. Default to 'claude-3-5-sonnet-20241022'."),
+	tools: ToolsSchema.optional(),
+	maxTokens: z.number().optional(),
 })
-export const AuthResultSchema = ResultSchema.extend({})
 
-export function createServer() {
+export const ConfigRequestSchema = RequestSchema.extend({
+	method: z.literal("config"),
+	params: ConfigSchema,
+})
+export const ConfigResultSchema = ResultSchema.extend({})
+
+export type Config = z.infer<typeof ConfigSchema>
+
+/**
+ * Marks the last message with cache flag
+ */
+function cacheLastMessage(messages: PromptCachingBetaMessageParam[]) {
+	const cachedMessages = JSON.parse(JSON.stringify(messages))
+	const content = cachedMessages.at(-1)?.content
+	if (Array.isArray(content)) {
+		content[0].cache_control = { type: "ephemeral" }
+	}
+	return cachedMessages
+}
+
+export function createServer(
+	mcpConfig: MCPConfig,
+	config: Config = ConfigSchema.parse({}),
+) {
 	const server = new Server(
 		{
 			name: "mcp-agent",
@@ -54,15 +81,16 @@ export function createServer() {
 
 	// Initialize state
 	const globals = {
-		client: null as Anthropic | null,
+		client: config.apiKey ? new Anthropic({ apiKey: config.apiKey }) : null,
 		isRunning: false,
-		messages: [] as Array<any>,
 		result: null as string | null,
 	}
+	const agentEmitter = new EventEmitter()
 
-	server.setRequestHandler(AuthRequestSchema, async (request) => {
+	server.setRequestHandler(ConfigRequestSchema, async (request) => {
 		const { apiKey } = request.params
 		globals.client = new Anthropic({ apiKey })
+		Object.assign(config, ConfigSchema.parse(request.params))
 		return {}
 	})
 
@@ -73,13 +101,13 @@ export function createServer() {
 					name: "run",
 					description:
 						"Starts an autonomous agent that executes an instruction. This call will return immediately with no response and the agent will start running in the background. Think of this as an intern who can handle a subset of your tasks.",
-					inputSchema: zodToJsonSchema(RunArgsSchema) as ToolInput,
+					inputSchema: zodToJsonSchema(RunArgsSchema),
 				},
 				{
 					name: "get_result",
 					description:
 						"Get the result of the agent. If the agent is not finished running and block time expired, this will return an error.",
-					inputSchema: zodToJsonSchema(GetResultArgsSchema) as ToolInput,
+					inputSchema: zodToJsonSchema(GetResultArgsSchema),
 				},
 			],
 		}
@@ -90,7 +118,7 @@ export function createServer() {
 			const { name, arguments: args } = request.params
 
 			if (!globals.client) {
-				throw new Error("Unrecoverable error: Not authenticated.")
+				throw new Error("Not authenticated.")
 			}
 			const client = globals.client
 
@@ -107,7 +135,8 @@ export function createServer() {
 
 					globals.isRunning = true
 					globals.result = null
-					globals.messages = [
+
+					const messages: PromptCachingBetaMessageParam[] = [
 						{
 							role: "user",
 							content: parsed.data.instruction,
@@ -117,30 +146,53 @@ export function createServer() {
 					// Start the execution asynchronously
 					;(async () => {
 						let isDone = false
-						try {
-							while (!isDone) {
-								const response = await client.messages.create({
-									model: parsed.data.model,
-									max_tokens: 1024,
-									messages: globals.messages,
-								})
 
-								globals.messages.push({
+						// Connect to MCPs
+						const connection = await Connection.connect(mcpConfig)
+						try {
+							const handler = new AnthropicHandler(connection)
+							while (!isDone) {
+								const response =
+									await client.beta.promptCaching.messages.create({
+										model: config.model ?? "claude-3-5-sonnet-20241022",
+										max_tokens: config.maxTokens ?? 1024,
+										messages: cacheLastMessage(messages),
+										tools: await handler.listTools(),
+									})
+								// Handle tool calls
+								const toolMessages = await handler.call(response)
+
+								messages.push({
 									role: "assistant",
 									content: response.content,
 								})
+								messages.push(...toolMessages)
+								isDone = toolMessages.length === 0
 
-								// TODO: Support tool calling
-								isDone = true
+								console.log(
+									"Assistant: ",
+									response.content
+										.map((c) =>
+											c.type === "text"
+												? c.text
+												: `${c.name}: ${JSON.stringify(c.input)}`,
+										)
+										.join("\n"),
+								)
 							}
 
 							// Set the final result
+							const lastContent = messages[messages.length - 1].content
 							globals.result =
-								globals.messages[globals.messages.length - 1].content
+								typeof lastContent === "string"
+									? lastContent
+									: JSON.stringify(lastContent)
 						} catch (error) {
 							globals.result = `Error: ${error}`
 						} finally {
 							globals.isRunning = false
+							connection.close()
+							agentEmitter.emit("done")
 						}
 					})()
 
@@ -162,15 +214,23 @@ export function createServer() {
 
 					if (globals.isRunning) {
 						// Wait until the agent is done
-						while (globals.isRunning) {
-							await new Promise((resolve) =>
-								setTimeout(resolve, parsed.data.block * 1000),
-							)
-						}
+						await new Promise<void>((resolve) => {
+							const timeout = setTimeout(() => {
+								agentEmitter.removeListener("done", handleDone)
+								resolve()
+							}, parsed.data.block * 1000)
+							const handleDone = () => {
+								clearTimeout(timeout)
+								resolve()
+							}
+							agentEmitter.once("done", handleDone)
+						})
 					}
-
-					if (globals.result === null) {
+					if (globals.isRunning) {
 						throw new Error("No result available yet.")
+					}
+					if (globals.result === null) {
+						throw new Error("Agent not started.")
 					}
 
 					return {

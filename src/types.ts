@@ -1,31 +1,29 @@
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
-import type { FunctionParameters } from "openai/resources/index.js"
 
 export type MCPConfig = Record<string, { server: Server } | { url: string }>
 
 // Type guards
 export function isServerConfig(
-  config: { server: Server } | { url: string }
+	config: { server: Server } | { url: string },
 ): config is { server: Server } {
-  return "server" in config
+	return "server" in config
 }
 
 export function isURIConfig(
-  config: { server: Server } | { url: string }
+	config: { server: Server } | { url: string },
 ): config is { url: string } {
-  return "uri" in config
+	return "url" in config
 }
 
-export interface Tool {
-  name: string
-  description?: string
-  inputSchema: FunctionParameters
-}
+import { z } from "zod"
 
-export type Tools = { [mcp: string]: Tool[] }
+export const ToolSchema = z.object({
+	name: z.string(),
+	description: z.string().optional(),
+	inputSchema: z.record(z.unknown()),
+})
 
-export interface ListToolsResponse {
-  _meta?: Record<string, any>
-  nextCursor?: string
-  tools: Tool[]
-}
+export const ToolsSchema = z.record(z.array(ToolSchema))
+
+export interface Tool extends z.infer<typeof ToolSchema> {}
+export type Tools = z.infer<typeof ToolsSchema>
