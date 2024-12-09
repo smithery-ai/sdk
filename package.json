@@ -1,6 +1,6 @@
 {
 	"name": "@unroute/sdk",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Connect language models to Model Context Protocols",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -9,7 +9,9 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc --watch",
@@ -17,7 +19,9 @@
 		"format": "npx @biomejs/biome format --write"
 	},
 	"license": "GPL-3.0-only",
-	"workspaces": ["mcps/*"],
+	"workspaces": [
+		"mcps/*"
+	],
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
 		"@modelcontextprotocol/sdk": "^1.0.3",
