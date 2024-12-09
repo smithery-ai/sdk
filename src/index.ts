@@ -1,5 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
+import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js"
 import {
 	CallToolResultSchema,
 	type Tool,
@@ -12,11 +14,10 @@ import {
 	type MCPConfig,
 	type Tools,
 } from "./types.js"
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
 
 export { AnthropicHandler } from "./anthropic.js"
 export { OpenAIHandler } from "./openai.js"
-export type { Tools, MCPConfig } from "./types.js"
+export type { MCPConfig, Tools } from "./types.js"
 
 export class Connection {
 	mcps: Map<string, Client> = new Map()
@@ -80,7 +81,10 @@ export class Connection {
 		return this.toolsCache
 	}
 
-	async callTools(calls: { mcp: string; name: string; arguments: any }[]) {
+	async callTools(
+		calls: { mcp: string; name: string; arguments: any }[],
+		options?: RequestOptions,
+	) {
 		return await Promise.all(
 			calls.map(async (call) => {
 				const mcp = this.mcps.get(call.mcp)
@@ -93,6 +97,7 @@ export class Connection {
 						arguments: call.arguments,
 					},
 					CallToolResultSchema,
+					options,
 				)
 			}),
 		)

@@ -11,6 +11,7 @@ import { z } from "zod"
 import { zodToJsonSchema } from "zod-to-json-schema"
 // TODO: use polyfill for client side?
 import { EventEmitter } from "node:events"
+import { humanId } from "human-id"
 
 import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/resources/beta/prompt-caching/index.js"
 import { AnthropicHandler } from "@unroute/sdk/anthropic.js"
@@ -22,9 +23,19 @@ export const RunArgsSchema = z.object({
 		.describe(
 			"The instruction to execute. This is a prompt sent to a large language model. You will need to prompt in detail and ask specifically for a response from the model if needed.",
 		),
+	// TODO: implement tool filtering
+	tools: z
+		.array(z.string())
+		.optional()
+		.describe(
+			"A subset of tools (function names) that this agent can access. To avoid confusing the agent, only allow it to use the relevant tools",
+		),
 })
 
 export const GetResultArgsSchema = z.object({
+	pid: z
+		.string()
+		.describe("The process id of the process to get the result of."),
 	block: z
 		.number()
 		.default(0)
@@ -82,10 +93,14 @@ export function createServer(
 	// Initialize state
 	const globals = {
 		client: config.apiKey ? new Anthropic({ apiKey: config.apiKey }) : null,
-		isRunning: false,
-		result: null as string | null,
 	}
-	const agentEmitter = new EventEmitter()
+	interface Run {
+		isRunning: boolean
+		result: string | null
+		agentEmitter: EventEmitter
+	}
+	// A set of processes
+	const processes = new Map<string, Run>()
 
 	server.setRequestHandler(ConfigRequestSchema, async (request) => {
 		const { apiKey } = request.params
@@ -128,23 +143,27 @@ export function createServer(
 					if (!parsed.success) {
 						throw new Error(`Invalid arguments: ${parsed.error}`)
 					}
-
-					if (globals.isRunning) {
-						throw new Error("Agent is already running an instruction")
-					}
-
-					globals.isRunning = true
-					globals.result = null
-
-					const messages: PromptCachingBetaMessageParam[] = [
-						{
-							role: "user",
-							content: parsed.data.instruction,
-						},
-					]
-
 					// Start the execution asynchronously
+					const procId = humanId()
 					;(async () => {
+						console.log(
+							"Starting agent with instruction:",
+							parsed.data.instruction,
+						)
+						const run: Run = {
+							isRunning: true,
+							result: null,
+							agentEmitter: new EventEmitter(),
+						}
+						processes.set(procId, run)
+
+						const messages: PromptCachingBetaMessageParam[] = [
+							{
+								role: "user",
+								content: parsed.data.instruction,
+							},
+						]
+
 						let isDone = false
 
 						// Connect to MCPs
@@ -183,16 +202,16 @@ export function createServer(
 
 							// Set the final result
 							const lastContent = messages[messages.length - 1].content
-							globals.result =
+							run.result =
 								typeof lastContent === "string"
 									? lastContent
 									: JSON.stringify(lastContent)
 						} catch (error) {
-							globals.result = `Error: ${error}`
+							run.result = `Error: ${error}`
 						} finally {
-							globals.isRunning = false
+							run.isRunning = false
+							run.agentEmitter.emit("done")
 							connection.close()
-							agentEmitter.emit("done")
 						}
 					})()
 
@@ -200,7 +219,7 @@ export function createServer(
 						content: [
 							{
 								type: "text",
-								text: "Started executing instruction",
+								text: `Started executing instruction. pid: ${procId}`,
 							},
 						],
 					}
@@ -212,32 +231,37 @@ export function createServer(
 						throw new Error(`Invalid arguments: ${parsed.error}`)
 					}
 
-					if (globals.isRunning) {
+					const run = processes.get(parsed.data.pid)
+					if (!run) {
+						throw new Error(`Process ${parsed.data.pid} not found.`)
+					}
+
+					if (run.isRunning) {
 						// Wait until the agent is done
 						await new Promise<void>((resolve) => {
 							const timeout = setTimeout(() => {
-								agentEmitter.removeListener("done", handleDone)
+								run.agentEmitter.removeListener("done", handleDone)
 								resolve()
 							}, parsed.data.block * 1000)
 							const handleDone = () => {
 								clearTimeout(timeout)
 								resolve()
 							}
-							agentEmitter.once("done", handleDone)
+							run.agentEmitter.once("done", handleDone)
 						})
 					}
-					if (globals.isRunning) {
-						throw new Error("No result available yet.")
-					}
-					if (globals.result === null) {
+					if (run.result === null) {
 						throw new Error("Agent not started.")
 					}
+
+					// Delete run
+					processes.delete(parsed.data.pid)
 
 					return {
 						content: [
 							{
 								type: "text",
-								text: globals.result,
+								text: run.result,
 							},
 						],
 					}

@@ -10,7 +10,8 @@
 		"./*": "./dist/*"
 	},
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc",
+		"watch": "tsc --watch"
 	},
 	"license": "GPL-3.0-only",
 	"workspaces": ["mcps/*"],

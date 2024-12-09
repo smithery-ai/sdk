@@ -1,21 +1,35 @@
-import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { z } from "zod"
 
-export type MCPConfig = Record<string, { server: Server } | { url: string }>
+export const MCPConfigSchema = z.record(
+	z.string(),
+	z.union([
+		z.object({ server: z.instanceof(Server) }),
+		z.object({ url: z.string() }),
+		z.object({ npm: z.string() }),
+	]),
+)
+
+export type MCPConfig = z.infer<typeof MCPConfigSchema>
 
 // Type guards
 export function isServerConfig(
-	config: { server: Server } | { url: string },
+	config: MCPConfig[string],
 ): config is { server: Server } {
-	return "server" in config
+	return "server" in config && config.server instanceof Server
 }
 
 export function isURIConfig(
-	config: { server: Server } | { url: string },
+	config: MCPConfig[string],
 ): config is { url: string } {
-	return "url" in config
+	return "url" in config && typeof config.url === "string"
 }
 
-import { z } from "zod"
+export function isNpmConfig(
+	config: MCPConfig[string],
+): config is { npm: string } {
+	return "npm" in config && typeof config.npm === "string"
+}
 
 export const ToolSchema = z.object({
 	name: z.string(),
