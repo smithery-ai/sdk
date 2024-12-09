@@ -10,14 +10,8 @@ import { spawn } from "node:child_process"
 
 // Schema definitions
 export const ExecuteCommandArgsSchema = z.object({
-<<<<<<< HEAD
 	command: z.string().describe("The command to execute"),
 	args: z.array(z.string()).describe("Command arguments"),
-=======
-  command: z.string().describe("The command to execute"),
-  args: z.array(z.string()).describe("Command arguments"),
-  purpose: z.string().describe("A very concise explanation of what this command will do"),
->>>>>>> d7f68e5 (update purpose param for shell call)
 })
 
 const ToolInputSchema = ToolSchema.shape.inputSchema
