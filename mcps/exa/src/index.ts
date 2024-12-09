@@ -167,6 +167,55 @@ export const ConfigRequestSchema = RequestSchema.extend({
 export const ConfigResultSchema = ResultSchema.extend({})
 export type Config = z.infer<typeof ConfigSchema>
 
+// Add new schema for get contents tool
+export const GetContentsArgsSchema = z
+	.object({
+		ids: z.array(z.string()).describe("Array of document IDs obtained from searches"),
+		contents: z
+			.object({
+				text: z
+					.object({
+						maxCharacters: z
+							.number()
+							.int()
+							.optional()
+							.describe("Max length in characters for the text returned"),
+						includeHtmlTags: z
+							.boolean()
+							.optional()
+							.default(false)
+							.describe("Whether HTML tags should be included. Default false"),
+					})
+					.optional()
+					.describe("Parsed contents of the page."),
+				highlights: z
+					.object({
+						numSentences: z
+							.number()
+							.int()
+							.optional()
+							.default(5)
+							.describe("The number of sentences to be returned in each snippet. Default 5"),
+						highlightsPerUrl: z
+							.number()
+							.int()
+							.optional()
+							.default(1)
+							.describe("The number of snippets to return per page. Default 1"),
+						query: z.string().optional().describe("Query for highlights"),
+					})
+					.optional()
+					.describe("Relevant extract(s) from the webpage."),
+				summary: z
+					.object({
+						query: z.string().optional().describe("If specified, tries to answer the query in the summary"),
+					})
+					.optional(),
+			})
+			.optional(),
+	})
+	.describe("Parameters for retrieving contents from Exa API")
+
 export function createServer(config: Config = ConfigSchema.parse({})) {
 	const server = new Server(
 		{
@@ -201,6 +250,11 @@ export function createServer(config: Config = ConfigSchema.parse({})) {
 					description: "Search the web using semantic queries.",
 					inputSchema: zodToJsonSchema(SearchArgsSchema) as ToolInput,
 				},
+				{
+					name: "getContents",
+					description: "Retrieve contents of documents based on their IDs.",
+					inputSchema: zodToJsonSchema(GetContentsArgsSchema) as ToolInput,
+				},
 			],
 		}
 	})
@@ -224,6 +278,23 @@ export function createServer(config: Config = ConfigSchema.parse({})) {
 						parsed.data.query,
 						omit(parsed.data, "query"),
 					)
+					return {
+						content: [
+							{
+								type: "text",
+								text: JSON.stringify(results),
+							},
+						],
+					}
+				}
+
+				case "getContents": {
+					const parsed = GetContentsArgsSchema.safeParse(args)
+					if (!parsed.success) {
+						throw new Error(`Invalid arguments: ${parsed.error}`)
+					}
+
+					const results = await globals.exa.getContents(parsed.data)
 					return {
 						content: [
 							{

@@ -32,7 +32,7 @@ async function main() {
 		{
 			role: "user",
 			content:
-				"Figure out the average of Biden and Trump's age in number of days. Figure out today's date as well.",
+				"Search about the latest news about syria and give me a summary",
 		},
 	]
 
