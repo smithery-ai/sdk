@@ -1,6 +1,6 @@
 {
   "name": "@unroute/mcp-e2b",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Henry Mao & E2B Team",
   "type": "module",
   "main": "dist/index.js",

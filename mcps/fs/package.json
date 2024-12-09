@@ -1,6 +1,6 @@
 {
 	"name": "@unroute/mcp-fs",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"author": "Henry Mao & MCP Team",
 	"type": "module",
 	"main": "dist/index.js",
