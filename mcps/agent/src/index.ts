@@ -66,7 +66,7 @@ export const ConfigSchema = z.object({
 	model: z
 		.enum(["claude-3-5-sonnet-20241022"])
 		.optional()
-		.describe("The model to use. Default to 'claude-3-5-sonnet-20241022."),
+		.describe("The model to use. Default to 'claude-3-5-sonnet-20241022'."),
 	maxTokens: z.number().optional(),
 })
 
