@@ -1,0 +1,27 @@
+{
+	"name": "@unroute/mcp-shell",
+	"version": "0.0.2",
+	"author": "Henry Mao & MCP Team",
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+	  "dist"
+	],
+	"scripts": {
+	  "build": "tsc",
+	  "watch": "tsc --watch"
+	},
+	"dependencies": {
+	  "@modelcontextprotocol/sdk": "^0.7.0",
+	  "zod": "^3.22.0",
+	  "zod-to-json-schema": "^3.22.0"
+	},
+	"devDependencies": {
+	  "@types/node": "^20.11.0",
+	  "typescript": "^5.3.3"
+	},
+	"peerDependencies": {
+	  "@modelcontextprotocol/sdk": "^0.7.0"
+	}
+  }
