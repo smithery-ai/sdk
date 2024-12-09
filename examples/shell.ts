@@ -9,6 +9,7 @@ import url from "node:url"
 import readline from "node:readline"
 
 // Utility for human approval
+<<<<<<< HEAD
 async function getHumanApproval(
 	command: string,
 	args: string[],
@@ -27,6 +28,24 @@ async function getHumanApproval(
 			},
 		)
 	})
+=======
+async function getHumanApproval(command: string, args: string[]): Promise<boolean> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+
+  return new Promise((resolve) => {
+    rl.question(
+      `Command: ${command} ${args.join(' ')}\n` +  
+      `Approve? [y/N]: `,
+      (answer) => {
+        rl.close()
+        resolve(answer.toLowerCase() === 'y')
+      }
+    )
+  })
+>>>>>>> 839a706 (remove purpose arg from mcp-shell)
 }
 
 // Patch event source
