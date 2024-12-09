@@ -28,6 +28,7 @@
 		"@unroute/mcp-e2b": "*",
 		"@unroute/mcp-exa": "*",
 		"@unroute/mcp-fs": "*",
+		"@unroute/mcp-shell": "*",
 		"dotenv": "^16.4.7",
 		"eventsource": "^2.0.2",
 		"tsx": "^4.19.2",
