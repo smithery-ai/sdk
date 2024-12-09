@@ -68,7 +68,6 @@ export const ConfigSchema = z.object({
 		.optional()
 		.describe("The model to use. Default to 'claude-3-5-sonnet-20241022."),
 	maxTokens: z.number().optional(),
-	timeout: z.number().optional(),
 })
 
 export const ConfigRequestSchema = RequestSchema.extend({
@@ -208,9 +207,7 @@ export function createServer(
 										tools,
 									})
 								// Handle tool calls
-								const toolMessages = await handler.call(response, {
-									timeout: (parsed.data.timeout ?? config.timeout ?? 60) * 1000,
-								})
+								const toolMessages = await handler.call(response)
 
 								messages.push({
 									role: "assistant",

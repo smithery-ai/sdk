@@ -19,14 +19,10 @@ async function main() {
 	// Connect to MCPs
 	const connection = await Connection.connect({
 		exa: {
-			server: exa.createServer({
-				apiKey: process.env.EXA_API_KEY as string,
-			}),
+			server: exa.createServer(),
 		},
 		e2b: {
-			server: e2b.createServer({
-				apiKey: process.env.E2B_API_KEY as string,
-			}),
+			server: e2b.createServer(),
 		},
 	})
 
