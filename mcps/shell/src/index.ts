@@ -54,15 +54,9 @@ async function executeCommand(
 }
 
 export interface ShellServerOptions {
-<<<<<<< HEAD
 	allowedCommands?: string[]
 	timeout?: number
 	approvalHandler?: (command: string, args: string[]) => Promise<boolean>
-=======
-  allowedCommands?: string[]
-  timeout?: number
-  approvalHandler?: (command: string, args: string[]) => Promise<boolean>
->>>>>>> 839a706 (remove purpose arg from mcp-shell)
 }
 
 export function createServer(options: ShellServerOptions = {}) {
@@ -112,18 +106,13 @@ export function createServer(options: ShellServerOptions = {}) {
 				throw new Error(`Invalid arguments: ${parsed.error}`)
 			}
 
-<<<<<<< HEAD
 			const { command, args: cmdArgs } = parsed.data
-=======
-      const { command, args: cmdArgs } = parsed.data
->>>>>>> 839a706 (remove purpose arg from mcp-shell)
 
 			// Validate command
 			if (!ALLOWED_COMMANDS.has(command)) {
 				throw new Error(`Command not allowed: ${command}`)
 			}
 
-<<<<<<< HEAD
 			// Get human approval without purpose
 			const approved = await approvalHandler(command, cmdArgs)
 			if (!approved) {
@@ -136,18 +125,6 @@ export function createServer(options: ShellServerOptions = {}) {
 					],
 				}
 			}
-=======
-      // Get human approval without purpose
-      const approved = await approvalHandler(command, cmdArgs)
-      if (!approved) {
-        return {
-          content: [{ 
-            type: "text", 
-            text: "Command was not approved by user."
-          }],
-        }
-      }
->>>>>>> 839a706 (remove purpose arg from mcp-shell)
 
 			// Execute command
 			const result = await executeCommand(command, cmdArgs)

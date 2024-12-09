@@ -52,6 +52,14 @@ async function main() {
 
 	const exaServer = exa.createServer()
 
+	// Check if API key is defined
+	const apiKey = process.env.ANTHROPIC_API_KEY;
+	console.log("API Key:", apiKey);
+	if (!apiKey) {
+		console.error("Error: ANTHROPIC_API_KEY is not defined.");
+		return;
+	}
+
 	// Clean, intuitive configuration
 	const connection = await Connection.connect({
 		agent: agent.createServer(
@@ -60,7 +68,7 @@ async function main() {
 				exa: exaServer,
 			},
 			{
-				apiKey: process.env.ANTHROPIC_API_KEY as string,
+				apiKey: apiKey,
 				maxTokens: 4096,
 			},
 		),
