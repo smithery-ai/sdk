@@ -219,7 +219,10 @@ export function createServer(
 						content: [
 							{
 								type: "text",
-								text: `Started executing instruction. pid: ${procId}`,
+								text: JSON.stringify({
+									status: "started",
+									pid: procId,
+								}),
 							},
 						],
 					}
@@ -274,7 +277,9 @@ export function createServer(
 			const errorMessage =
 				error instanceof Error ? error.message : String(error)
 			return {
-				content: [{ type: "text", text: `Error: ${errorMessage}` }],
+				content: [
+					{ type: "text", text: JSON.stringify({ error: errorMessage }) },
+				],
 				isError: true,
 			}
 		}

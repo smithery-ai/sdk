@@ -6,12 +6,10 @@ import {
 	ResultSchema,
 	type ToolSchema,
 } from "@modelcontextprotocol/sdk/types.js"
-import { default as exa } from "exa-js"
-import { omit } from "lodash"
+import Exa from "exa-js"
+import omit from "lodash/omit.js"
 import { z } from "zod"
 import { zodToJsonSchema } from "zod-to-json-schema"
-
-const Exa = exa.default
 
 // Define schema for each tool
 export const SearchArgsSchema = z
@@ -182,11 +180,13 @@ export function createServer() {
 
 	// Initialize Exa client
 	const globals = {
-		exa: null as InstanceType<typeof Exa> | null,
+		// @ts-expect-error - Exa types are not properly defined
+		exa: null as Exa | null,
 	}
 
 	server.setRequestHandler(AuthRequestSchema, async (request) => {
 		const { apiKey } = request.params
+		// @ts-expect-error - Exa types are not properly defined
 		globals.exa = new Exa(apiKey)
 		return {}
 	})
