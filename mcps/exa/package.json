@@ -1,11 +1,13 @@
 {
 	"name": "@unroute/mcp-exa",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"author": "Henry Mao",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc --watch"
