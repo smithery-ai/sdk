@@ -6,12 +6,12 @@ import {
 	RequestSchema,
 	ResultSchema,
 } from "@modelcontextprotocol/sdk/types.js"
-import { type MCPConfig, ToolsSchema } from "@unroute/sdk/types.js"
+import type { MCPConfig } from "@unroute/sdk/types.js"
 import { z } from "zod"
 import { zodToJsonSchema } from "zod-to-json-schema"
 // TODO: use polyfill for client side?
-import { EventEmitter } from "node:events"
 import { humanId } from "human-id"
+import { EventEmitter } from "node:events"
 
 import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/resources/beta/prompt-caching/index.js"
 import { AnthropicHandler } from "@unroute/sdk/anthropic.js"
@@ -28,7 +28,7 @@ export const RunArgsSchema = z.object({
 		.array(z.string())
 		.optional()
 		.describe(
-			"A subset of tools (function names) that this agent can access. To avoid confusing the agent, only allow it to use the relevant tools",
+			"A subset of your tools (function names) that this agent can access. To avoid confusing the agent, only allow it to use the relevant tools. Defaults to enabling all tools.",
 		),
 })
 
@@ -46,11 +46,11 @@ export const GetResultArgsSchema = z.object({
 
 export const ConfigSchema = z.object({
 	apiKey: z.string().optional(),
+	recursive: z.boolean().optional(),
 	model: z
 		.enum(["claude-3-5-sonnet-20241022"])
 		.optional()
 		.describe("The model to use. Default to 'claude-3-5-sonnet-20241022'."),
-	tools: ToolsSchema.optional(),
 	maxTokens: z.number().optional(),
 })
 
@@ -147,8 +147,8 @@ export function createServer(
 					const procId = humanId()
 					;(async () => {
 						console.log(
-							"Starting agent with instruction:",
-							parsed.data.instruction,
+							"Starting agent with parameters:",
+							JSON.stringify(parsed.data),
 						)
 						const run: Run = {
 							isRunning: true,
@@ -167,16 +167,31 @@ export function createServer(
 						let isDone = false
 
 						// Connect to MCPs
-						const connection = await Connection.connect(mcpConfig)
+						const connection = await Connection.connect(
+							config.recursive
+								? {
+										...mcpConfig,
+										// Recursively allows the agent to spawn new agents.
+										agent: { server },
+									}
+								: mcpConfig,
+						)
 						try {
 							const handler = new AnthropicHandler(connection)
 							while (!isDone) {
+								let tools = await handler.listTools()
+								// Filter tools
+								if (parsed.data.tools) {
+									tools = tools.filter((t) =>
+										parsed.data.tools?.includes(t.name),
+									)
+								}
 								const response =
 									await client.beta.promptCaching.messages.create({
 										model: config.model ?? "claude-3-5-sonnet-20241022",
 										max_tokens: config.maxTokens ?? 1024,
 										messages: cacheLastMessage(messages),
-										tools: await handler.listTools(),
+										tools,
 									})
 								// Handle tool calls
 								const toolMessages = await handler.call(response)
