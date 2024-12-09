@@ -1,3 +1,4 @@
+// NOTE: AGENT HAS ACCESS TO FS
 import * as agent from "@unroute/mcp-agent"
 import * as exa from "@unroute/mcp-exa"
 import * as fs from "@unroute/mcp-fs"
