@@ -62,7 +62,7 @@ async function main() {
 
 	while (!isDone) {
 		const response = await openai.chat.completions.create({
-			model: "gpt-4-turbo-preview",
+			model: "gpt-4o",
 			messages,
 			tools: await handler.listTools(),
 		})

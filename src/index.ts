@@ -12,6 +12,7 @@ import {
 	isURIConfig,
 	type MCPConfig,
 	type Tools,
+	isWrappedServerConfig,
 } from "./types.js"
 
 export { AnthropicHandler } from "./anthropic.js"
@@ -23,7 +24,6 @@ export class Connection {
 
 	static async connect(config: MCPConfig) {
 		const connection = new Connection()
-		// Initialize MCPs with their respective configs
 		await Promise.all(
 			Object.entries(config).map(async ([mcpName, mcpConfig]) => {
 				const mcp = new Client(
@@ -36,10 +36,13 @@ export class Connection {
 					},
 				)
 				if (isURIConfig(mcpConfig)) {
+					// For URI configs, connect using SSE (Server-Sent Events) transport
 					await mcp.connect(new SSEClientTransport(new URL(mcpConfig.url)))
-				} else if (isServerConfig(mcpConfig)) {
-					const server = mcpConfig.server
-					const [clientTransport, serverTransport] =
+					} else if (isServerConfig(mcpConfig) || isWrappedServerConfig(mcpConfig)) {
+					// Handle both direct Server instances and wrapped {server: Server} configs
+					const server = isWrappedServerConfig(mcpConfig) ? mcpConfig.server : mcpConfig
+					// Create paired transports for in-memory communication between client and server
+					const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
 						InMemoryTransport.createLinkedPair()
 
 					await server.connect(serverTransport)

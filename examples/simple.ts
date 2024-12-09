@@ -19,14 +19,10 @@ async function main() {
 	// Connect to MCPs
 	const connection = await Connection.connect({
 		exa: {
-			server: exa.createServer({
-				apiKey: process.env.EXA_API_KEY as string,
-			}),
+			server: exa.createServer(),
 		},
 		e2b: {
-			server: e2b.createServer({
-				apiKey: process.env.E2B_API_KEY as string,
-			}),
+			server: e2b.createServer(),
 		},
 	})
 
@@ -36,7 +32,7 @@ async function main() {
 		{
 			role: "user",
 			content:
-				"Figure out the average of Biden and Trump's age in number of days. Figure out today's date as well.",
+				"Search about the latest news about syria and give me a summary",
 		},
 	]
 

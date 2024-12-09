@@ -10,13 +10,17 @@ export const MCPConfigSchema = z.record(
 	]),
 )
 
-export type MCPConfig = z.infer<typeof MCPConfigSchema>
+export type URIConfig = { url: string } | { npm: string }
+
+// Define a type for the internal wrapped server configuration
+export type WrappedServerConfig = { server: Server }
+
+// Update MCPConfig to accept both direct and wrapped server instances
+export type MCPConfig = Record<string, Server | URIConfig | WrappedServerConfig>
 
 // Type guards
-export function isServerConfig(
-	config: MCPConfig[string],
-): config is { server: Server } {
-	return "server" in config && config.server instanceof Server
+export function isServerConfig(config: any): config is Server {
+	return config instanceof Server
 }
 
 export function isURIConfig(
@@ -29,6 +33,10 @@ export function isNpmConfig(
 	config: MCPConfig[string],
 ): config is { npm: string } {
 	return "npm" in config && typeof config.npm === "string"
+}
+
+export function isWrappedServerConfig(config: any): config is WrappedServerConfig {
+	return 'server' in config && config.server instanceof Server
 }
 
 export const ToolSchema = z.object({
