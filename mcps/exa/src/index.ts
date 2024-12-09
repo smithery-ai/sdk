@@ -216,6 +216,99 @@ export const GetContentsArgsSchema = z
 	})
 	.describe("Parameters for retrieving contents from Exa API")
 
+// Add new schema for find similar links tool
+export const FindSimilarLinksArgsSchema = z
+	.object({
+		url: z.string().describe("The URL for which you would like to find similar links."),
+		numResults: z
+			.number()
+			.int()
+			.optional()
+			.default(10)
+			.describe("Number of search results to return. Default 10."),
+		includeDomains: z
+			.array(z.string())
+			.optional()
+			.describe("List of domains to include in the search."),
+		excludeDomains: z
+			.array(z.string())
+			.optional()
+			.describe("List of domains to exclude in the search."),
+		startCrawlDate: z
+			.string()
+			.datetime()
+			.optional()
+			.describe("Results will include links that were crawled after this date."),
+		endCrawlDate: z
+			.string()
+			.datetime()
+			.optional()
+			.describe("Results will include links that were crawled before this date."),
+		startPublishedDate: z
+			.string()
+			.datetime()
+			.optional()
+			.describe("Only links with a published date after this will be returned."),
+		endPublishedDate: z
+			.string()
+			.datetime()
+			.optional()
+			.describe("Only links with a published date before this will be returned."),
+		includeText: z
+			.array(z.string())
+			.max(1)
+			.optional()
+			.describe("List of strings that must be present in webpage text of results."),
+		excludeText: z
+			.array(z.string())
+			.max(1)
+			.optional()
+			.describe("List of strings that must not be present in webpage text of results."),
+		contents: z
+			.object({
+				text: z
+					.object({
+						maxCharacters: z
+							.number()
+							.int()
+							.optional()
+							.describe("Max length in characters for the text returned"),
+						includeHtmlTags: z
+							.boolean()
+							.optional()
+							.default(false)
+							.describe("Whether HTML tags should be included. Default false"),
+					})
+					.optional()
+					.describe("Parsed contents of the page."),
+				highlights: z
+					.object({
+						numSentences: z
+							.number()
+							.int()
+							.optional()
+							.default(5)
+							.describe("The number of sentences to be returned in each snippet. Default 5"),
+						highlightsPerUrl: z
+							.number()
+							.int()
+							.optional()
+							.default(1)
+							.describe("The number of snippets to return per page. Default 1"),
+						query: z.string().optional().describe("Query for highlights"),
+					})
+					.optional()
+					.describe("Relevant extract(s) from the webpage."),
+				summary: z
+					.object({
+						query: z.string().optional().describe("If specified, tries to answer the query in the summary"),
+					})
+					.optional(),
+			})
+			.optional(),
+	})
+	.describe("Parameters for finding similar links using Exa API")
+
 export function createServer(config: Config = ConfigSchema.parse({})) {
 	const server = new Server(
 		{
@@ -254,6 +347,11 @@ export function createServer(config: Config = ConfigSchema.parse({})) {
 					name: "getContents",
 					description: "Retrieve contents of documents based on their IDs.",
 					inputSchema: zodToJsonSchema(GetContentsArgsSchema) as ToolInput,
+				},
+				{
+					name: "findSimilarLinks",
+					description: "Find similar links to the provided URL.",
+					inputSchema: zodToJsonSchema(FindSimilarLinksArgsSchema) as ToolInput,
 				},
 			],
 		}
@@ -295,6 +393,23 @@ export function createServer(config: Config = ConfigSchema.parse({})) {
 					}
 
 					const results = await globals.exa.getContents(parsed.data)
+					return {
+						content: [
+							{
+								type: "text",
+								text: JSON.stringify(results),
+							},
+						],
+					}
+				}
+
+				case "findSimilarLinks": {
+					const parsed = FindSimilarLinksArgsSchema.safeParse(args)
+					if (!parsed.success) {
+						throw new Error(`Invalid arguments: ${parsed.error}`)
+					}
+
+					const results = await globals.exa.findSimilarLinks(parsed.data)
 					return {
 						content: [
 							{
