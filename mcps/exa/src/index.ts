@@ -157,15 +157,17 @@ export const SearchArgsSchema = z
 
 type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
 
-export const AuthRequestSchema = RequestSchema.extend({
-	method: z.literal("auth"),
-	params: z.object({
-		apiKey: z.string(),
-	}),
+export const ConfigSchema = z.object({
+	apiKey: z.string(),
+})
+export const ConfigRequestSchema = RequestSchema.extend({
+	method: z.literal("config"),
+	params: ConfigSchema,
 })
 export const AuthResultSchema = ResultSchema.extend({})
+export type Config = z.infer<typeof ConfigSchema>
 
-export function createServer() {
+export function createServer(config: Config = ConfigSchema.parse({})) {
 	const server = new Server(
 		{
 			name: "exa",
@@ -181,10 +183,10 @@ export function createServer() {
 	// Initialize Exa client
 	const globals = {
 		// @ts-expect-error - Exa types are not properly defined
-		exa: null as Exa | null,
+		exa: config.apiKey ? new Exa(config.apiKey) : (null as Exa | null),
 	}
 
-	server.setRequestHandler(AuthRequestSchema, async (request) => {
+	server.setRequestHandler(ConfigRequestSchema, async (request) => {
 		const { apiKey } = request.params
 		// @ts-expect-error - Exa types are not properly defined
 		globals.exa = new Exa(apiKey)

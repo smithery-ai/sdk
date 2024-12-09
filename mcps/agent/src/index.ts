@@ -23,12 +23,21 @@ export const RunArgsSchema = z.object({
 		.describe(
 			"The instruction to execute. This is a prompt sent to a large language model. You will need to prompt in detail and ask specifically for a response from the model if needed.",
 		),
-	// TODO: implement tool filtering
+
 	tools: z
 		.array(z.string())
 		.optional()
 		.describe(
 			"A subset of your tools (function names) that this agent can access. To avoid confusing the agent, only allow it to use the relevant tools. Defaults to enabling all tools.",
+		),
+
+	// TODO: fully implement timeout
+	timeout: z
+		.number()
+		.int()
+		.optional()
+		.describe(
+			"Maximum amount of time allocated to running the agent in seconds.",
 		),
 })
 
@@ -47,6 +56,13 @@ export const GetResultArgsSchema = z.object({
 export const ConfigSchema = z.object({
 	apiKey: z.string().optional(),
 	recursive: z.boolean().optional(),
+	timeout: z
+		.number()
+		.int()
+		.optional()
+		.describe(
+			"Default maximum amount of time allocated to running the agent in seconds.",
+		),
 	model: z
 		.enum(["claude-3-5-sonnet-20241022"])
 		.optional()
@@ -147,7 +163,7 @@ export function createServer(
 					const procId = humanId()
 					;(async () => {
 						console.log(
-							"Starting agent with parameters:",
+							`[${procId}] Starting agent with parameters:`,
 							JSON.stringify(parsed.data),
 						)
 						const run: Run = {
@@ -194,7 +210,9 @@ export function createServer(
 										tools,
 									})
 								// Handle tool calls
-								const toolMessages = await handler.call(response)
+								const toolMessages = await handler.call(response, {
+									timeout: (parsed.data.timeout ?? config.timeout ?? 60) * 1000,
+								})
 
 								messages.push({
 									role: "assistant",
@@ -204,7 +222,7 @@ export function createServer(
 								isDone = toolMessages.length === 0
 
 								console.log(
-									"Assistant: ",
+									`[${procId}] Assistant: `,
 									response.content
 										.map((c) =>
 											c.type === "text"
@@ -213,6 +231,7 @@ export function createServer(
 										)
 										.join("\n"),
 								)
+								console.log(`[${procId}] Tools: `, JSON.stringify(toolMessages))
 							}
 
 							// Set the final result

@@ -4,6 +4,7 @@ import type {
 	Tool,
 } from "@anthropic-ai/sdk/resources/index.js"
 
+import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js"
 import type { Connection } from "./index.js"
 import type { Tools } from "./types.js"
 
@@ -25,7 +26,10 @@ export class AnthropicHandler {
 	}
 
 	// TODO: Support streaming
-	async call(response: Message): Promise<MessageParam[]> {
+	async call(
+		response: Message,
+		options?: RequestOptions,
+	): Promise<MessageParam[]> {
 		const content = response.content
 		if (!content || content.length === 0) {
 			return []
@@ -49,6 +53,7 @@ export class AnthropicHandler {
 					arguments: toolCall.input as object,
 				}
 			}),
+			options,
 		)
 
 		return [
