@@ -4,8 +4,8 @@ import dotenv from "dotenv"
 import EventSource from "eventsource"
 import { OpenAI } from "openai"
 import type { ChatCompletionMessageParam } from "openai/resources/chat/index"
-import { Connection } from "../src/index"
-import { OpenAIHandler } from "../src/openai"
+import { Connection } from "../index.js"
+import { OpenAIHandler } from "../integrations/llm/openai.js"
 
 // Patch event source
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -3,8 +3,8 @@ import dotenv from "dotenv"
 import EventSource from "eventsource"
 import { OpenAI } from "openai"
 import type { ChatCompletionMessageParam } from "openai/resources/chat/index"
-import { Connection } from "../src/index"
-import { OpenAIHandler } from "../src/openai"
+import { Connection } from "../index.js"
+import { OpenAIHandler } from "../integrations/llm/openai.js"
 import url from "node:url"
 import readline from "node:readline"
 
@@ -41,12 +41,10 @@ async function main() {
 
 	// Connect to MCPs
 	const connection = await Connection.connect({
-		shell: {
-			server: shellMcp.createServer({
-				allowedCommands: ["ls", "pwd", "date", "echo"],
-				approvalHandler: getHumanApproval,
-			}),
-		},
+		shell: shellMcp.createServer({
+			allowedCommands: ["ls", "pwd", "date", "echo"],
+			approvalHandler: getHumanApproval,
+		}),
 	})
 
 	// Example conversation with tool usage

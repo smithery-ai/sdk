@@ -6,7 +6,6 @@ import {
 	RequestSchema,
 	ResultSchema,
 } from "@modelcontextprotocol/sdk/types.js"
-import type { MCPConfig } from "@unroute/sdk/types.js"
 import { z } from "zod"
 import { zodToJsonSchema } from "zod-to-json-schema"
 // TODO: use polyfill for client side?
@@ -14,7 +13,7 @@ import { humanId } from "human-id"
 import { EventEmitter } from "node:events"
 
 import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/resources/beta/prompt-caching/index.js"
-import { AnthropicHandler } from "@unroute/sdk/anthropic.js"
+import { AnthropicHandler } from "@unroute/sdk/integrations/llm/anthropic.js"
 import { Connection } from "../../../dist/index.js"
 // Define schemas for our tools
 export const RunArgsSchema = z.object({
@@ -186,9 +185,9 @@ export function createServer(
 						const connection = await Connection.connect(
 							// Convert the mcpConfig entries into a format where each value is wrapped in an object with a 'server' key
 							Object.fromEntries(
-							  Object.entries(mcpConfig).map(([k, v]) => [k, { server: v }])
-							)
-						  )
+								Object.entries(mcpConfig).map(([k, v]) => [k, { server: v }]),
+							),
+						)
 						try {
 							const handler = new AnthropicHandler(connection)
 							while (!isDone) {

@@ -4,19 +4,14 @@ import { z } from "zod"
 export const MCPConfigSchema = z.record(
 	z.string(),
 	z.union([
+		z.instanceof(Server),
 		z.object({ server: z.instanceof(Server) }),
 		z.object({ url: z.string() }),
-		z.object({ npm: z.string() }),
+		z.object({ pipe: z.string() }),
 	]),
 )
 
-export type URIConfig = { url: string } | { npm: string }
-
-// Define a type for the internal wrapped server configuration
-export type WrappedServerConfig = { server: Server }
-
-// Update MCPConfig to accept both direct and wrapped server instances
-export type MCPConfig = Record<string, Server | URIConfig | WrappedServerConfig>
+export type MCPConfig = z.infer<typeof MCPConfigSchema>
 
 // Type guards
 export function isServerConfig(config: any): config is Server {
@@ -29,14 +24,16 @@ export function isURIConfig(
 	return "url" in config && typeof config.url === "string"
 }
 
-export function isNpmConfig(
+export function isPipeConfig(
 	config: MCPConfig[string],
-): config is { npm: string } {
-	return "npm" in config && typeof config.npm === "string"
+): config is { pipe: string } {
+	return "pipe" in config && typeof config.pipe === "string"
 }
 
-export function isWrappedServerConfig(config: any): config is WrappedServerConfig {
-	return 'server' in config && config.server instanceof Server
+export function isWrappedServerConfig(
+	config: any,
+): config is { server: Server } {
+	return "server" in config && config.server instanceof Server
 }
 
 export const ToolSchema = z.object({

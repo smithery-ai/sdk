@@ -9,11 +9,7 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"baseUrl": ".",
-		"paths": {
-			"@unroute/mcp-e2b": ["mcps/e2b/src"],
-			"@unroute/mcp-exa": ["mcps/exa/src"]
-		}
+		"baseUrl": "."
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist"]
