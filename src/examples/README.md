@@ -1,6 +1,6 @@
-# Unroute SDK Examples
+# Examples
 
-This directory contains examples demonstrating how to use the Unroute SDK.
+This directory contains examples demonstrating how to use the Smithery SDK.
 
 ## Running the Examples
 

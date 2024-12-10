@@ -13,7 +13,7 @@ import { humanId } from "human-id"
 import { EventEmitter } from "node:events"
 
 import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/resources/beta/prompt-caching/index.js"
-import { AnthropicHandler } from "@unroute/sdk/integrations/llm/anthropic.js"
+import { AnthropicHandler } from "@smithery/sdk/integrations/llm/anthropic.js"
 import { Connection, type MCPConfig } from "../../../dist/index.js"
 // Define schemas for our tools
 export const RunArgsSchema = z.object({

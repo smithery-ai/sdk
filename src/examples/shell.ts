@@ -1,4 +1,4 @@
-import * as shellMcp from "@unroute/mcp-shell"
+import * as shellMcp from "@smithery/mcp-shell"
 import dotenv from "dotenv"
 import EventSource from "eventsource"
 import { OpenAI } from "openai"

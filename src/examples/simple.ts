@@ -1,5 +1,5 @@
-import * as e2b from "@unroute/mcp-e2b"
-import * as exa from "@unroute/mcp-exa"
+import * as e2b from "@smithery/mcp-e2b"
+import * as exa from "@smithery/mcp-exa"
 import dotenv from "dotenv"
 import EventSource from "eventsource"
 import { OpenAI } from "openai"

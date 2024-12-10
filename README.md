@@ -1,6 +1,6 @@
-# Unroute Typescript Framework [![npm version](https://badge.fury.io/js/@unroute%2Fsdk.svg)](https://badge.fury.io/js/@unroute%2Fsdk)
+# Smithery Typescript Framework [![npm version](https://badge.fury.io/js/@smithery%2Fsdk.svg)](https://badge.fury.io/js/@smithery%2Fsdk)
 
-Unroute is a Typescript framework that easily connects language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing you to build agents that use resources and tools without being overwhelmed by JSON schemas.
+Smithery is a Typescript framework that easily connects language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing you to build agents that use resources and tools without being overwhelmed by JSON schemas.
 
 ⚠️ _This repository is work in progress and in alpha. Not recommended for production use yet._ ⚠️
 
@@ -15,7 +15,7 @@ Unroute is a Typescript framework that easily connects language models (LLMs) to
 ## Installation
 
 ```bash
-npm install @unroute/sdk
+npm install @smithery/sdk
 ```
 
 ## Usage
@@ -23,15 +23,15 @@ npm install @unroute/sdk
 In this example, we'll connect use OpenAI client with Exa search capabilities.
 
 ```bash
-npm install @unroute/mcp-exa
+npm install @smithery/mcp-exa
 ```
 
 The following code sets up OpenAI and connects to an Exa MCP server. In this case, we're running the server locally within the same process, so it's just a simple passthrough.
 
 ```typescript
-import { Connection } from "@unroute/sdk"
-import { OpenAIHandler } from "@unroute/sdk/openai"
-import * as exa from "@unroute/mcp-exa"
+import { Connection } from "@smithery/sdk"
+import { OpenAIHandler } from "@smithery/sdk/openai"
+import * as exa from "@smithery/mcp-exa"
 import { OpenAI } from "openai"
 
 const openai = new OpenAI()
@@ -93,7 +93,7 @@ while (!isDone) {
 }
 ```
 
-See a full example in the [examples](./examples) directory.
+See a full example in the [examples](./src/examples) directory.
 
 # Troubleshooting
 
