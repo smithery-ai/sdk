@@ -155,18 +155,6 @@ export const SearchArgsSchema = z
 	})
 	.describe("Search parameters for Exa API")
 
-type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
-
-export const ConfigSchema = z.object({
-	apiKey: z.string(),
-})
-export const ConfigRequestSchema = RequestSchema.extend({
-	method: z.literal("config"),
-	params: ConfigSchema,
-})
-export const ConfigResultSchema = ResultSchema.extend({})
-export type Config = z.infer<typeof ConfigSchema>
-
 // Add new schema for get contents tool
 export const GetContentsArgsSchema = z
 	.object({
@@ -309,6 +297,18 @@ export const FindSimilarLinksArgsSchema = z
 	})
 	.describe("Parameters for finding similar links using Exa API")
 
+	type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
+
+	export const ConfigSchema = z.object({
+		apiKey: z.string(),
+	})
+	export const ConfigRequestSchema = RequestSchema.extend({
+		method: z.literal("config"),
+		params: ConfigSchema,
+	})
+	export const ConfigResultSchema = ResultSchema.extend({})
+	export type Config = z.infer<typeof ConfigSchema>
+
 export function createServer(config: Config = ConfigSchema.parse({})) {
 	const server = new Server(
 		{
@@ -344,12 +344,12 @@ export function createServer(config: Config = ConfigSchema.parse({})) {
 					inputSchema: zodToJsonSchema(SearchArgsSchema) as ToolInput,
 				},
 				{
-					name: "getContents",
+					name: "get_contents",
 					description: "Retrieve contents of documents based on their IDs.",
 					inputSchema: zodToJsonSchema(GetContentsArgsSchema) as ToolInput,
 				},
 				{
-					name: "findSimilarLinks",
+					name: "find_similar_links",
 					description: "Find similar links to the provided URL.",
 					inputSchema: zodToJsonSchema(FindSimilarLinksArgsSchema) as ToolInput,
 				},
@@ -386,7 +386,7 @@ export function createServer(config: Config = ConfigSchema.parse({})) {
 					}
 				}
 
-				case "getContents": {
+				case "get_contents": {
 					const parsed = GetContentsArgsSchema.safeParse(args)
 					if (!parsed.success) {
 						throw new Error(`Invalid arguments: ${parsed.error}`)
@@ -394,16 +394,16 @@ export function createServer(config: Config = ConfigSchema.parse({})) {
 
 					const results = await globals.exa.getContents(parsed.data)
 					return {
-						content: [
-							{
-								type: "text",
-								text: JSON.stringify(results),
-							},
-						],
-					}
+							content: [
+								{
+									type: "text",
+									text: JSON.stringify(results),
+								},
+							],
+						}
 				}
 
-				case "findSimilarLinks": {
+				case "find_similar_links": {
 					const parsed = FindSimilarLinksArgsSchema.safeParse(args)
 					if (!parsed.success) {
 						throw new Error(`Invalid arguments: ${parsed.error}`)
