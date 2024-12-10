@@ -7,7 +7,23 @@ export const MCPConfigSchema = z.record(
 		z.instanceof(Server),
 		z.object({ server: z.instanceof(Server) }),
 		z.object({ url: z.string() }),
-		z.object({ pipe: z.string() }),
+		z.object({
+			stdio: z.object({
+				command: z
+					.string()
+					.describe("The executable to run to start the server."),
+				args: z
+					.array(z.string())
+					.optional()
+					.describe("Command line arguments to pass to the executable."),
+				env: z
+					.record(z.string(), z.string())
+					.optional()
+					.describe(
+						"The environment to use when spawning the process. If not specified, the result of getDefaultEnvironment() will be used.",
+					),
+			}),
+		}),
 	]),
 )
 
@@ -24,10 +40,10 @@ export function isURIConfig(
 	return "url" in config && typeof config.url === "string"
 }
 
-export function isPipeConfig(
-	config: MCPConfig[string],
-): config is { pipe: string } {
-	return "pipe" in config && typeof config.pipe === "string"
+export function isStdioConfig(config: MCPConfig[string]): config is {
+	stdio: { command: string; args?: string[]; env?: Record<string, string> }
+} {
+	return "stdio" in config
 }
 
 export function isWrappedServerConfig(

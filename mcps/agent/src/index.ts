@@ -14,7 +14,7 @@ import { EventEmitter } from "node:events"
 
 import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/resources/beta/prompt-caching/index.js"
 import { AnthropicHandler } from "@unroute/sdk/integrations/llm/anthropic.js"
-import { Connection } from "../../../dist/index.js"
+import { Connection, type MCPConfig } from "../../../dist/index.js"
 // Define schemas for our tools
 export const RunArgsSchema = z.object({
 	instruction: z
@@ -90,7 +90,7 @@ function cacheLastMessage(messages: PromptCachingBetaMessageParam[]) {
 }
 
 export function createServer(
-	mcpConfig: Record<string, Server>,
+	mcpConfig: MCPConfig,
 	config: Config = ConfigSchema.parse({}),
 ) {
 	const server = new Server(
@@ -183,10 +183,12 @@ export function createServer(
 
 						// Connect to MCPs
 						const connection = await Connection.connect(
-							// Convert the mcpConfig entries into a format where each value is wrapped in an object with a 'server' key
-							Object.fromEntries(
-								Object.entries(mcpConfig).map(([k, v]) => [k, { server: v }]),
-							),
+							config.recursive
+								? {
+										agent: server,
+										...mcpConfig,
+									}
+								: mcpConfig,
 						)
 						try {
 							const handler = new AnthropicHandler(connection)

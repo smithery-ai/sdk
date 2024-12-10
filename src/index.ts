@@ -13,7 +13,9 @@ import {
 	type MCPConfig,
 	type Tools,
 	isWrappedServerConfig,
+	isStdioConfig,
 } from "./types.js"
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 
 export { AnthropicHandler } from "./integrations/llm/anthropic.js"
 export { OpenAIHandler } from "./integrations/llm/openai.js"
@@ -38,6 +40,9 @@ export class Connection {
 				if (isURIConfig(mcpConfig)) {
 					// For URI configs, connect using SSE (Server-Sent Events) transport
 					await mcp.connect(new SSEClientTransport(new URL(mcpConfig.url)))
+				} else if (isStdioConfig(mcpConfig)) {
+					// For pipe configs, spawn the server locally, then connect using using Stdio transport
+					await mcp.connect(new StdioClientTransport(mcpConfig.stdio))
 				} else if (
 					isServerConfig(mcpConfig) ||
 					isWrappedServerConfig(mcpConfig)

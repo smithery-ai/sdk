@@ -158,7 +158,9 @@ export const SearchArgsSchema = z
 // Add new schema for get contents tool
 export const GetContentsArgsSchema = z
 	.object({
-		ids: z.array(z.string()).describe("Array of document IDs obtained from searches"),
+		ids: z
+			.array(z.string())
+			.describe("Array of document IDs obtained from searches"),
 		contents: z
 			.object({
 				text: z
@@ -183,7 +185,9 @@ export const GetContentsArgsSchema = z
 							.int()
 							.optional()
 							.default(5)
-							.describe("The number of sentences to be returned in each snippet. Default 5"),
+							.describe(
+								"The number of sentences to be returned in each snippet. Default 5",
+							),
 						highlightsPerUrl: z
 							.number()
 							.int()
@@ -196,7 +200,12 @@ export const GetContentsArgsSchema = z
 					.describe("Relevant extract(s) from the webpage."),
 				summary: z
 					.object({
-						query: z.string().optional().describe("If specified, tries to answer the query in the summary"),
+						query: z
+							.string()
+							.optional()
+							.describe(
+								"If specified, tries to answer the query in the summary",
+							),
 					})
 					.optional(),
 			})
@@ -207,7 +216,9 @@ export const GetContentsArgsSchema = z
 // Add new schema for find similar links tool
 export const FindSimilarLinksArgsSchema = z
 	.object({
-		url: z.string().describe("The URL for which you would like to find similar links."),
+		url: z
+			.string()
+			.describe("The URL for which you would like to find similar links."),
 		numResults: z
 			.number()
 			.int()
@@ -226,32 +237,44 @@ export const FindSimilarLinksArgsSchema = z
 			.string()
 			.datetime()
 			.optional()
-			.describe("Results will include links that were crawled after this date."),
+			.describe(
+				"Results will include links that were crawled after this date.",
+			),
 		endCrawlDate: z
 			.string()
 			.datetime()
 			.optional()
-			.describe("Results will include links that were crawled before this date."),
+			.describe(
+				"Results will include links that were crawled before this date.",
+			),
 		startPublishedDate: z
 			.string()
 			.datetime()
 			.optional()
-			.describe("Only links with a published date after this will be returned."),
+			.describe(
+				"Only links with a published date after this will be returned.",
+			),
 		endPublishedDate: z
 			.string()
 			.datetime()
 			.optional()
-			.describe("Only links with a published date before this will be returned."),
+			.describe(
+				"Only links with a published date before this will be returned.",
+			),
 		includeText: z
 			.array(z.string())
 			.max(1)
 			.optional()
-			.describe("List of strings that must be present in webpage text of results."),
+			.describe(
+				"List of strings that must be present in webpage text of results.",
+			),
 		excludeText: z
 			.array(z.string())
 			.max(1)
 			.optional()
-			.describe("List of strings that must not be present in webpage text of results."),
+			.describe(
+				"List of strings that must not be present in webpage text of results.",
+			),
 		contents: z
 			.object({
 				text: z
@@ -276,7 +299,9 @@ export const FindSimilarLinksArgsSchema = z
 							.int()
 							.optional()
 							.default(5)
-							.describe("The number of sentences to be returned in each snippet. Default 5"),
+							.describe(
+								"The number of sentences to be returned in each snippet. Default 5",
+							),
 						highlightsPerUrl: z
 							.number()
 							.int()
@@ -289,7 +314,12 @@ export const FindSimilarLinksArgsSchema = z
 					.describe("Relevant extract(s) from the webpage."),
 				summary: z
 					.object({
-						query: z.string().optional().describe("If specified, tries to answer the query in the summary"),
+						query: z
+							.string()
+							.optional()
+							.describe(
+								"If specified, tries to answer the query in the summary",
+							),
 					})
 					.optional(),
 			})
@@ -297,17 +327,17 @@ export const FindSimilarLinksArgsSchema = z
 	})
 	.describe("Parameters for finding similar links using Exa API")
 
-	type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
+type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
 
-	export const ConfigSchema = z.object({
-		apiKey: z.string(),
-	})
-	export const ConfigRequestSchema = RequestSchema.extend({
-		method: z.literal("config"),
-		params: ConfigSchema,
-	})
-	export const ConfigResultSchema = ResultSchema.extend({})
-	export type Config = z.infer<typeof ConfigSchema>
+export const ConfigSchema = z.object({
+	apiKey: z.string(),
+})
+export const ConfigRequestSchema = RequestSchema.extend({
+	method: z.literal("config"),
+	params: ConfigSchema,
+})
+export const ConfigResultSchema = ResultSchema.extend({})
+export type Config = z.infer<typeof ConfigSchema>
 
 export function createServer(config: Config = ConfigSchema.parse({})) {
 	const server = new Server(
@@ -394,13 +424,13 @@ export function createServer(config: Config = ConfigSchema.parse({})) {
 
 					const results = await globals.exa.getContents(parsed.data)
 					return {
-							content: [
-								{
-									type: "text",
-									text: JSON.stringify(results),
-								},
-							],
-						}
+						content: [
+							{
+								type: "text",
+								text: JSON.stringify(results),
+							},
+						],
+					}
 				}
 
 				case "find_similar_links": {
