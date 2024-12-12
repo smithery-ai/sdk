@@ -62,3 +62,5 @@ export const ToolsSchema = z.record(z.array(ToolSchema))
 
 export interface Tool extends z.infer<typeof ToolSchema> {}
 export type Tools = z.infer<typeof ToolsSchema>
+
+
