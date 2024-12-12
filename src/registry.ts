@@ -2,64 +2,60 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import type { StdioServerParameters } from "@modelcontextprotocol/sdk/client/stdio.js"
 import { REGISTRY_URL } from "./config.js"
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
+// import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
 
 // Basic types for our registry
-export interface RegistryEntry {
+export interface RegistryPackage {
   id: string
   name: string
   description: string
-  connection: {
-    type: "stdio" | "sse" | "server"
-    config: {
-      command?: string
-      args?: string[]
-      envTemplate?: Record<string, string>
-      url?: string
-      server?: Server
+  vendor: string
+  sourceUrl: string
+  license: string
+  homepage: string
+  connections: Array<{
+    configSchema: Record<string, any>
+    stdio: {
+      command: string
+      args: string[]
+      env: Record<string, any>
     }
-  }
+  }>
 }
 
 // Helper to create StdioClientTransport config
 export function createStdioConfig(
-  entry: RegistryEntry, 
+  pkg: RegistryPackage, 
   variables: Record<string, string>
 ): StdioServerParameters {
-  if (entry.connection.type !== "stdio") {
-    throw new Error("Not a stdio connection")
+  if (pkg.connections.length === 0) {
+    throw new Error(`No connections defined for package: ${pkg.id}`)
   }
 
+  // Use first connection for now - could add connection selection later
+  const connection = pkg.connections[0]
+  
   const env: Record<string, string> = {}
-  if (entry.connection.config.envTemplate) {
-    const missingVars: string[] = []
-    
-    for (const [key, template] of Object.entries(entry.connection.config.envTemplate)) {
-      env[key] = template.replace(/\${([^}]+)}/g, (_, varName) => {
-        if (!(varName in variables)) {
-          missingVars.push(varName)
-          return ''
-        }
-        return variables[varName]
-      })
-    }
-
-    if (missingVars.length > 0) {
-      throw new Error(
-        `Missing required environment variables: ${missingVars.join(', ')}`
-      )
-    }
+  for (const [key, template] of Object.entries(connection.stdio.env)) {
+    env[key] = template.toString().replace(/\${([^}]+)}/g, (_: string, varName: string) => {
+      if (!(varName in variables)) {
+        throw new Error(`Missing required variable: ${varName}`)
+      }
+      return variables[varName]
+    })
   }
 
   return {
-    command: entry.connection.config.command!,
-    args: entry.connection.config.args,
+    command: connection.stdio.command,
+    args: connection.stdio.args,
     env
   }
 }
 
 export async function fetchRegistryEntry(
   id: string,
-): Promise<RegistryEntry | null> {
+): Promise<RegistryPackage | null> {
   try {
     const response = await fetch(`${REGISTRY_URL}/${id}`)
     if (!response.ok) {
@@ -72,15 +68,24 @@ export async function fetchRegistryEntry(
   }
 }
 
+export async function createTransport(
+  id: string,
+  variables: Record<string, string>
+) {
+  const pkg = await fetchRegistryEntry(id)
+  if (!pkg) {
+    throw new Error(`Registry package not found: ${id}`)
+  }
+
+  const config = createStdioConfig(pkg, variables)
+  const transport = new StdioClientTransport(config)
+  await transport.start()
+  return transport
+}
+
 // Example usage:
 /*
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
-
-const entry = await fetchRegistryEntry("brave-search")
-if (entry) {
-  const transportConfig = createStdioConfig(entry, {
-    braveApiKey: "user-api-key"
-  })
-  const transport = new StdioClientTransport(transportConfig)
-}
+const transport = await createTransport("brave-search", {
+  braveApiKey: "user-api-key"
+})
 */
