@@ -1,11 +1,13 @@
 {
 	"name": "@smithery/mcp-e2b",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"author": "Henry Mao & E2B Team",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc --watch"
