@@ -31,7 +31,7 @@ async function main() {
 	const messages: ChatCompletionMessageParam[] = [
 		{
 			role: "user",
-			content: "Search about the latest news about syria and give me a summary",
+			content: "What are some AI events happening in Singapore and how many days until the next one?",
 		},
 	]
 
