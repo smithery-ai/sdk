@@ -7,27 +7,29 @@ import type { RegistryPackage, RegistryVariables } from "./types.js"
 
 // Helper to create StdioClientTransport config
 export function createStdioConfig(
-  pkg: RegistryPackage, 
-  variables: RegistryVariables
+	pkg: RegistryPackage,
+	variables: RegistryVariables,
 ): StdioServerParameters {
 	if (pkg.connections.length === 0) {
 		throw new Error(`No connections defined for package: ${pkg.id}`)
 	}
 
-  // Use first connection for now - could add connection selection later
-  const connection = pkg.connections[0]
-  
-  const env: Record<string, string> = {}
-  if (connection.stdio.env) {
-    for (const [key, template] of Object.entries(connection.stdio.env)) {
-      env[key] = template.toString().replace(/\${([^}]+)}/g, (_: string, varName: string) => {
-        if (!(varName in variables)) {
-          throw new Error(`Missing required variable: ${varName}`)
-        }
-        return variables[varName]
-      })
-    }
-  }
+	// Use first connection for now - could add connection selection later
+	const connection = pkg.connections[0]
+
+	const env: Record<string, string> = {}
+	if (connection.stdio.env) {
+		for (const [key, template] of Object.entries(connection.stdio.env)) {
+			env[key] = template
+				.toString()
+				.replace(/\${([^}]+)}/g, (_: string, varName: string) => {
+					if (!(varName in variables)) {
+						throw new Error(`Missing required variable: ${varName}`)
+					}
+					return variables[varName]
+				})
+		}
+	}
 
 	return {
 		command: connection.stdio.command,
@@ -52,8 +54,8 @@ export async function fetchRegistryEntry(
 }
 
 export async function createTransport(
-  id: string,
-  variables: RegistryVariables
+	id: string,
+	variables: RegistryVariables,
 ) {
 	const pkg = await fetchRegistryEntry(id)
 	if (!pkg) {
