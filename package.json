@@ -1,6 +1,6 @@
 {
 	"name": "@smithery/sdk",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"description": "Connect language models to Model Context Protocols",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -9,15 +9,21 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc --watch",
 		"lint": "npx @biomejs/biome lint --write",
-		"format": "npx @biomejs/biome format --write"
+		"format": "npx @biomejs/biome format --write",
+		"bump": "npm version patch -ws --include-workspace-root",
+		"link": "npm link -ws --include-workspace-root"
 	},
 	"license": "GPL-3.0-only",
-	"workspaces": ["mcps/*"],
+	"workspaces": [
+		"mcps/*"
+	],
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
 		"@modelcontextprotocol/sdk": "^1.0.3",

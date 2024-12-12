@@ -62,6 +62,7 @@ export const ToolsSchema = z.record(z.array(ToolSchema))
 
 export interface Tool extends z.infer<typeof ToolSchema> {}
 export type Tools = z.infer<typeof ToolsSchema>
+<<<<<<< HEAD
 
 // Registry types
 type StdioConfig = { 
@@ -87,3 +88,5 @@ export interface RegistryPackage {
 export type RegistryVariables = Record<string, string>
 
 
+=======
+>>>>>>> main

@@ -10,9 +10,9 @@ export function createStdioConfig(
   pkg: RegistryPackage, 
   variables: RegistryVariables
 ): StdioServerParameters {
-  if (pkg.connections.length === 0) {
-    throw new Error(`No connections defined for package: ${pkg.id}`)
-  }
+	if (pkg.connections.length === 0) {
+		throw new Error(`No connections defined for package: ${pkg.id}`)
+	}
 
   // Use first connection for now - could add connection selection later
   const connection = pkg.connections[0]
@@ -29,41 +29,41 @@ export function createStdioConfig(
     }
   }
 
-  return {
-    command: connection.stdio.command,
-    args: connection.stdio.args,
-    env
-  }
+	return {
+		command: connection.stdio.command,
+		args: connection.stdio.args,
+		env,
+	}
 }
 
 export async function fetchRegistryEntry(
-  id: string,
+	id: string,
 ): Promise<RegistryPackage | null> {
-  try {
-    const response = await fetch(`${REGISTRY_URL}/${id}`)
-    if (!response.ok) {
-      return null
-    }
-    return await response.json()
-  } catch (error) {
-    console.error("Error fetching registry entry:", error)
-    return null
-  }
+	try {
+		const response = await fetch(`${REGISTRY_URL}/${id}`)
+		if (!response.ok) {
+			return null
+		}
+		return await response.json()
+	} catch (error) {
+		console.error("Error fetching registry entry:", error)
+		return null
+	}
 }
 
 export async function createTransport(
   id: string,
   variables: RegistryVariables
 ) {
-  const pkg = await fetchRegistryEntry(id)
-  if (!pkg) {
-    throw new Error(`Registry package not found: ${id}`)
-  }
+	const pkg = await fetchRegistryEntry(id)
+	if (!pkg) {
+		throw new Error(`Registry package not found: ${id}`)
+	}
 
-  const config = createStdioConfig(pkg, variables)
-  const transport = new StdioClientTransport(config)
-  await transport.start()
-  return transport
+	const config = createStdioConfig(pkg, variables)
+	const transport = new StdioClientTransport(config)
+	await transport.start()
+	return transport
 }
 
 // Example usage:
