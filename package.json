@@ -14,7 +14,9 @@
 		"build": "tsc",
 		"watch": "tsc --watch",
 		"lint": "npx @biomejs/biome lint --write",
-		"format": "npx @biomejs/biome format --write"
+		"format": "npx @biomejs/biome format --write",
+		"bump": "npm version patch -ws --include-workspace-root",
+		"link": "npm link -ws --include-workspace-root"
 	},
 	"license": "GPL-3.0-only",
 	"workspaces": ["mcps/*"],
