@@ -1,21 +1,28 @@
 // src/registry.ts
 import type { StdioServerParameters } from "@modelcontextprotocol/sdk/client/stdio.js"
-import { REGISTRY_URL } from "./config.js"
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
-import type { RegistryPackage, RegistryVariables } from "./types.js"
-// import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
+import { REGISTRY_URL } from "./config.js"
+import {
+	isStdio,
+	type JSONSchema,
+	type RegistryServer,
+	type StdioConnection,
+} from "./registry-types.js"
 
 // Helper to create StdioClientTransport config
 export function createStdioConfig(
-	pkg: RegistryPackage,
-	variables: RegistryVariables,
-): StdioServerParameters {
+	pkg: RegistryServer,
+	variables: JSONSchema,
+): StdioConnection {
 	if (pkg.connections.length === 0) {
 		throw new Error(`No connections defined for package: ${pkg.id}`)
 	}
 
 	// Use first connection for now - could add connection selection later
 	const connection = pkg.connections[0]
+
+	if (!isStdio(connection))
+		throw new Error(`Connection not supported for stdio: ${connection}`)
 
 	const env: Record<string, string> = {}
 	if (connection.stdio.env) {
@@ -38,31 +45,20 @@ export function createStdioConfig(
 	}
 }
 
-export async function fetchRegistryEntry(
-	id: string,
-): Promise<RegistryPackage | null> {
-	try {
-		const response = await fetch(`${REGISTRY_URL}/servers/${id}`)
-		if (!response.ok) {
-			return null
-		}
-		return await response.json()
-	} catch (error) {
-		console.error("Error fetching registry entry:", error)
-		return null
+export async function fetchRegistryEntry(id: string): Promise<RegistryServer> {
+	const response = await fetch(`${REGISTRY_URL}/servers/${id}`)
+	if (!response.ok) {
+		throw new Error(`Registry entry not found: ${id}`)
 	}
+	return await response.json()
 }
 
 export async function createTransport(
 	id: string,
-	variables: RegistryVariables = {},
+	variables: JSONSchema = {},
 	options: Partial<StdioServerParameters> = {},
 ) {
 	const pkg = await fetchRegistryEntry(id)
-	if (!pkg) {
-		throw new Error(`Registry package not found: ${id}`)
-	}
-
 	const config = createStdioConfig(pkg, variables)
 	const transport = new StdioClientTransport({ ...config, ...options })
 	return transport
