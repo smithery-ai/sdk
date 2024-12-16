@@ -13,8 +13,9 @@ import { humanId } from "human-id"
 import { EventEmitter } from "node:events"
 
 import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/resources/beta/prompt-caching/index.js"
-import { AnthropicHandler } from "@smithery/sdk/integrations/llm/anthropic.js"
-import { Connection, type MCPConfig } from "@smithery/sdk/index.js"
+import type { MultiClient } from "@smithery/sdk/index.js"
+import { AnthropicChatAdapter } from "@smithery/sdk/integrations/llm/anthropic.js"
+
 // Define schemas for our tools
 export const RunArgsSchema = z.object({
 	instruction: z
@@ -90,7 +91,8 @@ function cacheLastMessage(messages: PromptCachingBetaMessageParam[]) {
 }
 
 export function createServer(
-	mcpConfig: MCPConfig,
+	// You must connect the client yourself
+	client: MultiClient,
 	config: Config = ConfigSchema.parse({}),
 ) {
 	const server = new Server(
@@ -150,7 +152,7 @@ export function createServer(
 			if (!globals.client) {
 				throw new Error("Not authenticated.")
 			}
-			const client = globals.client
+			const llm = globals.client
 
 			switch (name) {
 				case "run": {
@@ -181,17 +183,8 @@ export function createServer(
 
 						let isDone = false
 
-						// Connect to MCPs
-						const connection = await Connection.connect(
-							config.recursive
-								? {
-										agent: server,
-										...mcpConfig,
-									}
-								: mcpConfig,
-						)
 						try {
-							const handler = new AnthropicHandler(connection)
+							const handler = new AnthropicChatAdapter(client)
 							while (!isDone) {
 								let tools = await handler.listTools()
 								// Filter tools
@@ -200,15 +193,14 @@ export function createServer(
 										parsed.data.tools?.includes(t.name),
 									)
 								}
-								const response =
-									await client.beta.promptCaching.messages.create({
-										model: config.model ?? "claude-3-5-sonnet-20241022",
-										max_tokens: config.maxTokens ?? 1024,
-										messages: cacheLastMessage(messages),
-										tools,
-									})
+								const response = await llm.beta.promptCaching.messages.create({
+									model: config.model ?? "claude-3-5-sonnet-20241022",
+									max_tokens: config.maxTokens ?? 1024,
+									messages: cacheLastMessage(messages),
+									tools,
+								})
 								// Handle tool calls
-								const toolMessages = await handler.call(response)
+								const toolMessages = await handler.callTool(response)
 
 								messages.push({
 									role: "assistant",
@@ -241,7 +233,7 @@ export function createServer(
 						} finally {
 							run.isRunning = false
 							run.agentEmitter.emit("done")
-							connection.close()
+							await client.close()
 						}
 					})()
 

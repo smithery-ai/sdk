@@ -10,7 +10,7 @@
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"baseUrl": ".",
-		"rootDir": "."
+		"rootDir": "src"
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist", "src/examples/**/*"]

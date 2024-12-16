@@ -33,7 +33,6 @@
 		"@types/uuid": "^9.0.7",
 		"@smithery/mcp-e2b": "*",
 		"@smithery/mcp-exa": "*",
-		"@smithery/mcp-shell": "*",
 		"dotenv": "^16.4.7",
 		"eventsource": "^2.0.2",
 		"tsx": "^4.19.2",

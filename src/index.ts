@@ -11,8 +11,6 @@ import {
 	type Tool,
 } from "@modelcontextprotocol/sdk/types.js"
 
-export type { MCPConfig, Tools } from "./types.js"
-
 interface ClientInfo {
 	name: string
 	version: string
