@@ -12,6 +12,7 @@
 	"files": ["dist"],
 	"scripts": {
 		"build": "tsc",
+		"build:all": "npm run build -ws --include-workspace-root",
 		"watch": "tsc --watch",
 		"lint": "npx @biomejs/biome lint --write",
 		"format": "npx @biomejs/biome format --write",

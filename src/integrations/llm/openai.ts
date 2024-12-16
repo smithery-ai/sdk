@@ -6,58 +6,71 @@ import type {
 } from "openai/resources/index.js"
 
 import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js"
-import type { Connection } from "../../index.js"
-import type { Tools } from "../../types.js"
+import type { Client } from "@modelcontextprotocol/sdk/client/index.js"
+import { CallToolResultSchema } from "@modelcontextprotocol/sdk/types.js"
 
-export class OpenAIHandler {
-	constructor(private connection: Connection) {}
+interface OpenAIAdapterOptions {
+	strict?: boolean
+	truncateDescriptionLength?: number
+}
 
-	async listTools(strict = false): Promise<ChatCompletionTool[]> {
-		return this.format(await this.connection.listTools(), strict)
-	}
+/**
+ * Adapt an MCP client so it works seamlessly with OpenAI chat completions
+ */
+export class OpenAIChatAdapter {
+	constructor(
+		private client: Pick<Client, "callTool" | "listTools">,
+		private options: OpenAIAdapterOptions = {
+			// Restriction enforced by OpenAI
+			truncateDescriptionLength: 1024,
+		},
+	) {}
 
-	format(tools: Tools, strict = false): ChatCompletionTool[] {
-		return Object.entries(tools).flatMap(([mcpName, tools]) =>
-			tools.map((tool) => ({
-				type: "function",
-				function: {
-					name: `${mcpName}_${tool.name}`,
-					description: tool.description,
-					parameters: tool.inputSchema,
-					strict,
-				},
-			})),
-		)
+	async listTools(): Promise<ChatCompletionTool[]> {
+		const toolResult = await this.client.listTools()
+		return toolResult.tools.map((tool) => ({
+			type: "function" as const,
+			function: {
+				name: tool.name,
+				description: tool.description?.slice(
+					0,
+					this.options?.truncateDescriptionLength,
+				),
+				parameters: tool.inputSchema,
+				strict: this.options?.strict ?? false,
+			},
+		}))
 	}
 
 	// TODO: Support streaming
-	async call(
+	async callTool(
 		response: OpenAI.Chat.Completions.ChatCompletion,
 		options?: RequestOptions,
 	): Promise<ChatCompletionToolMessageParam[]> {
-		const choice = response.choices[0]
-		// TODO: Support `n`
-		if (!choice) {
-			return []
+		if (response.choices.length !== 1) {
+			// TODO: Support `n`
+			throw new Error("Multiple choices not supported")
 		}
-		const toolCalls = choice.message?.tool_calls
-		if (!toolCalls) {
+
+		const choice = response.choices[0]
+		if (!choice?.message?.tool_calls) {
 			return []
 		}
 
-		const results = await this.connection.callTools(
-			toolCalls.map((toolCall) => {
-				const splitPoint = toolCall.function.name.indexOf("_")
-				const mcp = toolCall.function.name.slice(0, splitPoint)
-				const name = toolCall.function.name.slice(splitPoint + 1)
-				return {
-					mcp,
-					name,
-					arguments: JSON.parse(toolCall.function.arguments),
-				}
+		const toolCalls = choice.message.tool_calls
+		const results = await Promise.all(
+			toolCalls.map(async (toolCall) => {
+				return await this.client.callTool(
+					{
+						name: toolCall.function.name,
+						arguments: JSON.parse(toolCall.function.arguments),
+					},
+					CallToolResultSchema,
+					options,
+				)
 			}),
-			options,
 		)
+
 		return results.map((result, index) => ({
 			role: "tool",
 			content: result.content as ChatCompletionContentPartText[],

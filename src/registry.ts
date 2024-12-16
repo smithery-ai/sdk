@@ -42,7 +42,7 @@ export async function fetchRegistryEntry(
 	id: string,
 ): Promise<RegistryPackage | null> {
 	try {
-		const response = await fetch(`${REGISTRY_URL}/${id}`)
+		const response = await fetch(`${REGISTRY_URL}/servers/${id}`)
 		if (!response.ok) {
 			return null
 		}
@@ -55,7 +55,8 @@ export async function fetchRegistryEntry(
 
 export async function createTransport(
 	id: string,
-	variables: RegistryVariables,
+	variables: RegistryVariables = {},
+	options?: Partial<StdioServerParameters>,
 ) {
 	const pkg = await fetchRegistryEntry(id)
 	if (!pkg) {
@@ -63,8 +64,7 @@ export async function createTransport(
 	}
 
 	const config = createStdioConfig(pkg, variables)
-	const transport = new StdioClientTransport(config)
-	await transport.start()
+	const transport = new StdioClientTransport({ ...config, ...options })
 	return transport
 }
 

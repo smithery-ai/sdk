@@ -4,29 +4,27 @@ import type {
 	Tool,
 } from "@anthropic-ai/sdk/resources/index.js"
 
+import type { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js"
-import type { Connection } from "../../index.js"
-import type { Tools } from "../../types.js"
+import { CallToolResultSchema } from "@modelcontextprotocol/sdk/types.js"
 
-export class AnthropicHandler {
-	constructor(private connection: Connection) {}
+/**
+ * Adapt an MCP client so it works seamlessly with Anthropic messages
+ */
+export class AnthropicChatAdapter {
+	constructor(private client: Pick<Client, "callTool" | "listTools">) {}
 
 	async listTools(): Promise<Tool[]> {
-		return this.format(await this.connection.listTools())
-	}
-
-	format(tools: Tools): Tool[] {
-		return Object.entries(tools).flatMap(([mcpName, tools]) =>
-			tools.map((tool) => ({
-				name: `${mcpName}_${tool.name}`,
-				input_schema: { ...tool.inputSchema, type: "object" },
-				description: tool.description,
-			})),
-		)
+		const toolResult = await this.client.listTools()
+		return toolResult.tools.map((tool) => ({
+			name: tool.name,
+			description: tool.description,
+			input_schema: tool.inputSchema,
+		}))
 	}
 
 	// TODO: Support streaming
-	async call(
+	async callTool(
 		response: Message,
 		options?: RequestOptions,
 	): Promise<MessageParam[]> {
@@ -42,18 +40,18 @@ export class AnthropicHandler {
 			return []
 		}
 
-		const results = await this.connection.callTools(
-			toolCalls.map((toolCall) => {
-				const splitPoint = toolCall.name.indexOf("_")
-				const mcp = toolCall.name.slice(0, splitPoint)
-				const name = toolCall.name.slice(splitPoint + 1)
-				return {
-					mcp,
-					name,
-					arguments: toolCall.input as object,
-				}
+		// Run parallel tool call
+		const results = await Promise.all(
+			toolCalls.map(async (toolCall) => {
+				return await this.client.callTool(
+					{
+						name: toolCall.name,
+						arguments: toolCall.input as any,
+					},
+					CallToolResultSchema,
+					options,
+				)
 			}),
-			options,
 		)
 
 		return [

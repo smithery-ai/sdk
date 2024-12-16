@@ -330,7 +330,7 @@ export const FindSimilarLinksArgsSchema = z
 type ToolInput = z.infer<typeof ToolSchema.shape.inputSchema>
 
 export const ConfigSchema = z.object({
-	apiKey: z.string(),
+	apiKey: z.string().optional(),
 })
 export const ConfigRequestSchema = RequestSchema.extend({
 	method: z.literal("config"),

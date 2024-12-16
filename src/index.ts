@@ -1,111 +1,137 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
-import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js"
+import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js"
 import {
+	type CallToolRequest,
 	CallToolResultSchema,
+	type CompatibilityCallToolResultSchema,
+	type ListToolsRequest,
 	type Tool,
 } from "@modelcontextprotocol/sdk/types.js"
-import { v4 as uuidv4 } from "uuid"
-import {
-	isServerConfig,
-	isURIConfig,
-	type MCPConfig,
-	type Tools,
-	isWrappedServerConfig,
-	isStdioConfig,
-} from "./types.js"
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 
-export { AnthropicHandler } from "./integrations/llm/anthropic.js"
-export { OpenAIHandler } from "./integrations/llm/openai.js"
 export type { MCPConfig, Tools } from "./types.js"
 
-export class Connection {
-	mcps: Map<string, Client> = new Map()
+interface ClientInfo {
+	name: string
+	version: string
+}
+/**
+ * A client that connects to multiple MCPs and provides a unified interface for
+ * accessing their tools, treating them as a single MCP.
+ */
+export class MultiClient
+	implements Pick<Client, "callTool" | "listTools" | "close">
+{
+	clients: Record<string, Client> = {}
 
-	static async connect(config: MCPConfig) {
-		const connection = new Connection()
+	client_info: ClientInfo
+
+	constructor(
+		client_info?: ClientInfo,
+		private client_capabilities: {
+			capabilities: Record<string, unknown>
+		} = {
+			capabilities: {},
+		},
+	) {
+		this.client_info = client_info || {
+			name: "MultiClient",
+			version: "1.0.0",
+		}
+	}
+
+	/**
+	 * Connects to a collection of transport or servers.
+	 */
+	async connectAll(transports: Record<string, Transport | Server>) {
 		await Promise.all(
-			Object.entries(config).map(async ([mcpName, mcpConfig]) => {
-				const mcp = new Client(
+			Object.entries(transports).map(async ([namespace, transport]) => {
+				const client = new Client(
 					{
-						name: uuidv4(),
+						name: this.client_info.name,
 						version: "1.0.0",
 					},
-					{
-						capabilities: {},
-					},
+					this.client_capabilities,
 				)
-				if (isURIConfig(mcpConfig)) {
-					// For URI configs, connect using SSE (Server-Sent Events) transport
-					await mcp.connect(new SSEClientTransport(new URL(mcpConfig.url)))
-				} else if (isStdioConfig(mcpConfig)) {
-					// For pipe configs, spawn the server locally, then connect using using Stdio transport
-					await mcp.connect(new StdioClientTransport(mcpConfig.stdio))
-				} else if (
-					isServerConfig(mcpConfig) ||
-					isWrappedServerConfig(mcpConfig)
-				) {
-					// Handle both direct Server instances and wrapped {server: Server} configs
-					const server = isWrappedServerConfig(mcpConfig)
-						? mcpConfig.server
-						: mcpConfig
-					// Create paired transports for in-memory communication between client and server
+
+				if (transport instanceof Server) {
 					const [clientTransport, serverTransport] =
 						InMemoryTransport.createLinkedPair()
 
-					await server.connect(serverTransport)
-					await mcp.connect(clientTransport)
+					await transport.connect(serverTransport)
+					await client.connect(clientTransport)
+				} else {
+					await client.connect(transport)
 				}
-				connection.mcps.set(mcpName, mcp)
+				this.clients[namespace] = client
 			}),
 		)
-		return connection
 	}
 
-	// TODO: Invalidate cache on tool change
-	private toolsCache: Tools | null = null
-
-	async listTools(): Promise<Tools> {
-		if (this.toolsCache === null) {
-			this.toolsCache = (
-				await Promise.all(
-					Array.from(this.mcps.entries()).map(async ([name, mcp]) => {
-						const capabilities = mcp.getServerCapabilities()
-						if (!capabilities?.tools) return []
-						const response = await mcp.listTools()
-						return { [name]: response.tools } as Tool
-					}),
-				)
-			).reduce((acc, curr) => Object.assign(acc, curr), {})
-		}
-		return this.toolsCache
+	/**
+	 * Maps a tool name to a namespace-specific name to avoid conflicts.
+	 */
+	toolNameMapper = (namespace: string, tool: Tool) => {
+		return `${namespace}_${tool.name}`
+	}
+	toolNameUnmapper = (fullToolName: string) => {
+		const namespace = fullToolName.split("_")[0]
+		const toolName = fullToolName.split("_").slice(1).join("_")
+		return { namespace, toolName }
 	}
 
-	async callTools(
-		calls: { mcp: string; name: string; arguments: any }[],
+	/**
+	 * List all tools available from all MCPs, ensuring each tool is namespaced.
+	 * @param params - Optional parameters for the request.
+	 * @param options - Optional options for the request.
+	 * @returns A promise that resolves to an array of tools.
+	 */
+	async listTools(
+		params?: ListToolsRequest["params"],
 		options?: RequestOptions,
 	) {
-		return await Promise.all(
-			calls.map(async (call) => {
-				const mcp = this.mcps.get(call.mcp)
-				if (!mcp) {
-					throw new Error(`MCP tool ${call.mcp} not found`)
-				}
-				return mcp.callTool(
-					{
-						name: call.name,
-						arguments: call.arguments,
-					},
-					CallToolResultSchema,
-					options,
-				)
-			}),
+		const tools: Tool[] = (
+			await Promise.all(
+				Object.entries(this.clients).map(async ([namespace, mcp]) => {
+					const capabilities = mcp.getServerCapabilities()
+					if (!capabilities?.tools) return []
+					const response = await mcp.listTools(params, options)
+					return response.tools.map((tool) => ({
+						...tool,
+						name: this.toolNameMapper(namespace, tool),
+					}))
+				}),
+			)
+		).flat()
+		return { tools }
+	}
+
+	async callTool(
+		params: CallToolRequest["params"],
+		resultSchema:
+			| typeof CallToolResultSchema
+			| typeof CompatibilityCallToolResultSchema = CallToolResultSchema,
+		options?: RequestOptions,
+	) {
+		const { namespace, toolName } = this.toolNameUnmapper(params.name)
+
+		const mcp = this.clients[namespace]
+		if (!mcp) {
+			throw new Error(`MCP tool ${namespace} not found`)
+		}
+		return mcp.callTool(
+			{
+				name: toolName,
+				arguments: params.arguments,
+			},
+			resultSchema,
+			options,
 		)
 	}
 
 	async close() {
-		await Promise.all(Array.from(this.mcps.values()).map((mcp) => mcp.close()))
+		await Promise.all(Object.values(this.clients).map((mcp) => mcp.close()))
 	}
 }
