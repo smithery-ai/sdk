@@ -69,7 +69,7 @@ export const RegistryServerSchema = z.object({
 		.string()
 		.optional()
 		.describe("A concise description of the MCP server for end-users."),
-	vendor: z.string().describe("The name of the author of the MCP."),
+	vendor: z.string().describe("The name of the author of the MCP.").optional(),
 	sourceUrl: z
 		.string()
 		.describe("A URL to the official page of the MCP repository."),
