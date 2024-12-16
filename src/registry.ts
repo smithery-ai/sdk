@@ -34,7 +34,7 @@ export function createStdioConfig(
 	return {
 		command: connection.stdio.command,
 		args: connection.stdio.args,
-		env,
+		env: Object.keys(env).length > 0 ? env : undefined,
 	}
 }
 
@@ -56,7 +56,7 @@ export async function fetchRegistryEntry(
 export async function createTransport(
 	id: string,
 	variables: RegistryVariables = {},
-	options?: Partial<StdioServerParameters>,
+	options: Partial<StdioServerParameters> = {},
 ) {
 	const pkg = await fetchRegistryEntry(id)
 	if (!pkg) {

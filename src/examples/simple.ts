@@ -29,12 +29,6 @@ async function main() {
 
 	const sequentialThinking = await createTransport(
 		"@modelcontextprotocol/server-sequential-thinking",
-		{},
-		{
-			env: {
-				PATH: process.env.PATH as string,
-			},
-		},
 	)
 	const client = new MultiClient()
 	await client.connectAll({
