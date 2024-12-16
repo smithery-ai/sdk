@@ -1,4 +1,4 @@
-// src/registry.ts
+import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import type { StdioServerParameters } from "@modelcontextprotocol/sdk/client/stdio.js"
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 import { REGISTRY_URL } from "./config.js"
@@ -53,7 +53,7 @@ export async function fetchRegistryEntry(id: string): Promise<RegistryServer> {
 	return await response.json()
 }
 
-export async function createTransport(
+export async function createRegistryTransport(
 	id: string,
 	variables: JSONSchema = {},
 	options: Partial<StdioServerParameters> = {},
@@ -62,6 +62,30 @@ export async function createTransport(
 	const config = createStdioConfig(pkg, variables)
 	const transport = new StdioClientTransport({ ...config, ...options })
 	return transport
+}
+
+/**
+ * A short cut to create a client that connects to a registry entry and is ready to use
+ * @param id ID of the registry entry
+ */
+export async function createRegistryClient(
+	id: string,
+	variables: JSONSchema = {},
+	options: Partial<StdioServerParameters> = {},
+) {
+	const transport = await createRegistryTransport(id, variables, options)
+
+	const client = new Client(
+		{
+			name: "mcp-client",
+			version: "1.0.0",
+		},
+		{
+			capabilities: {},
+		},
+	)
+	await client.connect(transport)
+	return client
 }
 
 // Example usage:

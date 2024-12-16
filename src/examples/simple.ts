@@ -8,7 +8,7 @@ import type { ChatCompletionMessageParam } from "openai/resources/index.mjs"
 import { MultiClient } from "../index.js"
 import { AnthropicChatAdapter } from "../integrations/llm/anthropic.js"
 import { OpenAIChatAdapter } from "../integrations/llm/openai.js"
-import { createTransport } from "../registry.js"
+import { createRegistryTransport } from "../registry.js"
 import { exit } from "node:process"
 // Patch event source
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,7 +27,7 @@ async function main() {
 		apiKey: process.env.EXA_API_KEY as string,
 	})
 
-	const sequentialThinking = await createTransport(
+	const sequentialThinking = await createRegistryTransport(
 		"@modelcontextprotocol/server-sequential-thinking",
 	)
 	const client = new MultiClient()
