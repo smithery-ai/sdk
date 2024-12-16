@@ -11,6 +11,10 @@ import {
 	type Tool,
 } from "@modelcontextprotocol/sdk/types.js"
 
+export { createTransport, createStdioConfig, fetchRegistryEntry } from "./registry.js"
+export { OpenAIChatAdapter } from "./integrations/llm/openai.js"
+export { AnthropicChatAdapter } from "./integrations/llm/anthropic.js"
+
 interface ClientInfo {
 	name: string
 	version: string
