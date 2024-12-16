@@ -7,8 +7,8 @@ Smithery is a Typescript framework that easily connects language models (LLMs) t
 **Key Features**
 
 - Connect to multiple MCPs with a single client
-- Tool schema is handled automatically for the LLM
-- Supports LLM reasoning through multiple tool calls
+- Adapters to transform MCP resposnes for OpenAI and Anthropic clients
+- Supports chaining tool calls until LLM completes
 
 # Quickstart
 
@@ -29,34 +29,40 @@ npm install @smithery/mcp-exa
 The following code sets up OpenAI and connects to an Exa MCP server. In this case, we're running the server locally within the same process, so it's just a simple passthrough.
 
 ```typescript
-import { Connection } from "@smithery/sdk"
-import { OpenAIHandler } from "@smithery/sdk/openai"
+import { MultiClient } from "@smithery/sdk"
+import { OpenAIChatAdapter } from "@smithery/sdk/integrations/llm/openai"
 import * as exa from "@smithery/mcp-exa"
 import { OpenAI } from "openai"
+import { createTransport } from "@smithery/sdk/registry"
 
 const openai = new OpenAI()
-const connection = await Connection.connect({
-  exa: {
-    server: exa.createServer({
-      apiKey: process.env.EXA_API_KEY,
-    }),
-  },
+const exaServer = exa.createServer({
+  apiKey: process.env.EXA_API_KEY,
+})
+
+const sequentialThinking = await createTransport(
+  "@modelcontextprotocol/server-sequential-thinking",
+)
+const client = new MultiClient()
+await client.connectAll({
+  exa: exaServer,
+  sequentialThinking: sequentialThinking,
 })
 ```
 
 Now you can make your LLM aware of the available tools from Exa.
 
 ```typescript
-// Create a handler
-const handler = new OpenAIHandler(connection)
+// Create an adapter
+const adapter = new OpenAIChatAdapter(client)
 const response = await openai.chat.completions.create({
   model: "gpt-4o-mini",
   messages: [{ role: "user", content: "In 2024, did OpenAI release GPT-5?" }],
   // Pass the tools to OpenAI call
-  tools: await handler.listTools(),
+  tools: await adapter.listTools(),
 })
 // Obtain the tool outputs as new messages
-const toolMessages = await handler.call(response)
+const toolMessages = await adapter.callTool(response)
 ```
 
 Using this, you can easily enable your LLM to call tools and obtain the results.
@@ -68,23 +74,23 @@ In this case, you have to loop your LLM call and update your messages until ther
 Example:
 
 ```typescript
-let messages: ChatCompletionMessageParam[] = [
+let messages = [
   {
     role: "user",
     content:
       "Deduce Obama's age in number of days. It's November 28, 2024 today. Search to ensure correctness.",
   },
 ]
-const handler = new OpenAIHandler(connection)
+const adapter = new OpenAIChatAdapter(client)
 
 while (!isDone) {
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages,
-    tools: await handler.listTools(),
+    tools: await adapter.listTools(),
   })
   // Handle tool calls
-  const toolMessages = await handler.call(response)
+  const toolMessages = await adapter.callTool(response)
 
   // Append new messages
   messages.push(response.choices[0].message)
@@ -113,4 +119,3 @@ Patch the global EventSource object:
 ```typescript
 import EventSource from "eventsource"
 global.EventSource = EventSource as any
-```
