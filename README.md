@@ -1,0 +1,1 @@
+# smithery-node
