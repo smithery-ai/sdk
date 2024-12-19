@@ -83,10 +83,15 @@ export class ServerBuilder {
 			if (tool.parameters) {
 				const parsed = tool.parameters.safeParse(request.params.arguments)
 				if (!parsed.success) {
-					throw new McpError(
-						ErrorCode.InvalidRequest,
-						`Invalid ${request.params.name} arguments`,
-					)
+					return {
+						content: [
+							{
+								type: "text",
+								text: `Invalid ${request.params.name} arguments: ${parsed.error.message}`,
+							},
+						],
+						isError: true,
+					}
 				}
 				args = parsed.data
 			}
