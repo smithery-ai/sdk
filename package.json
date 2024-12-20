@@ -9,21 +9,16 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"scripts": {
 		"build": "tsc",
 		"build:all": "npm run build -ws --include-workspace-root",
 		"watch": "tsc --watch",
 		"check": "npx @biomejs/biome check --write --unsafe",
-		"bump": "npm version patch -ws --include-workspace-root",
 		"link": "npm link -ws --include-workspace-root"
 	},
 	"license": "GPL-3.0-only",
-	"workspaces": [
-		"mcps/*"
-	],
+	"workspaces": ["mcps/*"],
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
 		"@icons-pack/react-simple-icons": "^10.2.0",

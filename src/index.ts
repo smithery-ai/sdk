@@ -11,11 +11,6 @@ import {
 	type Tool,
 } from "@modelcontextprotocol/sdk/types.js"
 
-export {
-	createRegistryTransport as createTransport,
-	createStdioConfig,
-	fetchRegistryEntry,
-} from "./registry.js"
 export { OpenAIChatAdapter } from "./integrations/llm/openai.js"
 export { AnthropicChatAdapter } from "./integrations/llm/anthropic.js"
 

@@ -1,6 +1,6 @@
 # Smithery Typescript Framework [![npm version](https://badge.fury.io/js/@smithery%2Fsdk.svg)](https://badge.fury.io/js/@smithery%2Fsdk)
 
-Smithery is a Typescript framework that easily connects language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing you to build agents that use resources and tools without being overwhelmed by JSON schemas.
+Smithery is a Typescript framework with utilities to make it easier to connect language models (LLMs) to [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs), allowing you to build agents that use resources and tools without being overwhelmed by JSON schemas.
 
 ⚠️ _This repository is work in progress and in alpha. Not recommended for production use yet._ ⚠️
 
@@ -9,6 +9,8 @@ Smithery is a Typescript framework that easily connects language models (LLMs) t
 - Connect to multiple MCPs with a single client
 - Adapters to transform MCP resposnes for OpenAI and Anthropic clients
 - Supports chaining tool calls until LLM completes
+
+To find our registry of MCPs, visit [https://smithery.ai/](https://smithery.ai/).
 
 # Quickstart
 
