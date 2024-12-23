@@ -7,7 +7,7 @@ Smithery is a Typescript framework with utilities to make it easier to connect l
 **Key Features**
 
 - Connect to multiple MCPs with a single client
-- Adapters to transform MCP resposnes for OpenAI and Anthropic clients
+- Adapters to transform MCP responses for OpenAI and Anthropic clients
 - Supports chaining tool calls until LLM completes
 
 To find our registry of MCPs, visit [https://smithery.ai/](https://smithery.ai/).
