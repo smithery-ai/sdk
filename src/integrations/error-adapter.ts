@@ -12,7 +12,7 @@ import {
 export function wrapErrorAdapter<C extends Pick<Client, "callTool">>(
 	client: C,
 ): C {
-	const callTool = client.callTool
+	const callTool = client.callTool.bind(client)
 	client.callTool = async (
 		params: CallToolRequest["params"],
 		resultSchema:
@@ -22,12 +22,13 @@ export function wrapErrorAdapter<C extends Pick<Client, "callTool">>(
 	) => {
 		try {
 			return await callTool(params, resultSchema, options)
-		} catch (e) {
+		} catch (err) {
+			console.error("Tool calling error:", err)
 			return {
 				content: [
 					{
 						type: "text",
-						text: JSON.stringify(e),
+						text: JSON.stringify(err, Object.getOwnPropertyNames(err)),
 					},
 				],
 				isError: true,

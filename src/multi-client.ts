@@ -4,11 +4,11 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import type { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js"
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js"
 import {
-    type CallToolRequest,
-    CallToolResultSchema,
-    type CompatibilityCallToolResultSchema,
-    type ListToolsRequest,
-    type Tool,
+	type CallToolRequest,
+	CallToolResultSchema,
+	type CompatibilityCallToolResultSchema,
+	type ListToolsRequest,
+	type Tool,
 } from "@modelcontextprotocol/sdk/types.js"
 
 interface ClientInfo {
