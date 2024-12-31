@@ -1,6 +1,6 @@
 {
 	"name": "@smithery/sdk",
-	"version": "0.0.16",
+	"version": "0.0.17",
 	"description": "Connect language models to Model Context Protocols",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -9,7 +9,9 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsc",
 		"build:all": "npm run build -ws --include-workspace-root",
