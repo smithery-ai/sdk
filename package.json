@@ -18,7 +18,6 @@
 		"link": "npm link -ws --include-workspace-root"
 	},
 	"license": "GPL-3.0-only",
-	"workspaces": ["mcps/*"],
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
 		"@icons-pack/react-simple-icons": "^10.2.0",
