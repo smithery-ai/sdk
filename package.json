@@ -9,9 +9,7 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"scripts": {
 		"build": "tsc",
 		"build:all": "npm run build -ws --include-workspace-root",
@@ -23,7 +21,7 @@
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
 		"@icons-pack/react-simple-icons": "^10.2.0",
-		"@modelcontextprotocol/sdk": "^1.0.3",
+		"@modelcontextprotocol/sdk": "^1.1.1",
 		"openai": "^4.0.0",
 		"uuid": "^11.0.3"
 	},

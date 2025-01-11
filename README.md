@@ -22,68 +22,75 @@ npm install @smithery/sdk
 
 ## Usage
 
-In this example, we'll connect use OpenAI client with Exa search capabilities.
+In this example, we'll connect to Exa search capabilities using either OpenAI or Anthropic.
 
 ```bash
-npm install @smithery/mcp-exa
+npm install @smithery/sdk @modelcontextprotocol/sdk
 ```
 
-The following code sets up OpenAI and connects to an Exa MCP server. In this case, we're running the server locally within the same process, so it's just a simple passthrough.
+The following code sets up the client and connects to an Exa MCP server:
 
 ```typescript
 import { MultiClient } from "@smithery/sdk"
 import { OpenAIChatAdapter } from "@smithery/sdk/integrations/llm/openai"
-import * as exa from "@smithery/mcp-exa"
+import { AnthropicChatAdapter } from "@smithery/sdk/integrations/llm/anthropic"
+import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
 import { OpenAI } from "openai"
-import { createTransport } from "@smithery/sdk/registry"
+import Anthropic from "@anthropic-ai/sdk"
+import EventSource from "eventsource"
 
-const openai = new OpenAI()
-const exaServer = exa.createServer({
-  apiKey: process.env.EXA_API_KEY,
-})
+// Patch event source for Node.js environment
+global.EventSource = EventSource as any
 
-const sequentialThinking = await createTransport(
-  "@modelcontextprotocol/server-sequential-thinking",
+// Create a new connection
+const exaTransport = new SSEClientTransport(
+  // Replace with your deployed MCP server URL
+  new URL("https://your-mcp-server.example.com/sse")
 )
+
+// Initialize a multi-client connection
 const client = new MultiClient()
 await client.connectAll({
-  exa: exaServer,
-  sequentialThinking: sequentialThinking,
+  exa: exaTransport,
+  // You can add more connections here...
+})
+
+// Configure and authenticate
+await client.clients.exa.request({
+  method: "config",
+  params: {
+    config: {
+      apiKey: process.env.EXA_API_KEY,
+    },
+  },
 })
 ```
 
-Now you can make your LLM aware of the available tools from Exa.
+Now you can use either OpenAI or Anthropic to interact with the tools:
 
 ```typescript
-// Create an adapter
-const adapter = new OpenAIChatAdapter(client)
-const response = await openai.chat.completions.create({
+// Using OpenAI
+const openai = new OpenAI()
+const openaiAdapter = new OpenAIChatAdapter(client)
+const openaiResponse = await openai.chat.completions.create({
   model: "gpt-4o-mini",
-  messages: [{ role: "user", content: "In 2024, did OpenAI release GPT-5?" }],
-  // Pass the tools to OpenAI call
-  tools: await adapter.listTools(),
+  messages: [{ role: "user", content: "What AI events are happening in Singapore?" }],
+  tools: await openaiAdapter.listTools(),
 })
-// Obtain the tool outputs as new messages
-const toolMessages = await adapter.callTool(response)
+const openaiToolMessages = await openaiAdapter.callTool(openaiResponse)
 ```
 
-Using this, you can easily enable your LLM to call tools and obtain the results.
-
-However, it's often the case where your LLM needs to call a tool, see its response, and continue processing output of the tool in order to give you a final response.
-
-In this case, you have to loop your LLM call and update your messages until there are no more toolMessages to continue.
-
-Example:
+For more complex interactions where the LLM needs to process tool outputs and potentially make additional calls, you'll need to implement a conversation loop. Here's an example:
 
 ```typescript
 let messages = [
   {
     role: "user",
-    content:
-      "Deduce Obama's age in number of days. It's November 28, 2024 today. Search to ensure correctness.",
+    content: "What are some AI events happening in Singapore and how many days until the next one?",
   },
 ]
 const adapter = new OpenAIChatAdapter(client)
+let isDone = false
 
 while (!isDone) {
   const response = await openai.chat.completions.create({
@@ -91,6 +98,7 @@ while (!isDone) {
     messages,
     tools: await adapter.listTools(),
   })
+  
   // Handle tool calls
   const toolMessages = await adapter.callTool(response)
 
@@ -109,14 +117,14 @@ See a full example in the [examples](./src/examples) directory.
 Error: ReferenceError: EventSource is not defined
 ```
 
-This event means you're trying to use EventSource API (which is typically used in the browser) from Node. You'll have to install the following to use it:
+This error means you're trying to use EventSource API (which is typically used in the browser) from Node. Install the following packages:
 
 ```bash
 npm install eventsource
 npm install -D @types/eventsource
 ```
 
-Patch the global EventSource object:
+Then patch the global EventSource object:
 
 ```typescript
 import EventSource from "eventsource"

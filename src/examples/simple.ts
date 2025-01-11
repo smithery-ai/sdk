@@ -1,15 +1,15 @@
 import Anthropic from "@anthropic-ai/sdk"
 import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/src/resources/beta/prompt-caching/index.js"
-import * as exa from "@smithery/mcp-exa"
+import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
 import dotenv from "dotenv"
 import EventSource from "eventsource"
+import { exit } from "node:process"
 import { OpenAI } from "openai"
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs"
+import { type ConfigRequest, ConfigResultSchema } from "../config.js"
 import { MultiClient } from "../index.js"
 import { AnthropicChatAdapter } from "../integrations/llm/anthropic.js"
 import { OpenAIChatAdapter } from "../integrations/llm/openai.js"
-import { createRegistryTransport } from "../registry.js"
-import { exit } from "node:process"
 // Patch event source
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 global.EventSource = EventSource as any
@@ -23,18 +23,36 @@ async function main() {
 	const args = process.argv.slice(2)
 	const useOpenAI = args.includes("--openai")
 
-	const exaServer = exa.createServer({
-		apiKey: process.env.EXA_API_KEY as string,
-	})
-
-	const sequentialThinking = await createRegistryTransport(
-		"@modelcontextprotocol/server-sequential-thinking",
+	// Create a new connection
+	const exaTransport = new SSEClientTransport(
+		// Replace the URL to your deployed MCP.
+		new URL("https://exa-mcp-server-42082066756.us-central1.run.app/sse"),
 	)
+
+	// Initialize a multi-client connection
 	const client = new MultiClient()
 	await client.connectAll({
-		exa: exaServer,
-		sequentialThinking: sequentialThinking,
+		exa: exaTransport,
+		// You can add more connections here...
 	})
+
+	// Configure servers. Authenticate
+	const resp = await client.clients.exa.request(
+		{
+			method: "config",
+			params: {
+				config: {
+					apiKey: process.env.EXA_API_KEY,
+				},
+			},
+		} as ConfigRequest,
+		ConfigResultSchema,
+	)
+
+	if (resp.error) {
+		console.error("Failed to authenticate:", resp.error)
+		exit(1)
+	}
 
 	// Example conversation with tool usage
 	let isDone = false
@@ -71,7 +89,6 @@ async function main() {
 		} else {
 			const adapter = new AnthropicChatAdapter(client)
 			const response = await chatState.llm.beta.promptCaching.messages.create({
-				// model: "claude-3-5-haiku-20241022",
 				model: "claude-3-5-sonnet-20241022",
 				max_tokens: 64,
 				messages: chatState.messages,

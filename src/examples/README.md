@@ -26,7 +26,7 @@ This directory contains examples demonstrating how to use the Smithery SDK.
 4. Run an example:
    ```bash
    # Run the simple example
-   npx tsx examples/simple.ts
+   npx tsx src/examples/simple.ts
    ```
 
 ## Available Examples
