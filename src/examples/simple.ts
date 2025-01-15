@@ -6,7 +6,7 @@ import EventSource from "eventsource"
 import { exit } from "node:process"
 import { OpenAI } from "openai"
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs"
-import { type ConfigRequest, ConfigResultSchema } from "../config.js"
+import { createSmitherySSE as createSmitheryUrl } from "../config.js"
 import { MultiClient } from "../index.js"
 import { AnthropicChatAdapter } from "../integrations/llm/anthropic.js"
 import { OpenAIChatAdapter } from "../integrations/llm/openai.js"
@@ -25,8 +25,13 @@ async function main() {
 
 	// Create a new connection
 	const exaTransport = new SSEClientTransport(
-		// Replace the URL to your deployed MCP.
-		new URL("https://exa-mcp-server-42082066756.us-central1.run.app/sse"),
+		createSmitheryUrl(
+			// Note: this server may not exist. Replace with your deployment
+			"https://exa-mcp-server-42082066756.us-central1.run.app/sse",
+			{
+				apiKey: process.env.EXA_API_KEY,
+			},
+		),
 	)
 
 	// Initialize a multi-client connection
@@ -35,24 +40,6 @@ async function main() {
 		exa: exaTransport,
 		// You can add more connections here...
 	})
-
-	// Configure servers. Authenticate
-	const resp = await client.clients.exa.request(
-		{
-			method: "config",
-			params: {
-				config: {
-					apiKey: process.env.EXA_API_KEY,
-				},
-			},
-		} as ConfigRequest,
-		ConfigResultSchema,
-	)
-
-	if (resp.error) {
-		console.error("Failed to authenticate:", resp.error)
-		exit(1)
-	}
 
 	// Example conversation with tool usage
 	let isDone = false
