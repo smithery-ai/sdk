@@ -1,18 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk"
 import type { PromptCachingBetaMessageParam } from "@anthropic-ai/sdk/src/resources/beta/prompt-caching/index.js"
-import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
 import dotenv from "dotenv"
-import EventSource from "eventsource"
 import { exit } from "node:process"
 import { OpenAI } from "openai"
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs"
-import { createSmitheryUrl } from "../config.js"
 import { MultiClient } from "../index.js"
 import { AnthropicChatAdapter } from "../integrations/llm/anthropic.js"
 import { OpenAIChatAdapter } from "../integrations/llm/openai.js"
-// Patch event source
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-global.EventSource = EventSource as any
+import { createTransport } from "../transport.js"
 
 /**
  * Showcases a multi-tool calling example with OpenAI or Anthropic
@@ -24,14 +19,12 @@ async function main() {
 	const useOpenAI = args.includes("--openai")
 
 	// Create a new connection
-	const exaTransport = new SSEClientTransport(
-		createSmitheryUrl(
-			// Note: this server may not exist. Replace with your deployment
-			"https://exa-mcp-server-42082066756.us-central1.run.app/sse",
-			{
-				apiKey: process.env.EXA_API_KEY,
-			},
-		),
+	const exaTransport = createTransport(
+		// Note: this server may not exist. Replace with your deployment
+		"https://exa-mcp-server-42082066756.us-central1.run.app",
+		{
+			apiKey: process.env.EXA_API_KEY,
+		},
 	)
 
 	// Initialize a multi-client connection

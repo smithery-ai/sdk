@@ -34,18 +34,14 @@ The following code sets up the client and connects to an Exa MCP server:
 import { MultiClient } from "@smithery/sdk"
 import { OpenAIChatAdapter } from "@smithery/sdk/integrations/llm/openai"
 import { AnthropicChatAdapter } from "@smithery/sdk/integrations/llm/anthropic"
-import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js"
+import { createTransport } from "@smithery/sdk/transport.js"
 import { OpenAI } from "openai"
 import Anthropic from "@anthropic-ai/sdk"
-import EventSource from "eventsource"
-
-// Patch event source for Node.js environment
-global.EventSource = EventSource as any
 
 // Create a new connection
-const exaTransport = new SSEClientTransport(
+const exaTransport = createTransport(
   // Replace with your deployed MCP server URL
-  new URL("https://your-mcp-server.example.com/sse")
+  "https://your-mcp-server.example.com"
 )
 
 // Initialize a multi-client connection
@@ -110,22 +106,3 @@ while (!isDone) {
 ```
 
 See a full example in the [examples](./src/examples) directory.
-
-# Troubleshooting
-
-```
-Error: ReferenceError: EventSource is not defined
-```
-
-This error means you're trying to use EventSource API (which is typically used in the browser) from Node. Install the following packages:
-
-```bash
-npm install eventsource
-npm install -D @types/eventsource
-```
-
-Then patch the global EventSource object:
-
-```typescript
-import EventSource from "eventsource"
-global.EventSource = EventSource as any

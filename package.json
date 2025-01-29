@@ -9,9 +9,7 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"scripts": {
 		"build": "tsc",
 		"build:all": "npm run build -ws --include-workspace-root",
@@ -30,11 +28,9 @@
 	"devDependencies": {
 		"@smithery/mcp-e2b": "*",
 		"@smithery/mcp-exa": "*",
-		"@types/eventsource": "^1.1.15",
 		"@types/node": "^20.0.0",
 		"@types/uuid": "^9.0.7",
 		"dotenv": "^16.4.7",
-		"eventsource": "^2.0.2",
 		"tsx": "^4.19.2",
 		"typescript": "^5.0.0"
 	}
