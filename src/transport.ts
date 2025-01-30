@@ -14,20 +14,20 @@ export function createTransport(smitheryServerUrl: string, config?: object) {
 		// First try to parse as-is
 		url = new URL(smitheryServerUrl);
 		
-		// For WebSocket connections, only ws: and wss: are valid
-		if (url.protocol !== 'ws:' && url.protocol !== 'wss:') {
+		// For WebSocket connections, ws:, wss:, and ws+unix: are valid
+		if (url.protocol !== 'ws:' && url.protocol !== 'wss:' && url.protocol !== 'ws+unix:') {
 			// Special case: automatically convert http(s) to ws(s)
 			if (url.protocol === 'http:' || url.protocol === 'https:') {
 				console.warn(
 					'Warning: HTTP/HTTPS protocol detected in smitheryServerUrl. ' +
 					'Converting to WebSocket protocol. For better compatibility, ' +
-					'consider providing the URL without a protocol.'
+					'consider providing the URL without protocol.'
 				);
 				url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
 			} else {
 				throw new Error(
 					`Protocol ${url.protocol} is not supported for WebSocket connections. ` +
-					'Please use ws:// or wss:// (or provide URL without protocol)'
+					'Please use ws://, wss://, ws+unix:// (or provide URL without protocol)'
 				);
 			}
 		}
