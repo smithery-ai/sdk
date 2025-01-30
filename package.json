@@ -1,6 +1,6 @@
 {
 	"name": "@smithery/sdk",
-	"version": "0.0.24",
+	"version": "0.0.25",
 	"description": "Connect language models to Model Context Protocols",
 	"type": "module",
 	"main": "./dist/index.js",
