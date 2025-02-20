@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
 		"@icons-pack/react-simple-icons": "^10.2.0",
-		"@modelcontextprotocol/sdk": "^1.1.1",
+		"@modelcontextprotocol/sdk": "^1.5.0",
 		"openai": "^4.0.0",
 		"uuid": "^11.0.3"
 	},
