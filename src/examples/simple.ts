@@ -70,7 +70,7 @@ async function main() {
 			const adapter = new AnthropicChatAdapter(client)
 			const response = await chatState.llm.beta.promptCaching.messages.create({
 				model: "claude-3-5-sonnet-20241022",
-				max_tokens: 64,
+				max_tokens: 256,
 				messages: chatState.messages,
 				tools: await adapter.listTools(),
 			})
