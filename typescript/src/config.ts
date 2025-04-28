@@ -10,7 +10,7 @@ export function createSmitheryUrl(
 	config?: object,
 	apiKey?: string,
 ) {
-	const url = new URL(baseUrl)
+	const url = new URL(`${baseUrl}/mcp`)
 	if (config) {
 		const param =
 			typeof window !== "undefined"
