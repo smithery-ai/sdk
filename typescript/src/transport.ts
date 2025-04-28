@@ -9,7 +9,11 @@ import { createSmitheryUrl } from "./config.js"
  * @param apiKey Optional API key for authentication
  * @returns Transport
  */
-export function createTransport(smitheryServerUrl: string, config?: object, apiKey?: string) {
+export function createTransport(
+	smitheryServerUrl: string,
+	config?: object,
+	apiKey?: string,
+) {
 	return new WebSocketClientTransport(
 		createSmitheryUrl(`${smitheryServerUrl}/ws`, config, apiKey),
 	)
