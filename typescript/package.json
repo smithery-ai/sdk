@@ -9,9 +9,7 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"scripts": {
 		"build": "tsc",
 		"build:all": "npm run build -ws --include-workspace-root",
@@ -23,13 +21,15 @@
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
 		"@icons-pack/react-simple-icons": "^10.2.0",
-		"@modelcontextprotocol/sdk": "^1.5.0",
+		"@modelcontextprotocol/sdk": "^1.10.2",
+		"express": "^5.1.0",
 		"openai": "^4.0.0",
 		"uuid": "^11.0.3"
 	},
 	"devDependencies": {
 		"@smithery/mcp-e2b": "*",
 		"@smithery/mcp-exa": "*",
+		"@types/express": "^5.0.1",
 		"@types/node": "^20.0.0",
 		"@types/uuid": "^9.0.7",
 		"dotenv": "^16.4.7",
