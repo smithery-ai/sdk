@@ -13,6 +13,10 @@ jobs:
   update-packages:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: typescript
+        
     steps:
       - name: Check out repository
         uses: actions/checkout@v3

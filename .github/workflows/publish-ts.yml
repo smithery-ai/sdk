@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ts-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -49,6 +49,7 @@ jobs:
       - name: Bump version
         run: |
           npm version patch -m "chore: bump version to %s [skip ci]"
+          cd ..
           git push
           git push --tags
 

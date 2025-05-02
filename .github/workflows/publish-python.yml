@@ -8,6 +8,10 @@ on:
       - 'python/**'
   workflow_dispatch:  # Allows manual triggering
 
+concurrency:
+  group: py-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
