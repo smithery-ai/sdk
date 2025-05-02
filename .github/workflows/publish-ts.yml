@@ -48,8 +48,8 @@ jobs:
 
       - name: Bump version
         run: |
+          mkdir -p .git
           npm version patch -m "chore: bump version to %s [skip ci]"
-          cd ..
           git push
           git push --tags
 
