@@ -1,7 +1,7 @@
 {
 	"name": "@smithery/sdk",
-	"version": "1.1.1",
-	"description": "Connect language models to Model Context Protocols",
+	"version": "1.2.0",
+	"description": "SDK to develop with Smithery",
 	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
@@ -17,18 +17,15 @@
 		"check": "npx @biomejs/biome check --write --unsafe",
 		"link": "npm link -ws --include-workspace-root"
 	},
-	"license": "GPL-3.0-only",
+	"license": "MIT",
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.1",
-		"@icons-pack/react-simple-icons": "^10.2.0",
 		"@modelcontextprotocol/sdk": "^1.10.2",
 		"express": "^5.1.0",
 		"openai": "^4.0.0",
 		"uuid": "^11.0.3"
 	},
 	"devDependencies": {
-		"@smithery/mcp-e2b": "*",
-		"@smithery/mcp-exa": "*",
 		"@types/express": "^5.0.1",
 		"@types/node": "^20.0.0",
 		"@types/uuid": "^9.0.7",
