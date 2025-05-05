@@ -8,11 +8,13 @@ import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
 /**
  * Arguments when we create a new instance of your server
  */
-export interface CreateServerArg {
-	config: Record<string, unknown>
+export interface CreateServerArg<T = Record<string, unknown>> {
+	config: T
 }
 
-export type CreateServerFn = (arg: CreateServerArg) => Server
+export type CreateServerFn<T = Record<string, unknown>> = (
+	arg: CreateServerArg<T>,
+) => Server
 
 /**
  * Creates a stateless server for handling MCP requests
@@ -20,7 +22,9 @@ export type CreateServerFn = (arg: CreateServerArg) => Server
  * @param createMcpServer Function to create an MCP server
  * @returns Express app
  */
-export function createStatelessServer(createMcpServer: CreateServerFn) {
+export function createStatelessServer<T = Record<string, unknown>>(
+	createMcpServer: CreateServerFn<T>,
+) {
 	const app = express()
 	app.use(express.json())
 
@@ -49,7 +53,7 @@ export function createStatelessServer(createMcpServer: CreateServerFn) {
 			}
 
 			// Create a new server instance with config
-			const server = createMcpServer({ config })
+			const server = createMcpServer({ config: config as T })
 
 			// Create a new transport instance
 			const transport = new StreamableHTTPServerTransport({

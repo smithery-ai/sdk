@@ -9,12 +9,14 @@ import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
 /**
  * Arguments when we create a new instance of your server
  */
-export interface CreateServerArg {
+export interface CreateServerArg<T = Record<string, unknown>> {
 	sessionId: string
-	config: Record<string, unknown>
+	config: T
 }
 
-export type CreateServerFn = (arg: CreateServerArg) => Server
+export type CreateServerFn<T = Record<string, unknown>> = (
+	arg: CreateServerArg<T>,
+) => Server
 
 /**
  * Creates a stateful server for handling MCP requests.
@@ -22,7 +24,9 @@ export type CreateServerFn = (arg: CreateServerArg) => Server
  * @param createMcpServer Function to create an MCP server
  * @returns Express app
  */
-export function createStatefulServer(createMcpServer: CreateServerFn) {
+export function createStatefulServer<T = Record<string, unknown>>(
+	createMcpServer: CreateServerFn<T>,
+) {
 	const app = express()
 	app.use(express.json())
 
@@ -61,7 +65,7 @@ export function createStatefulServer(createMcpServer: CreateServerFn) {
 
 				const server = createMcpServer({
 					sessionId: newSessionId,
-					config,
+					config: config as T,
 				})
 
 				// Connect to the MCP server
