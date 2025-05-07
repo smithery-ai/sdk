@@ -60,9 +60,21 @@ export function createStatefulServer<T = Record<string, unknown>>(
 				}
 			}
 
+			let config: ReturnType<typeof parseExpressRequestConfig>
 			try {
-				const config = parseExpressRequestConfig(req)
-
+				config = parseExpressRequestConfig(req)
+			} catch (error) {
+				res.status(400).json({
+					jsonrpc: "2.0",
+					error: {
+						code: -32000,
+						message: "Bad Request: Invalid configuration",
+					},
+					id: null,
+				})
+				return
+			}
+			try {
 				const server = createMcpServer({
 					sessionId: newSessionId,
 					config: config as T,
@@ -71,11 +83,12 @@ export function createStatefulServer<T = Record<string, unknown>>(
 				// Connect to the MCP server
 				await server.connect(transport)
 			} catch (error) {
-				res.status(400).json({
+				console.error("Error initializing server:", error)
+				res.status(500).json({
 					jsonrpc: "2.0",
 					error: {
-						code: -32000,
-						message: "Bad Request: Invalid configuration",
+						code: -32603,
+						message: "Error initializing server.",
 					},
 					id: null,
 				})
