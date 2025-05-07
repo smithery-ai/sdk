@@ -4,7 +4,7 @@ import express from "express"
 import { randomUUID } from "node:crypto"
 import { parseExpressRequestConfig } from "../config.js"
 
-import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
 /**
  * Arguments when we create a new instance of your server
@@ -16,7 +16,7 @@ export interface CreateServerArg<T = Record<string, unknown>> {
 
 export type CreateServerFn<T = Record<string, unknown>> = (
 	arg: CreateServerArg<T>,
-) => Server
+) => McpServer
 
 /**
  * Creates a stateful server for handling MCP requests.
@@ -26,7 +26,7 @@ export type CreateServerFn<T = Record<string, unknown>> = (
  */
 export function createStatefulServer<T = Record<string, unknown>>(
 	createMcpServer: CreateServerFn<T>,
-) {
+): { app: express.Express } {
 	const app = express()
 	app.use(express.json())
 
