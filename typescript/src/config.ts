@@ -1,27 +1,37 @@
 import type express from "express"
 
+export interface SmitheryUrlOptions {
+	// Smithery API key
+	apiKey?: string
+	// Configuration profile to use a config saved on Smithery
+	profile?: string
+	// Configuration object, which overrides the profile if provided
+	config?: object
+}
+
 /**
  * Creates a URL to connect to the Smithery MCP server.
  * @param baseUrl The base URL of the Smithery server
- * @param config Optional configuration object
- * @param apiKey API key for authentication. Required if using Smithery.
+ * @param options Optional configuration object
  * @returns A URL object with properly encoded parameters. Example: https://server.smithery.ai/{namespace}/mcp?config=BASE64_ENCODED_CONFIG&api_key=API_KEY
  */
 export function createSmitheryUrl(
 	baseUrl: string,
-	config?: object,
-	apiKey?: string,
+	options?: SmitheryUrlOptions,
 ) {
 	const url = new URL(`${baseUrl}/mcp`)
-	if (config) {
+	if (options?.config) {
 		const param =
 			typeof window !== "undefined"
-				? btoa(JSON.stringify(config))
-				: Buffer.from(JSON.stringify(config)).toString("base64")
+				? btoa(JSON.stringify(options.config))
+				: Buffer.from(JSON.stringify(options.config)).toString("base64")
 		url.searchParams.set("config", param)
 	}
-	if (apiKey) {
-		url.searchParams.set("api_key", apiKey)
+	if (options?.apiKey) {
+		url.searchParams.set("api_key", options.apiKey)
+	}
+	if (options?.profile) {
+		url.searchParams.set("profile", options.profile)
 	}
 	return url
 }

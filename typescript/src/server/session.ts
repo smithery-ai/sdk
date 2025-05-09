@@ -26,7 +26,7 @@ export const createLRUStore = <T extends Transport>(
 		get: (id) => {
 			const t = cache.get(id)
 			if (!t) return undefined
-            // refresh position
+			// refresh position
 			cache.delete(id)
 			cache.set(id, t)
 			return t
