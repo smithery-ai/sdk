@@ -1,6 +1,6 @@
 {
 	"name": "@smithery/sdk",
-	"version": "1.3.1",
+	"version": "1.3.2",
 	"description": "SDK to develop with Smithery",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -9,7 +9,9 @@
 		".": "./dist/index.js",
 		"./*": "./dist/*"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsc",
 		"build:all": "npm run build -ws --include-workspace-root",
