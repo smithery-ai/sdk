@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js"
 import express from "express"
-import { parseExpressRequestConfig } from "../config.js"
+import { parseExpressRequestConfig } from "../shared/config.js"
 
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import { type SessionStore, createLRUStore } from "./session.js"

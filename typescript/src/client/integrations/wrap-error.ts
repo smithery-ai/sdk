@@ -5,7 +5,7 @@ import {
 	CallToolResultSchema,
 	type CompatibilityCallToolResultSchema,
 } from "@modelcontextprotocol/sdk/types.js"
-import { patch } from "src/shared/patch.js"
+import { patch } from "../../shared/patch.js"
 
 /**
  * Wraps each tool call so any errors get sent back to the LLM instead of throwing

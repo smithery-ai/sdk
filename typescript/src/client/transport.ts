@@ -1,5 +1,5 @@
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js"
-import { createSmitheryUrl, type SmitheryUrlOptions } from "../config.js"
+import { createSmitheryUrl, type SmitheryUrlOptions } from "../shared/config.js"
 
 /**
  * Creates a transport to connect to the Smithery server

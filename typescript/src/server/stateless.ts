@@ -1,7 +1,7 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 import type { Request, Response } from "express"
 import express from "express"
-import { parseExpressRequestConfig } from "../config.js"
+import { parseExpressRequestConfig } from "../shared/config.js"
 
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
 
