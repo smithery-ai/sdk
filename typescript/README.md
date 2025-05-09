@@ -22,14 +22,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 function createMcpServer({ sessionId, config }) {
   // Create and return a server instance
   // https://github.com/modelcontextprotocol/typescript-sdk?tab=readme-ov-file#core-concepts
-  const server = new McpServer({
+  const mcpServer = new McpServer({
     name: "My App",
     version: "1.0.0"
   })
 
   // ...
   
-  return server
+  return mcpServer.server
 }
 
 // Create the stateless server using your MCP server function.
