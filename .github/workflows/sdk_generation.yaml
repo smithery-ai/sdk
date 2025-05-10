@@ -23,9 +23,10 @@ jobs:
     with:
       force: ${{ github.event.inputs.force }}
       mode: pr
-      signed_commits: true
       set_version: ${{ github.event.inputs.set_version }}
+      signed_commits: true
       working_directory: typescript/registry
     secrets:
       github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      npm_token: ${{ secrets.NPM_TOKEN }}
       speakeasy_api_key: ${{ secrets.SPEAKEASY_API_KEY }}

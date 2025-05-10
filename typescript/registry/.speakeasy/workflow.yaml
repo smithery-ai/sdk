@@ -12,6 +12,9 @@ targets:
     smithery-registry:
         target: typescript
         source: Smithery Registry API
+        publish:
+            npm:
+                token: $npm_token
         codeSamples:
             registry:
                 location: registry.speakeasyapi.dev/smithery-lhr/smithery/smithery-registry-api-typescript-code-samples
