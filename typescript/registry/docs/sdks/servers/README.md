@@ -18,7 +18,7 @@ Retrieves a paginated list of all available servers with optional filtering.
 import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -46,7 +46,7 @@ import { serversList } from "@smithery/registry/funcs/serversList.js";
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -100,7 +100,7 @@ Retrieves detailed information about a specific server by its qualified name.
 import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -126,7 +126,7 @@ import { serversGet } from "@smithery/registry/funcs/serversGet.js";
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {

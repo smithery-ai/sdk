@@ -3,7 +3,7 @@
 import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {

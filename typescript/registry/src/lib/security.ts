@@ -244,7 +244,7 @@ export function resolveGlobalSecurity(
       {
         fieldName: "Authorization",
         type: "http:bearer",
-        value: security?.bearerAuth ?? env().SMITHERYREGISTRY_BEARER_AUTH,
+        value: security?.bearerAuth ?? env().SMITHERY_BEARER_AUTH,
       },
     ],
   );
