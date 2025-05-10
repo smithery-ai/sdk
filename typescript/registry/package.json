@@ -1,7 +1,7 @@
 {
   "name": "@smithery/registry",
   "version": "0.2.1",
-  "author": "Speakeasy",
+  "author": "Smithery",
   "type": "module",
   "bin": {
     "mcp": "bin/mcp-server.js"
