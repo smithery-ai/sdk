@@ -22,34 +22,22 @@ This API allows you to discover and retrieve details about available MCP servers
 <!-- Start Table of Contents [toc] -->
 ## Table of Contents
 <!-- $toc-max-depth=2 -->
-- [@smithery/registry](#smitheryregistry)
-  - [Summary](#summary)
-  - [Table of Contents](#table-of-contents)
-  - [SDK Installation](#sdk-installation)
-    - [NPM](#npm)
-    - [PNPM](#pnpm)
-    - [Bun](#bun)
-    - [Yarn](#yarn)
-    - [Model Context Protocol (MCP) Server](#model-context-protocol-mcp-server)
-  - [Requirements](#requirements)
-  - [SDK Example Usage](#sdk-example-usage)
-    - [Example](#example)
-  - [Authentication](#authentication)
-    - [Per-Client Security Schemes](#per-client-security-schemes)
-  - [Available Resources and Operations](#available-resources-and-operations)
-    - [servers](#servers)
-  - [Standalone functions](#standalone-functions)
-  - [Pagination](#pagination)
-  - [Retries](#retries)
-  - [Error Handling](#error-handling)
-  - [Server Selection](#server-selection)
-    - [Override Server URL Per-Client](#override-server-url-per-client)
-  - [Custom HTTP Client](#custom-http-client)
-  - [Debugging](#debugging)
-- [Development](#development)
-  - [Maturity](#maturity)
-  - [Contributions](#contributions)
-    - [SDK Created by Speakeasy](#sdk-created-by-speakeasy)
+* [@smithery/registry](#smitheryregistry)
+  * [SDK Installation](#sdk-installation)
+  * [Requirements](#requirements)
+  * [SDK Example Usage](#sdk-example-usage)
+  * [Authentication](#authentication)
+  * [Available Resources and Operations](#available-resources-and-operations)
+  * [Standalone functions](#standalone-functions)
+  * [Pagination](#pagination)
+  * [Retries](#retries)
+  * [Error Handling](#error-handling)
+  * [Server Selection](#server-selection)
+  * [Custom HTTP Client](#custom-http-client)
+  * [Debugging](#debugging)
+* [Development](#development)
+  * [Maturity](#maturity)
+  * [Contributions](#contributions)
 
 <!-- End Table of Contents [toc] -->
 
@@ -65,25 +53,25 @@ The SDK can be installed with either [npm](https://www.npmjs.com/), [pnpm](https
 ### NPM
 
 ```bash
-npm add <UNSET>
+npm add https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
 ```
 
 ### PNPM
 
 ```bash
-pnpm add <UNSET>
+pnpm add https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
 ```
 
 ### Bun
 
 ```bash
-bun add <UNSET>
+bun add https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
 ```
 
 ### Yarn
 
 ```bash
-yarn add <UNSET> zod
+yarn add https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry zod
 
 # Note that Yarn does not install peer dependencies automatically. You will need
 # to install zod as shown above.
@@ -91,90 +79,6 @@ yarn add <UNSET> zod
 
 > [!NOTE]
 > This package is published with CommonJS and ES Modules (ESM) support.
-
-
-### Model Context Protocol (MCP) Server
-
-This SDK is also an installable MCP server where the various SDK methods are
-exposed as tools that can be invoked by AI applications.
-
-> Node.js v20 or greater is required to run the MCP server from npm.
-
-<details>
-<summary>Claude installation steps</summary>
-
-Add the following server definition to your `claude_desktop_config.json` file:
-
-```json
-{
-  "mcpServers": {
-    "SmitheryRegistry": {
-      "command": "npx",
-      "args": [
-        "-y", "--package", "@smithery/registry",
-        "--",
-        "mcp", "start",
-        "--bearer-auth", "..."
-      ]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary>Cursor installation steps</summary>
-
-Create a `.cursor/mcp.json` file in your project root with the following content:
-
-```json
-{
-  "mcpServers": {
-    "SmitheryRegistry": {
-      "command": "npx",
-      "args": [
-        "-y", "--package", "@smithery/registry",
-        "--",
-        "mcp", "start",
-        "--bearer-auth", "..."
-      ]
-    }
-  }
-}
-```
-
-</details>
-
-You can also run MCP servers as a standalone binary with no additional dependencies. You must pull these binaries from available Github releases:
-
-```bash
-curl -L -o mcp-server \
-    https://github.com/{org}/{repo}/releases/download/{tag}/mcp-server-bun-darwin-arm64 && \
-chmod +x mcp-server
-```
-
-If the repo is a private repo you must add your Github PAT to download a release `-H "Authorization: Bearer {GITHUB_PAT}"`.
-
-
-```json
-{
-  "mcpServers": {
-    "Todos": {
-      "command": "./DOWNLOAD/PATH/mcp-server",
-      "args": [
-        "start"
-      ]
-    }
-  }
-}
-```
-
-For a full list of server arguments, run:
-
-```sh
-npx -y --package @smithery/registry -- mcp start --help
-```
 <!-- End SDK Installation [installation] -->
 
 <!-- Start Requirements [requirements] -->
@@ -192,7 +96,7 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -218,16 +122,16 @@ run();
 
 This SDK supports the following security scheme globally:
 
-| Name         | Type | Scheme      | Environment Variable           |
-| ------------ | ---- | ----------- | ------------------------------ |
-| `bearerAuth` | http | HTTP Bearer | `SMITHERYREGISTRY_BEARER_AUTH` |
+| Name         | Type | Scheme      | Environment Variable   |
+| ------------ | ---- | ----------- | ---------------------- |
+| `bearerAuth` | http | HTTP Bearer | `SMITHERY_BEARER_AUTH` |
 
 To authenticate with the API the `bearerAuth` parameter must be set when initializing the SDK client instance. For example:
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -298,7 +202,7 @@ Here's an example of one such pagination call:
 import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -327,7 +231,7 @@ To change the default retry strategy for a single API call, simply provide a ret
 import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -371,7 +275,7 @@ const smitheryRegistry = new SmitheryRegistry({
     },
     retryConnectionErrors: false,
   },
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -412,7 +316,7 @@ import {
 } from "@smithery/registry/models/errors";
 
 const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -482,7 +386,7 @@ import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
   serverURL: "https://registry.smithery.ai",
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -566,7 +470,7 @@ import { SmitheryRegistry } from "@smithery/registry";
 const sdk = new SmitheryRegistry({ debugLogger: console });
 ```
 
-You can also enable a default debug logger by setting an environment variable `SMITHERYREGISTRY_DEBUG` to true.
+You can also enable a default debug logger by setting an environment variable `SMITHERY_DEBUG` to true.
 <!-- End Debugging [debug] -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->

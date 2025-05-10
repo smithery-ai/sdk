@@ -26,7 +26,7 @@ import { SDKValidationError } from "@smithery/registry/models/errors/sdkvalidati
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERYREGISTRY_BEARER_AUTH"] ?? "",
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {

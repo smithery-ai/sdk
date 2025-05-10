@@ -109,7 +109,7 @@ export class ClientSDK {
     this._baseURL = baseURL;
     this.#httpClient = client;
     this.#logger = options.debugLogger;
-    if (!this.#logger && env().SMITHERYREGISTRY_DEBUG) {
+    if (!this.#logger && env().SMITHERY_DEBUG) {
       this.#logger = console;
     }
   }

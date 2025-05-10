@@ -5,8 +5,11 @@ management:
   docVersion: 1.0.0
   speakeasyVersion: 1.543.4
   generationVersion: 2.598.22
-  releaseVersion: 0.2.1
-  configChecksum: d06c1f2ed7e0c589b593a7c563f0102e
+  releaseVersion: 0.3.0
+  configChecksum: d62d0ae5857aed76b4f521befd1072fc
+  repoURL: https://github.com/smithery-ai/sdk.git
+  repoSubDirectory: typescript/registry
+  installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
 features:
   typescript:
     additionalDependencies: 0.1.0
@@ -22,7 +25,6 @@ features:
     globalSecurityFlattening: 0.1.0
     globalServerURLs: 2.82.5
     groups: 2.81.2
-    mcpServer: 0.9.2
     nameOverrides: 2.81.2
     nullables: 0.1.1
     pagination: 2.83.0
@@ -84,21 +86,6 @@ generatedFiles:
   - src/lib/sdks.ts
   - src/lib/security.ts
   - src/lib/url.ts
-  - src/mcp-server/build.mts
-  - src/mcp-server/cli.ts
-  - src/mcp-server/cli/start/command.ts
-  - src/mcp-server/cli/start/impl.ts
-  - src/mcp-server/console-logger.ts
-  - src/mcp-server/extensions.ts
-  - src/mcp-server/mcp-server.ts
-  - src/mcp-server/prompts.ts
-  - src/mcp-server/resources.ts
-  - src/mcp-server/scopes.ts
-  - src/mcp-server/server.ts
-  - src/mcp-server/shared.ts
-  - src/mcp-server/tools.ts
-  - src/mcp-server/tools/serversGet.ts
-  - src/mcp-server/tools/serversList.ts
   - src/models/components/connectioninfo.ts
   - src/models/components/index.ts
   - src/models/components/pagination.ts
