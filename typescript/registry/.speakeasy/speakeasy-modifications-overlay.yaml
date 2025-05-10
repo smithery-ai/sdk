@@ -1,0 +1,61 @@
+overlay: 1.0.0
+x-speakeasy-jsonpath: rfc9535
+info:
+  title: Speakeasy Modifications
+  version: 0.0.4
+  x-speakeasy-metadata:
+    after: ""
+    before: ""
+    type: speakeasy-modifications
+actions:
+  - target: $["paths"]["/servers/{qualifiedName}"]["get"]
+    update:
+      x-speakeasy-group: servers
+      x-speakeasy-name-override: get
+    x-speakeasy-metadata:
+      after: sdk.servers.get()
+      before: sdk.<no_group>.getServer()
+      created_at: 1746911395462
+      reviewed_at: 1746911405498
+      type: method-name
+  - target: $["paths"]["/servers"]["get"]
+    update:
+      x-speakeasy-group: servers
+      x-speakeasy-name-override: list
+    x-speakeasy-metadata:
+      after: sdk.servers.list()
+      before: sdk.<no_group>.listServers()
+      created_at: 1746911395462
+      reviewed_at: 1746911405498
+      type: method-name
+  - target: $["paths"]["/servers"]["get"]
+    update:
+      x-speakeasy-pagination:
+        type: offsetLimit
+        inputs:
+          - name: page
+            in: parameters
+            type: page
+          - name: limit
+            in: parameters
+            type: pageSize
+        outputs:
+          results: $.data.resultArray
+    x-speakeasy-metadata:
+      created_at: 1746911826521
+      type: user-edit
+  - target: $
+    update:
+      x-speakeasy-retries:
+        strategy: backoff
+        backoff:
+          initialInterval: 500
+          maxInterval: 60000
+          maxElapsedTime: 3600000
+          exponent: 1.5
+        statusCodes:
+          - 5XX
+        retryConnectionErrors: true
+    x-speakeasy-metadata:
+      created_at: 1746911858635
+      type: user-edit

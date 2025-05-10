@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'typescript/**'
+      - 'typescript/sdk**'
   workflow_dispatch:  # Allows manual triggering
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: typescript
+        working-directory: typescript/sdk
 
     steps:
       - name: Check out repository

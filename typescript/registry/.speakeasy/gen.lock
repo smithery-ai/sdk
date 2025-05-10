@@ -1,0 +1,163 @@
+lockVersion: 2.0.0
+id: 54f57182-fe20-43ea-9003-64b97c2b41be
+management:
+  docChecksum: a27512295bc330f115da7349469ec078
+  docVersion: 1.0.0
+  speakeasyVersion: 1.543.4
+  generationVersion: 2.598.22
+  releaseVersion: 0.2.1
+  configChecksum: d06c1f2ed7e0c589b593a7c563f0102e
+features:
+  typescript:
+    additionalDependencies: 0.1.0
+    additionalProperties: 0.1.1
+    constsAndDefaults: 0.1.11
+    core: 3.21.7
+    defaultEnabledRetries: 0.1.0
+    devContainers: 2.90.0
+    enumUnions: 0.1.0
+    envVarSecurityUsage: 0.1.2
+    globalSecurity: 2.82.13
+    globalSecurityCallbacks: 0.1.0
+    globalSecurityFlattening: 0.1.0
+    globalServerURLs: 2.82.5
+    groups: 2.81.2
+    mcpServer: 0.9.2
+    nameOverrides: 2.81.2
+    nullables: 0.1.1
+    pagination: 2.83.0
+    responseFormat: 0.2.3
+    retries: 2.83.0
+    sdkHooks: 0.2.0
+generatedFiles:
+  - .devcontainer/README.md
+  - .devcontainer/devcontainer.json
+  - .devcontainer/setup.sh
+  - .gitattributes
+  - .npmignore
+  - FUNCTIONS.md
+  - RUNTIMES.md
+  - USAGE.md
+  - docs/lib/utils/retryconfig.md
+  - docs/models/components/connectioninfo.md
+  - docs/models/components/connectioninfotype.md
+  - docs/models/components/inputschema.md
+  - docs/models/components/pagination.md
+  - docs/models/components/security.md
+  - docs/models/components/serverdetailresponse.md
+  - docs/models/components/serverdetailresponsesecurity.md
+  - docs/models/components/serverlistitem.md
+  - docs/models/components/serverlistresponse.md
+  - docs/models/components/tool.md
+  - docs/models/components/tooltype.md
+  - docs/models/errors/notfounderror.md
+  - docs/models/errors/servererror.md
+  - docs/models/errors/unauthorizederror.md
+  - docs/models/operations/getserverrequest.md
+  - docs/models/operations/listserversrequest.md
+  - docs/models/operations/listserversresponse.md
+  - docs/sdks/servers/README.md
+  - docs/sdks/smitheryregistry/README.md
+  - eslint.config.mjs
+  - jsr.json
+  - package.json
+  - src/core.ts
+  - src/funcs/serversGet.ts
+  - src/funcs/serversList.ts
+  - src/hooks/hooks.ts
+  - src/hooks/index.ts
+  - src/hooks/types.ts
+  - src/index.ts
+  - src/lib/base64.ts
+  - src/lib/config.ts
+  - src/lib/dlv.ts
+  - src/lib/encodings.ts
+  - src/lib/env.ts
+  - src/lib/files.ts
+  - src/lib/http.ts
+  - src/lib/is-plain-object.ts
+  - src/lib/logger.ts
+  - src/lib/matchers.ts
+  - src/lib/primitives.ts
+  - src/lib/retries.ts
+  - src/lib/schemas.ts
+  - src/lib/sdks.ts
+  - src/lib/security.ts
+  - src/lib/url.ts
+  - src/mcp-server/build.mts
+  - src/mcp-server/cli.ts
+  - src/mcp-server/cli/start/command.ts
+  - src/mcp-server/cli/start/impl.ts
+  - src/mcp-server/console-logger.ts
+  - src/mcp-server/extensions.ts
+  - src/mcp-server/mcp-server.ts
+  - src/mcp-server/prompts.ts
+  - src/mcp-server/resources.ts
+  - src/mcp-server/scopes.ts
+  - src/mcp-server/server.ts
+  - src/mcp-server/shared.ts
+  - src/mcp-server/tools.ts
+  - src/mcp-server/tools/serversGet.ts
+  - src/mcp-server/tools/serversList.ts
+  - src/models/components/connectioninfo.ts
+  - src/models/components/index.ts
+  - src/models/components/pagination.ts
+  - src/models/components/security.ts
+  - src/models/components/serverdetailresponse.ts
+  - src/models/components/serverlistitem.ts
+  - src/models/components/serverlistresponse.ts
+  - src/models/components/tool.ts
+  - src/models/errors/apierror.ts
+  - src/models/errors/getserver.ts
+  - src/models/errors/httpclienterrors.ts
+  - src/models/errors/index.ts
+  - src/models/errors/sdkvalidationerror.ts
+  - src/models/errors/servererror.ts
+  - src/models/errors/unauthorizederror.ts
+  - src/models/operations/getserver.ts
+  - src/models/operations/index.ts
+  - src/models/operations/listservers.ts
+  - src/sdk/index.ts
+  - src/sdk/sdk.ts
+  - src/sdk/servers.ts
+  - src/types/async.ts
+  - src/types/blobs.ts
+  - src/types/constdatetime.ts
+  - src/types/enums.ts
+  - src/types/fp.ts
+  - src/types/index.ts
+  - src/types/operations.ts
+  - src/types/rfcdate.ts
+  - src/types/streams.ts
+  - tsconfig.json
+examples:
+  listServers:
+    speakeasy-default-list-servers:
+      parameters:
+        query:
+          q: "owner:mem0ai is:verified memory"
+          page: 1
+          pageSize: 10
+      responses:
+        "200":
+          application/json: {"servers": [], "pagination": {"currentPage": 1, "pageSize": 10, "totalPages": 5, "totalCount": 47}}
+        "401":
+          application/json: {"error": "Unauthorized: Invalid API key"}
+        "500":
+          application/json: {"error": "An unexpected error occurred"}
+  getServer:
+    speakeasy-default-get-server:
+      parameters:
+        path:
+          qualifiedName: "<value>"
+      responses:
+        "200":
+          application/json: {"qualifiedName": "smithery-ai/fetch", "displayName": "Fetch", "iconUrl": "https://example.com/icon.png", "deploymentUrl": "https://fetch.smithery.ai", "connections": [{"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}, {"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}, {"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}], "security": {"scanPassed": true}, "tools": [{"name": "fetch_url", "description": "Fetches content from a URL", "inputSchema": {"type": "object", "properties": {"url": {"type": "string", "description": "URL to fetch content from"}}, "required": ["url"]}}]}
+        "401":
+          application/json: {"error": "Unauthorized: Invalid API key"}
+        "404":
+          application/json: {"error": "Server not found"}
+        "500":
+          application/json: {"error": "An unexpected error occurred"}
+examplesVersion: 1.0.1
+generatedTests: {}

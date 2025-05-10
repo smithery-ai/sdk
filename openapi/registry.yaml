@@ -1,0 +1,323 @@
+openapi: 3.1.0
+info:
+  title: Smithery Registry API
+  description: |
+    The Smithery Registry API provides a programmatic way to search for MCP servers.
+    This API allows you to discover and retrieve details about available MCP servers.
+  version: 1.0.0
+  contact:
+    name: Smithery AI
+    url: https://smithery.ai
+  license:
+    name: MIT
+
+servers:
+  - url: https://registry.smithery.ai
+    description: Registry API Server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /servers:
+    get:
+      summary: List Servers
+      description: Retrieves a paginated list of all available servers with optional filtering.
+      operationId: listServers
+      parameters:
+        - name: q
+          in: query
+          description: |
+            Search query for semantic search. Can include special filters:
+            - `owner:username` to filter by repository owner
+            - `repo:repository-name` to filter by repository name
+            - `is:deployed` to show only deployed servers
+            - `is:verified` to show only verified servers
+          required: false
+          schema:
+            type: string
+            example: "owner:mem0ai is:verified memory"
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: A paginated list of servers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /servers/{qualifiedName}:
+    get:
+      summary: Get Server
+      description: Retrieves detailed information about a specific server by its qualified name.
+      operationId: getServer
+      parameters:
+        - name: qualifiedName
+          in: path
+          description: Qualified name of the server (e.g., 'exa')
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed server information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server not found"
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        All endpoints require authentication via a bearer token.
+        You can create an API key at https://smithery.ai/account/api-keys.
+
+  schemas:
+    ServerListResponse:
+      type: object
+      required:
+        - servers
+        - pagination
+      properties:
+        servers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServerListItem'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    ServerListItem:
+      type: object
+      required:
+        - qualifiedName
+        - displayName
+        - description
+        - homepage
+        - useCount
+        - isDeployed
+        - createdAt
+      properties:
+        qualifiedName:
+          type: string
+          description: Unique identifier for the server
+          example: "smithery-ai/fetch"
+        displayName:
+          type: string
+          description: Human-readable name of the server
+          example: "Fetch"
+        description:
+          type: string
+          description: Description of the server's functionality
+          example: "A server for fetching web content"
+        homepage:
+          type: string
+          description: Link to Smithery server page
+          example: "https://smithery.ai/server/smithery-ai/fetch"
+        useCount:
+          type: string
+          description: Number of times the server has been used via tool calling
+          example: "12345"
+        isDeployed:
+          type: boolean
+          description: Whether this server is deployed on Smithery as a HTTP server
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Server creation timestamp
+          example: "2023-01-01T12:00:00Z"
+
+    ServerDetailResponse:
+      type: object
+      required:
+        - qualifiedName
+        - displayName
+        - connections
+      properties:
+        qualifiedName:
+          type: string
+          description: Qualified name of the MCP server in the format `owner/repository`
+          example: "smithery-ai/fetch"
+        displayName:
+          type: string
+          description: Human-readable name of the MCP server
+          example: "Fetch"
+        iconUrl:
+          type: string
+          nullable: true
+          description: URL to the server's icon image
+          example: "https://example.com/icon.png"
+        deploymentUrl:
+          type: string
+          description: URL to the server's deployment
+          example: "https://fetch.smithery.ai"
+        connections:
+          type: array
+          description: Specifies how to connect to this server
+          items:
+            $ref: '#/components/schemas/ConnectionInfo'
+        security:
+          type: object
+          nullable: true
+          description: Information about the server's security status
+          properties:
+            scanPassed:
+              type: boolean
+              nullable: true
+              description: Whether the server has passed security checks
+              example: true
+        tools:
+          type: array
+          nullable: true
+          description: List of tools that this server provides
+          items:
+            $ref: '#/components/schemas/Tool'
+
+    ConnectionInfo:
+      type: object
+      required:
+        - type
+        - configSchema
+      properties:
+        type:
+          type: string
+          description: Connection type
+          enum: ["http", "stdio"]
+          example: "http"
+        url:
+          type: string
+          description: HTTP URL to connect to (for http type)
+          example: "https://api.smithery.ai/mcp/fetch"
+        configSchema:
+          type: object
+          description: JSON Schema defining required configuration options
+          additionalProperties: true
+          example:
+            type: "object"
+            properties:
+              apiKey:
+                type: "string"
+                description: "API key for authentication"
+            required: ["apiKey"]
+
+    Tool:
+      type: object
+      required:
+        - name
+        - inputSchema
+      properties:
+        name:
+          type: string
+          description: Name of the tool
+          example: "fetch_url"
+        description:
+          type: string
+          nullable: true
+          description: Description of the tool
+          example: "Fetches content from a URL"
+        inputSchema:
+          type: object
+          description: JSON Schema defining the required parameters for the tool
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: ["object"]
+            properties:
+              type: object
+              additionalProperties: true
+          additionalProperties: true
+          example:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+                description: "URL to fetch content from"
+            required: ["url"]
+
+    Pagination:
+      type: object
+      required:
+        - currentPage
+        - pageSize
+        - totalPages
+        - totalCount
+      properties:
+        currentPage:
+          type: integer
+          description: Current page number
+          example: 1
+        pageSize:
+          type: integer
+          description: Number of items per page
+          example: 10
+        totalPages:
+          type: integer
+          description: Total number of pages
+          example: 5
+        totalCount:
+          type: integer
+          description: Total number of items
+          example: 47
+
+  responses:
+    Unauthorized:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Unauthorized: Invalid API key"
+
+    ServerError:
+      description: An unexpected error occurred
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "An unexpected error occurred"

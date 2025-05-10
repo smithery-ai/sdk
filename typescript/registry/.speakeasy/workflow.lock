@@ -1,0 +1,38 @@
+speakeasyVersion: 1.543.4
+sources:
+    Smithery Registry API:
+        sourceNamespace: smithery-registry-api
+        sourceRevisionDigest: sha256:004beb7e4fd955b2adc93339fb9d76a431deae1132898d44804b33601370dc06
+        sourceBlobDigest: sha256:63d58569d935cdca032749c8422210676f438205c99b6fc1721cde2346c68df5
+        tags:
+            - latest
+            - 1.0.0
+targets:
+    smithery-registry:
+        source: Smithery Registry API
+        sourceNamespace: smithery-registry-api
+        sourceRevisionDigest: sha256:004beb7e4fd955b2adc93339fb9d76a431deae1132898d44804b33601370dc06
+        sourceBlobDigest: sha256:63d58569d935cdca032749c8422210676f438205c99b6fc1721cde2346c68df5
+        codeSamplesNamespace: smithery-registry-api-typescript-code-samples
+        codeSamplesRevisionDigest: sha256:dddc713bc2b4c6ad19dfd7f38f71afd5c96110fd3689bcf8613660653db913d9
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        Smithery Registry API:
+            inputs:
+                - location: ../../openapi/registry.yaml
+            overlays:
+                - location: .speakeasy/speakeasy-modifications-overlay.yaml
+            registry:
+                location: registry.speakeasyapi.dev/smithery-lhr/smithery/smithery-registry-api
+    targets:
+        smithery-registry:
+            target: typescript
+            source: Smithery Registry API
+            codeSamples:
+                registry:
+                    location: registry.speakeasyapi.dev/smithery-lhr/smithery/smithery-registry-api-typescript-code-samples
+                labelOverride:
+                    fixedValue: Typescript (SDK)
+                blocking: false
