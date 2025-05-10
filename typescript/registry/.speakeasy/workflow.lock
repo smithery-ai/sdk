@@ -2,20 +2,19 @@ speakeasyVersion: 1.543.4
 sources:
     Smithery Registry API:
         sourceNamespace: smithery-registry-api
-        sourceRevisionDigest: sha256:50bf430adaba0bf81e8858baa0aa50fcdad939535bd1e6ba317f53fa089c20ec
+        sourceRevisionDigest: sha256:c64981d37011bbf7729e20592a1c42f27ff121ca9226a86b655530e3639c42ca
         sourceBlobDigest: sha256:28c9bd42fd12cde7d55f018ee3372d8f7f30055e1604026ee55ed24d4e2e8240
         tags:
             - latest
-            - speakeasy-sdk-regen-1746913722
             - 1.0.0
 targets:
     smithery-registry:
         source: Smithery Registry API
         sourceNamespace: smithery-registry-api
-        sourceRevisionDigest: sha256:50bf430adaba0bf81e8858baa0aa50fcdad939535bd1e6ba317f53fa089c20ec
+        sourceRevisionDigest: sha256:c64981d37011bbf7729e20592a1c42f27ff121ca9226a86b655530e3639c42ca
         sourceBlobDigest: sha256:28c9bd42fd12cde7d55f018ee3372d8f7f30055e1604026ee55ed24d4e2e8240
         codeSamplesNamespace: smithery-registry-api-typescript-code-samples
-        codeSamplesRevisionDigest: sha256:3f594a3756634d1041bccb53221fd80e016b2351b0c725641bf1bb83528fc106
+        codeSamplesRevisionDigest: sha256:82309b5b04d7180c88952a56b26b00e4da556e8838f7838cc53c6657bd177aa6
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
@@ -31,6 +30,9 @@ workflow:
         smithery-registry:
             target: typescript
             source: Smithery Registry API
+            publish:
+                npm:
+                    token: $npm_token
             codeSamples:
                 registry:
                     location: registry.speakeasyapi.dev/smithery-lhr/smithery/smithery-registry-api-typescript-code-samples
