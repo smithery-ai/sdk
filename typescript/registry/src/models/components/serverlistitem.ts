@@ -27,7 +27,7 @@ export type ServerListItem = {
   /**
    * Number of times the server has been used via tool calling
    */
-  useCount: string;
+  useCount: number;
   /**
    * Server creation timestamp
    */
@@ -44,7 +44,7 @@ export const ServerListItem$inboundSchema: z.ZodType<
   displayName: z.string(),
   description: z.string(),
   homepage: z.string(),
-  useCount: z.string(),
+  useCount: z.number().int(),
   createdAt: z.string().datetime({ offset: true }).transform(v => new Date(v)),
 });
 
@@ -54,7 +54,7 @@ export type ServerListItem$Outbound = {
   displayName: string;
   description: string;
   homepage: string;
-  useCount: string;
+  useCount: number;
   createdAt: string;
 };
 
@@ -68,7 +68,7 @@ export const ServerListItem$outboundSchema: z.ZodType<
   displayName: z.string(),
   description: z.string(),
   homepage: z.string(),
-  useCount: z.string(),
+  useCount: z.number().int(),
   createdAt: z.date().transform(v => v.toISOString()),
 });
 

@@ -13,7 +13,7 @@ let value: ListServersResponse = {
         displayName: "Fetch",
         description: "A server for fetching web content",
         homepage: "https://smithery.ai/server/smithery-ai/fetch",
-        useCount: "12345",
+        useCount: 12345,
         createdAt: new Date("2023-01-01T12:00:00Z"),
       },
     ],
