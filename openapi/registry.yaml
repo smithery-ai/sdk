@@ -151,9 +151,9 @@ components:
           description: Link to Smithery server page
           example: "https://smithery.ai/server/smithery-ai/fetch"
         useCount:
-          type: string
+          type: integer
           description: Number of times the server has been used via tool calling
-          example: "12345"
+          example: 12345
         createdAt:
           type: string
           format: date-time
