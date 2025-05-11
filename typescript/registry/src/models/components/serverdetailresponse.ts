@@ -43,9 +43,9 @@ export type ServerDetailResponse = {
    */
   iconUrl?: string | null | undefined;
   /**
-   * URL to the server's deployment
+   * Whether this server is a remote server
    */
-  deploymentUrl?: string | undefined;
+  remote?: boolean | undefined;
   /**
    * Specifies how to connect to this server
    */
@@ -125,7 +125,7 @@ export const ServerDetailResponse$inboundSchema: z.ZodType<
   qualifiedName: z.string(),
   displayName: z.string(),
   iconUrl: z.nullable(z.string()).optional(),
-  deploymentUrl: z.string().optional(),
+  remote: z.boolean().optional(),
   connections: z.array(ConnectionInfo$inboundSchema),
   security: z.nullable(z.lazy(() => ServerDetailResponseSecurity$inboundSchema))
     .optional(),
@@ -137,7 +137,7 @@ export type ServerDetailResponse$Outbound = {
   qualifiedName: string;
   displayName: string;
   iconUrl?: string | null | undefined;
-  deploymentUrl?: string | undefined;
+  remote?: boolean | undefined;
   connections: Array<ConnectionInfo$Outbound>;
   security?: ServerDetailResponseSecurity$Outbound | null | undefined;
   tools?: Array<Tool$Outbound> | null | undefined;
@@ -152,7 +152,7 @@ export const ServerDetailResponse$outboundSchema: z.ZodType<
   qualifiedName: z.string(),
   displayName: z.string(),
   iconUrl: z.nullable(z.string()).optional(),
-  deploymentUrl: z.string().optional(),
+  remote: z.boolean().optional(),
   connections: z.array(ConnectionInfo$outboundSchema),
   security: z.nullable(
     z.lazy(() => ServerDetailResponseSecurity$outboundSchema),
