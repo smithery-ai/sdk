@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: a27512295bc330f115da7349469ec078
+  docChecksum: 1b2e51b8b88ba4fe82daa30290f2b373
   docVersion: 1.0.0
   speakeasyVersion: 1.543.4
   generationVersion: 2.598.22
-  releaseVersion: 0.3.3
-  configChecksum: cb8aade3411d5b951b3cff5fdaf0f78b
+  releaseVersion: 0.3.4
+  configChecksum: 2828c25796a5822c35f90c7541c7b49b
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -140,7 +140,7 @@ examples:
           qualifiedName: "<value>"
       responses:
         "200":
-          application/json: {"qualifiedName": "smithery-ai/fetch", "displayName": "Fetch", "iconUrl": "https://example.com/icon.png", "deploymentUrl": "https://fetch.smithery.ai", "connections": [{"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}, {"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}, {"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}], "security": {"scanPassed": true}, "tools": [{"name": "fetch_url", "description": "Fetches content from a URL", "inputSchema": {"type": "object", "properties": {"url": {"type": "string", "description": "URL to fetch content from"}}, "required": ["url"]}}]}
+          application/json: {"qualifiedName": "smithery-ai/fetch", "displayName": "Fetch", "iconUrl": "https://example.com/icon.png", "remote": true, "connections": [{"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}, {"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}, {"type": "http", "url": "https://api.smithery.ai/mcp/fetch", "configSchema": {"type": "object", "properties": {"apiKey": {"type": "string", "description": "API key for authentication"}}, "required": ["apiKey"]}}], "security": {"scanPassed": true}, "tools": [{"name": "fetch_url", "description": "Fetches content from a URL", "inputSchema": {"type": "object", "properties": {"url": {"type": "string", "description": "URL to fetch content from"}}, "required": ["url"]}}]}
         "401":
           application/json: {"error": "Unauthorized: Invalid API key"}
         "404":

@@ -29,10 +29,6 @@ export type ServerListItem = {
    */
   useCount: string;
   /**
-   * Whether this server is deployed on Smithery as a HTTP server
-   */
-  isDeployed: boolean;
-  /**
    * Server creation timestamp
    */
   createdAt: Date;
@@ -49,7 +45,6 @@ export const ServerListItem$inboundSchema: z.ZodType<
   description: z.string(),
   homepage: z.string(),
   useCount: z.string(),
-  isDeployed: z.boolean(),
   createdAt: z.string().datetime({ offset: true }).transform(v => new Date(v)),
 });
 
@@ -60,7 +55,6 @@ export type ServerListItem$Outbound = {
   description: string;
   homepage: string;
   useCount: string;
-  isDeployed: boolean;
   createdAt: string;
 };
 
@@ -75,7 +69,6 @@ export const ServerListItem$outboundSchema: z.ZodType<
   description: z.string(),
   homepage: z.string(),
   useCount: z.string(),
-  isDeployed: z.boolean(),
   createdAt: z.date().transform(v => v.toISOString()),
 });
 

@@ -14,7 +14,6 @@ let value: ListServersResponse = {
         description: "A server for fetching web content",
         homepage: "https://smithery.ai/server/smithery-ai/fetch",
         useCount: "12345",
-        isDeployed: true,
         createdAt: new Date("2023-01-01T12:00:00Z"),
       },
     ],
