@@ -33,6 +33,14 @@ export type ConnectionInfo = {
    * JSON Schema defining required configuration options
    */
   configSchema: { [k: string]: any };
+  /**
+   * True if the server is published on `npm`, `pypi`, or `uv` and runnable without users needing to clone the source code (for stdio type).
+   */
+  published?: boolean | undefined;
+  /**
+   * A lambda Javascript function that takes in the config object and returns a StdioConnection object (for stdio type).
+   */
+  stdioFunction?: string | undefined;
 };
 
 /** @internal */
@@ -65,6 +73,8 @@ export const ConnectionInfo$inboundSchema: z.ZodType<
   type: ConnectionInfoType$inboundSchema,
   url: z.string().optional(),
   configSchema: z.record(z.any()),
+  published: z.boolean().optional(),
+  stdioFunction: z.string().optional(),
 });
 
 /** @internal */
@@ -72,6 +82,8 @@ export type ConnectionInfo$Outbound = {
   type: string;
   url?: string | undefined;
   configSchema: { [k: string]: any };
+  published?: boolean | undefined;
+  stdioFunction?: string | undefined;
 };
 
 /** @internal */
@@ -83,6 +95,8 @@ export const ConnectionInfo$outboundSchema: z.ZodType<
   type: ConnectionInfoType$outboundSchema,
   url: z.string().optional(),
   configSchema: z.record(z.any()),
+  published: z.boolean().optional(),
+  stdioFunction: z.string().optional(),
 });
 
 /**

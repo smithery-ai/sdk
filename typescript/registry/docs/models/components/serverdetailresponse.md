@@ -26,6 +26,8 @@ let value: ServerDetailResponse = {
           "apiKey",
         ],
       },
+      published: true,
+      stdioFunction: "run_server",
     },
   ],
   security: {
