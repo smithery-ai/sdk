@@ -28,7 +28,7 @@ export type ConnectionInfo = {
   /**
    * HTTP URL to connect to (for http type)
    */
-  url?: string | undefined;
+  deploymentUrl?: string | undefined;
   /**
    * JSON Schema defining required configuration options
    */
@@ -71,7 +71,7 @@ export const ConnectionInfo$inboundSchema: z.ZodType<
   unknown
 > = z.object({
   type: ConnectionInfoType$inboundSchema,
-  url: z.string().optional(),
+  deploymentUrl: z.string().optional(),
   configSchema: z.record(z.any()),
   published: z.boolean().optional(),
   stdioFunction: z.string().optional(),
@@ -80,7 +80,7 @@ export const ConnectionInfo$inboundSchema: z.ZodType<
 /** @internal */
 export type ConnectionInfo$Outbound = {
   type: string;
-  url?: string | undefined;
+  deploymentUrl?: string | undefined;
   configSchema: { [k: string]: any };
   published?: boolean | undefined;
   stdioFunction?: string | undefined;
@@ -93,7 +93,7 @@ export const ConnectionInfo$outboundSchema: z.ZodType<
   ConnectionInfo
 > = z.object({
   type: ConnectionInfoType$outboundSchema,
-  url: z.string().optional(),
+  deploymentUrl: z.string().optional(),
   configSchema: z.record(z.any()),
   published: z.boolean().optional(),
   stdioFunction: z.string().optional(),
