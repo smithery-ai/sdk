@@ -13,7 +13,7 @@ let value: ServerDetailResponse = {
   connections: [
     {
       type: "http",
-      url: "https://api.smithery.ai/mcp/fetch",
+      deploymentUrl: "https://api.smithery.ai/mcp/fetch",
       configSchema: {
         "type": "object",
         "properties": {
