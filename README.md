@@ -15,5 +15,7 @@ Smithery SDK provides utilities to make it easier for you to develop or use [Mod
 To find our registry of MCPs, visit [https://smithery.ai/](https://smithery.ai/).
 
 ## Languages
-- [TypeScript](typescript/README.md)
-- [Python](python/README.md)
+- TypeScript
+  - [Registry](typescript/registry/README.md)
+  - [SDK](typescript/sdk/README.md)
+- Python (under construction!)
