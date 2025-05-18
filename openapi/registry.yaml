@@ -232,6 +232,14 @@ components:
                 type: "string"
                 description: "API key for authentication"
             required: ["apiKey"]
+        published:
+          type: boolean
+          description: True if the server is published on `npm`, `pypi`, or `uv` and runnable without users needing to clone the source code (for stdio type).
+          example: true
+        stdioFunction:
+          type: string
+          description: A lambda Javascript function that takes in the config object and returns a StdioConnection object (for stdio type).
+          example: "run_server"
 
     Tool:
       type: object
