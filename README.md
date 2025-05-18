@@ -18,6 +18,6 @@ To find our registry of MCPs, visit [https://smithery.ai/](https://smithery.ai/)
 
 ## Languages
 - TypeScript
-  - [Registry](typescript/registry/README.md) — find and connect to servers
-  - [SDK](typescript/sdk/README.md) — build servers
+  - [Registry](typescript/registry/README.md) — find and connect to MCP servers in [Smithery's registry](https://smithery.ai/)
+  - [SDK](typescript/sdk/README.md) — build and deploy MCP servers to [Smithery's registry](https://smithery.ai/)
 - Python (under construction!)
