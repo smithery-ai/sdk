@@ -217,7 +217,7 @@ components:
           description: Connection type
           enum: ["http", "stdio"]
           example: "http"
-        url:
+        deploymentUrl:
           type: string
           description: HTTP URL to connect to (for http type)
           example: "https://api.smithery.ai/mcp/fetch"
