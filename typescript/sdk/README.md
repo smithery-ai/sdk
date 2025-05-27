@@ -19,7 +19,7 @@ import { createStatelessServer } from '@smithery/sdk/server/stateless.js'
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
 // Create your MCP server function
-function createMcpServer({ sessionId, config }) {
+function createMcpServer({ config }) {
   // Create and return a server instance
   // https://github.com/modelcontextprotocol/typescript-sdk?tab=readme-ov-file#core-concepts
   const mcpServer = new McpServer({
@@ -33,13 +33,9 @@ function createMcpServer({ sessionId, config }) {
 }
 
 // Create the stateless server using your MCP server function.
-const { app } = createStatelessServer(createMcpServer)
-
-// Start the server
-const PORT = process.env.PORT || 8081
-app.listen(PORT, () => {
-  console.log(`MCP server running on port ${PORT}`)
-})
+createStatelessServer(createMcpServer)
+  .app
+  .listen(process.env.PORT || 3000)
 ```
 
 This example:
