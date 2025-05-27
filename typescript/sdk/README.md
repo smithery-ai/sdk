@@ -19,7 +19,7 @@ import { createStatelessServer } from '@smithery/sdk/server/stateless.js'
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
 // Create your MCP server function
-function createMcpServer({ sessionId, config }) {
+function createMcpServer({ config }) {
   // Create and return a server instance
   // https://github.com/modelcontextprotocol/typescript-sdk?tab=readme-ov-file#core-concepts
   const mcpServer = new McpServer({
