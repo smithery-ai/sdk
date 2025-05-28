@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js"
 import express from "express"
-import { parseExpressRequestConfig } from "../shared/config.js"
+import { parseAndValidateConfig } from "../shared/config.js"
+import type { z } from "zod"
 
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import { type SessionStore, createLRUStore } from "./session.js"
@@ -22,22 +23,27 @@ export type CreateServerFn<T = Record<string, unknown>> = (
 /**
  * Configuration options for the stateful server
  */
-export interface StatefulServerOptions {
+export interface StatefulServerOptions<T = Record<string, unknown>> {
 	/**
 	 * Session store to use for managing active sessions
 	 */
 	sessionStore?: SessionStore<StreamableHTTPServerTransport>
+	/**
+	 * Zod schema for config validation
+	 */
+	schema?: z.ZodSchema<T>
 }
 
 /**
  * Creates a stateful server for handling MCP requests.
  * For every new session, we invoke createMcpServer to create a new instance of the server.
  * @param createMcpServer Function to create an MCP server
+ * @param options Configuration options including optional schema validation
  * @returns Express app
  */
 export function createStatefulServer<T = Record<string, unknown>>(
 	createMcpServer: CreateServerFn<T>,
-	options?: StatefulServerOptions,
+	options?: StatefulServerOptions<T>,
 ) {
 	const app = express()
 	app.use(express.json())
@@ -72,20 +78,16 @@ export function createStatefulServer<T = Record<string, unknown>>(
 				}
 			}
 
-			let config: ReturnType<typeof parseExpressRequestConfig>
-			try {
-				config = parseExpressRequestConfig(req)
-			} catch (error) {
-				res.status(400).json({
-					jsonrpc: "2.0",
-					error: {
-						code: -32000,
-						message: "Bad Request: Invalid configuration",
-					},
-					id: null,
-				})
+			// New session - validate config
+			const configResult = parseAndValidateConfig(req, options?.schema)
+			if (!configResult.ok) {
+				const status = (configResult.error.status as number) || 400
+				res.status(status).json(configResult.error)
 				return
 			}
+
+			const config = configResult.value
+
 			try {
 				const server = createMcpServer({
 					sessionId: newSessionId,

@@ -1,9 +1,10 @@
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 import type { Request, Response } from "express"
 import express from "express"
-import { parseExpressRequestConfig } from "../shared/config.js"
+import { parseAndValidateConfig } from "../shared/config.js"
+import type { z } from "zod"
 
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 
 /**
  * Arguments when we create a new instance of your server
@@ -16,14 +17,20 @@ export type CreateServerFn<T = Record<string, unknown>> = (
 	arg: CreateServerArg<T>,
 ) => Server
 
+export interface CreateStatelessServerOptions<T> {
+	schema?: z.ZodSchema<T>
+}
+
 /**
  * Creates a stateless server for handling MCP requests
  * In stateless mode, each request creates a new server and transport instance
  * @param createMcpServer Function to create an MCP server
+ * @param options Optional configuration including Zod schema for validation
  * @returns Express app
  */
 export function createStatelessServer<T = Record<string, unknown>>(
 	createMcpServer: CreateServerFn<T>,
+	options?: CreateStatelessServerOptions<T>,
 ) {
 	const app = express()
 	app.use(express.json())
@@ -34,23 +41,15 @@ export function createStatelessServer<T = Record<string, unknown>>(
 		// when multiple clients connect concurrently.
 
 		try {
-			// Parse base64 encoded config from URL query parameter if present
-			let config: Record<string, unknown> = {}
-			if (req.query.config) {
-				try {
-					config = parseExpressRequestConfig(req)
-				} catch (configError) {
-					res.status(400).json({
-						jsonrpc: "2.0",
-						error: {
-							code: -32000,
-							message: "Bad Request: Invalid configuration",
-						},
-						id: null,
-					})
-					return
-				}
+			// Parse and validate config
+			const configResult = parseAndValidateConfig(req, options?.schema)
+			if (!configResult.ok) {
+				const status = configResult.error.status
+				res.status(status).json(configResult.error)
+				return
 			}
+
+			const config = configResult.value
 
 			// Create a new server instance with config
 			const server = createMcpServer({ config: config as T })
