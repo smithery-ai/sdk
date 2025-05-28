@@ -34,7 +34,7 @@ export function createStatelessServer<T = Record<string, unknown>>(
 	options?: CreateStatelessServerOptions<T>,
 ) {
 	const app = options?.app ?? express()
-	app.use(express.json())
+	app.use("/mcp", express.json())
 
 	app.post("/mcp", async (req: Request, res: Response) => {
 		// In stateless mode, create a new instance of transport and server for each request

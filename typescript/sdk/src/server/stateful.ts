@@ -51,7 +51,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 ) {
 	const app = options?.app ?? express()
 
-	app.use(express.json())
+	app.use("/mcp", express.json())
 
 	const sessionStore = options?.sessionStore ?? createLRUStore()
 

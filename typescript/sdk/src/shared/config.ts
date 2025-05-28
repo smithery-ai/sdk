@@ -109,10 +109,7 @@ export function parseAndValidateConfig<T = Record<string, unknown>>(
 	if (schema) {
 		const result = schema.safeParse(config)
 		if (!result.success) {
-			const jsonSchema = zodToJsonSchema(schema, {
-				name: "ConfigSchema",
-				$refStrategy: "none",
-			})
+			const jsonSchema = zodToJsonSchema(schema)
 
 			const errors = result.error.issues.map((issue) => {
 				// Safely traverse the config object to get the received value
