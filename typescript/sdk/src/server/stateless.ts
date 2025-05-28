@@ -19,6 +19,7 @@ export type CreateServerFn<T = Record<string, unknown>> = (
 
 export interface CreateStatelessServerOptions<T> {
 	schema?: z.ZodSchema<T>
+	app?: express.Application
 }
 
 /**
@@ -32,7 +33,7 @@ export function createStatelessServer<T = Record<string, unknown>>(
 	createMcpServer: CreateServerFn<T>,
 	options?: CreateStatelessServerOptions<T>,
 ) {
-	const app = express()
+	const app = options?.app ?? express()
 	app.use(express.json())
 
 	app.post("/mcp", async (req: Request, res: Response) => {

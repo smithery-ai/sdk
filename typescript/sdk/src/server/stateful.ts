@@ -32,20 +32,25 @@ export interface StatefulServerOptions<T = Record<string, unknown>> {
 	 * Zod schema for config validation
 	 */
 	schema?: z.ZodSchema<T>
+	/**
+	 * Express app instance to use (optional)
+	 */
+	app?: express.Application
 }
 
 /**
  * Creates a stateful server for handling MCP requests.
  * For every new session, we invoke createMcpServer to create a new instance of the server.
  * @param createMcpServer Function to create an MCP server
- * @param options Configuration options including optional schema validation
+ * @param options Configuration options including optional schema validation and Express app
  * @returns Express app
  */
 export function createStatefulServer<T = Record<string, unknown>>(
 	createMcpServer: CreateServerFn<T>,
 	options?: StatefulServerOptions<T>,
 ) {
-	const app = express()
+	const app = options?.app ?? express()
+
 	app.use(express.json())
 
 	const sessionStore = options?.sessionStore ?? createLRUStore()
