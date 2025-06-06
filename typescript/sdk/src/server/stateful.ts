@@ -2,10 +2,11 @@ import { randomUUID } from "node:crypto"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js"
 import express from "express"
-import { parseAndValidateConfig } from "../shared/config.js"
 import type { z } from "zod"
+import { parseAndValidateConfig } from "../shared/config.js"
 
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { zodToJsonSchema } from "zod-to-json-schema"
 import { type SessionStore, createLRUStore } from "./session.js"
 
 /**
@@ -131,6 +132,34 @@ export function createStatefulServer<T = Record<string, unknown>>(
 		await transport.handleRequest(req, res, req.body)
 	})
 
+	// Add .well-known/mcp-config endpoint for configuration discovery
+	app.get("/.well-known/mcp/config.json", (req, res) => {
+		// Set proper content type for JSON Schema
+		res.set("Content-Type", "application/schema+json; charset=utf-8")
+
+		const baseSchema = options?.schema
+			? zodToJsonSchema(options.schema, {
+					name: "SessionConfig",
+					$refStrategy: "none",
+				})
+			: {
+					type: "object",
+					properties: {},
+					required: [],
+				}
+
+		const configSchema = {
+			$schema: "https://json-schema.org/draft/2020-12/schema",
+			$id: `${req.protocol}://${req.get("host")}/.well-known/mcp/config.json`,
+			title: "MCP Session Configuration",
+			description: "Schema for the /mcp endpoint configuration",
+			"x-mcp-version": "1.0",
+			"x-query-style": "dot+bracket",
+			...baseSchema,
+		}
+
+		res.json(configSchema)
+	})
 	// Reusable handler for GET and DELETE requests
 	const handleSessionRequest = async (
 		req: express.Request,
