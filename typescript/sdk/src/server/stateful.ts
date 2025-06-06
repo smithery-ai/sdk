@@ -133,15 +133,12 @@ export function createStatefulServer<T = Record<string, unknown>>(
 	})
 
 	// Add .well-known/mcp-config endpoint for configuration discovery
-	app.get("/.well-known/mcp/config.json", (req, res) => {
+	app.get("/.well-known/mcp-config", (req, res) => {
 		// Set proper content type for JSON Schema
 		res.set("Content-Type", "application/schema+json; charset=utf-8")
 
 		const baseSchema = options?.schema
-			? zodToJsonSchema(options.schema, {
-					name: "SessionConfig",
-					$refStrategy: "none",
-				})
+			? zodToJsonSchema(options.schema)
 			: {
 					type: "object",
 					properties: {},
@@ -150,7 +147,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 
 		const configSchema = {
 			$schema: "https://json-schema.org/draft/2020-12/schema",
-			$id: `${req.protocol}://${req.get("host")}/.well-known/mcp/config.json`,
+			$id: `${req.protocol}://${req.get("host")}/.well-known/mcp-config`,
 			title: "MCP Session Configuration",
 			description: "Schema for the /mcp endpoint configuration",
 			"x-mcp-version": "1.0",
