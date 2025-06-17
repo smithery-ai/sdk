@@ -15,9 +15,10 @@ export interface CreateServerArg<T = Record<string, unknown>> {
 	config: T
 }
 
+// Allow CreateServerFn to return either a Server instance directly or a Promise that resolves to a Server
 export type CreateServerFn<T = Record<string, unknown>> = (
 	arg: CreateServerArg<T>,
-) => Server
+) => Server | Promise<Server>
 
 /**
  * Configuration options for the stateful server
@@ -87,7 +88,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 				return
 			}
 			try {
-				const server = createMcpServer({
+				const server = await createMcpServer({
 					sessionId: newSessionId,
 					config: config as T,
 				})
