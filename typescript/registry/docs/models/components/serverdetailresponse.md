@@ -10,26 +10,7 @@ let value: ServerDetailResponse = {
   displayName: "Fetch",
   iconUrl: "https://example.com/icon.png",
   remote: true,
-  connections: [
-    {
-      type: "http",
-      deploymentUrl: "https://api.smithery.ai/mcp/fetch",
-      configSchema: {
-        "type": "object",
-        "properties": {
-          "apiKey": {
-            "type": "string",
-            "description": "API key for authentication",
-          },
-        },
-        "required": [
-          "apiKey",
-        ],
-      },
-      published: true,
-      stdioFunction: "run_server",
-    },
-  ],
+  connections: [],
   security: {
     scanPassed: true,
   },

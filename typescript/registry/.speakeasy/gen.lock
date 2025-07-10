@@ -3,10 +3,10 @@ id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
   docChecksum: 139424e40f5ce4e3e5ba8905d4762d0c
   docVersion: 1.0.0
-  speakeasyVersion: 1.546.2
-  generationVersion: 2.604.4
-  releaseVersion: 0.3.7
-  configChecksum: 702229e6e1d0db0abe93c77a84b69b21
+  speakeasyVersion: 1.580.1
+  generationVersion: 2.656.3
+  releaseVersion: 0.4.0
+  configChecksum: 3376323930602320645b2a72f902b781
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -15,8 +15,8 @@ features:
   typescript:
     additionalDependencies: 0.1.0
     additionalProperties: 0.1.1
-    constsAndDefaults: 0.1.11
-    core: 3.21.8
+    constsAndDefaults: 0.1.12
+    core: 3.21.14
     defaultEnabledRetries: 0.1.0
     devContainers: 2.90.0
     enumUnions: 0.1.0
@@ -31,7 +31,7 @@ features:
     pagination: 2.83.0
     responseFormat: 0.2.3
     retries: 2.83.0
-    sdkHooks: 0.2.0
+    sdkHooks: 0.3.0
 generatedFiles:
   - .devcontainer/README.md
   - .devcontainer/devcontainer.json
@@ -62,6 +62,10 @@ generatedFiles:
   - docs/sdks/servers/README.md
   - docs/sdks/smitheryregistry/README.md
   - eslint.config.mjs
+  - examples/.env.template
+  - examples/README.md
+  - examples/package.json
+  - examples/serversList.example.ts
   - jsr.json
   - package.json
   - src/core.ts
@@ -99,8 +103,10 @@ generatedFiles:
   - src/models/errors/getserver.ts
   - src/models/errors/httpclienterrors.ts
   - src/models/errors/index.ts
+  - src/models/errors/responsevalidationerror.ts
   - src/models/errors/sdkvalidationerror.ts
   - src/models/errors/servererror.ts
+  - src/models/errors/smitheryregistryerror.ts
   - src/models/errors/unauthorizederror.ts
   - src/models/operations/getserver.ts
   - src/models/operations/index.ts

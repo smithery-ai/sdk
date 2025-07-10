@@ -3,6 +3,7 @@
  */
 
 import * as z from "zod";
+import { SmitheryRegistryError } from "./smitheryregistryerror.js";
 
 /**
  * An unexpected error occurred
@@ -14,19 +15,21 @@ export type ServerErrorData = {
 /**
  * An unexpected error occurred
  */
-export class ServerError extends Error {
+export class ServerError extends SmitheryRegistryError {
   error?: string | undefined;
 
   /** The original data that was passed to this error instance. */
   data$: ServerErrorData;
 
-  constructor(err: ServerErrorData) {
+  constructor(
+    err: ServerErrorData,
+    httpMeta: { response: Response; request: Request; body: string },
+  ) {
     const message = "message" in err && typeof err.message === "string"
       ? err.message
       : `API error occurred: ${JSON.stringify(err)}`;
-    super(message);
+    super(message, httpMeta);
     this.data$ = err;
-
     if (err.error != null) this.error = err.error;
 
     this.name = "ServerError";
@@ -40,9 +43,16 @@ export const ServerError$inboundSchema: z.ZodType<
   unknown
 > = z.object({
   error: z.string().optional(),
+  request$: z.instanceof(Request),
+  response$: z.instanceof(Response),
+  body$: z.string(),
 })
   .transform((v) => {
-    return new ServerError(v);
+    return new ServerError(v, {
+      request: v.request$,
+      response: v.response$,
+      body: v.body$,
+    });
   });
 
 /** @internal */
