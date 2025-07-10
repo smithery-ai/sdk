@@ -26,7 +26,7 @@
 		"express": "^5.1.0",
 		"json-schema": "^0.4.0",
 		"lodash": "^4.17.21",
-		"okay-error": "^1.0.2",
+		"okay-error": "^1.0.3",
 		"openai": "^4.0.0",
 		"uuid": "^11.0.3",
 		"zod": "^3.23.8",
