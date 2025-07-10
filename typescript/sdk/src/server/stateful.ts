@@ -1,7 +1,7 @@
-import { randomUUID } from "node:crypto"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js"
 import express from "express"
+import { randomUUID } from "node:crypto"
 import type { z } from "zod"
 import { parseAndValidateConfig } from "../shared/config.js"
 
@@ -71,7 +71,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 			const newSessionId = randomUUID()
 			transport = new StreamableHTTPServerTransport({
 				sessionIdGenerator: () => newSessionId,
-				onsessioninitialized: (sessionId) => {
+				onsessioninitialized: sessionId => {
 					// Store the transport by session ID
 					sessionStore.set(sessionId, transport)
 				},
@@ -120,8 +120,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 				jsonrpc: "2.0",
 				error: {
 					code: -32000,
-					message:
-						"Bad Request: No valid session ID provided. Session may have expired.",
+					message: "Session not found or expired",
 				},
 				id: null,
 			})
@@ -178,7 +177,41 @@ export function createStatefulServer<T = Record<string, unknown>>(
 	app.get("/mcp", handleSessionRequest)
 
 	// Handle DELETE requests for session termination
-	app.delete("/mcp", handleSessionRequest)
+	// https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#session-management
+	app.delete("/mcp", async (req, res) => {
+		const sessionId = req.headers["mcp-session-id"] as string | undefined
+
+		if (!sessionId) {
+			res.status(400).json({
+				jsonrpc: "2.0",
+				error: {
+					code: -32600,
+					message: "Missing mcp-session-id header",
+				},
+				id: null,
+			})
+			return
+		}
+
+		const transport = sessionStore.get(sessionId)
+		if (!transport) {
+			res.status(404).json({
+				jsonrpc: "2.0",
+				error: {
+					code: -32000,
+					message: "Session not found or expired",
+				},
+				id: null,
+			})
+			return
+		}
+
+		// Close the transport
+		transport.close?.()
+
+		// Acknowledge session termination with 204 No Content
+		res.status(204).end()
+	})
 
 	return { app }
 }
