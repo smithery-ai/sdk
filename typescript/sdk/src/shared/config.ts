@@ -111,7 +111,7 @@ export function parseAndValidateConfig<T = Record<string, unknown>>(
 		if (!result.success) {
 			const jsonSchema = zodToJsonSchema(schema)
 
-			const errors = result.error.issues.map((issue) => {
+			const errors = result.error.issues.map(issue => {
 				// Safely traverse the config object to get the received value
 				let received: unknown = config
 				for (const key of issue.path) {

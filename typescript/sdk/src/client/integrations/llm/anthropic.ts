@@ -16,7 +16,7 @@ export class AnthropicChatAdapter {
 
 	async listTools(): Promise<Tool[]> {
 		const toolResult = await this.client.listTools()
-		return toolResult.tools.map((tool) => ({
+		return toolResult.tools.map(tool => ({
 			name: tool.name,
 			description: tool.description,
 			input_schema: tool.inputSchema,
@@ -34,7 +34,7 @@ export class AnthropicChatAdapter {
 		}
 
 		// Find tool calls in the message content
-		const toolCalls = content.filter((part) => part.type === "tool_use")
+		const toolCalls = content.filter(part => part.type === "tool_use")
 
 		if (toolCalls.length === 0) {
 			return []
@@ -42,7 +42,7 @@ export class AnthropicChatAdapter {
 
 		// Run parallel tool call
 		const results = await Promise.all(
-			toolCalls.map(async (toolCall) => {
+			toolCalls.map(async toolCall => {
 				return await this.client.callTool(
 					{
 						name: toolCall.name,

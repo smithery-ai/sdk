@@ -28,7 +28,7 @@ export class OpenAIChatAdapter {
 
 	async listTools(): Promise<ChatCompletionTool[]> {
 		const toolResult = await this.client.listTools()
-		return toolResult.tools.map((tool) => ({
+		return toolResult.tools.map(tool => ({
 			type: "function" as const,
 			function: {
 				name: tool.name,
@@ -59,7 +59,7 @@ export class OpenAIChatAdapter {
 
 		const toolCalls = choice.message.tool_calls
 		const results = await Promise.all(
-			toolCalls.map(async (toolCall) => {
+			toolCalls.map(async toolCall => {
 				return await this.client.callTool(
 					{
 						name: toolCall.function.name,

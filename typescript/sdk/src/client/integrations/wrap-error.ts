@@ -14,7 +14,7 @@ export function wrapError<C extends Pick<Client, "callTool">>(client: C): C {
 	patch(
 		client,
 		"callTool",
-		(callTool) =>
+		callTool =>
 			async (
 				params: CallToolRequest["params"],
 				resultSchema:

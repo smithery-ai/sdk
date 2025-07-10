@@ -23,7 +23,7 @@ export const createLRUStore = <T extends Transport>(
 	const cache = new Map<string, T>()
 
 	return {
-		get: (id) => {
+		get: id => {
 			const t = cache.get(id)
 			if (!t) return undefined
 			// refresh position
@@ -48,6 +48,6 @@ export const createLRUStore = <T extends Transport>(
 			cache.set(id, transport)
 		},
 
-		delete: (id) => cache.delete(id),
+		delete: id => cache.delete(id),
 	}
 }
