@@ -156,11 +156,9 @@ export function createStatefulServer<T = Record<string, unknown>>(
 
 		res.json(configSchema)
 	})
-	// Reusable handler for GET and DELETE requests
-	const handleSessionRequest = async (
-		req: express.Request,
-		res: express.Response,
-	) => {
+
+	// Handle GET requests for server-to-client notifications via SSE
+	app.get("/mcp", async (req: express.Request, res: express.Response) => {
 		const sessionId = req.headers["mcp-session-id"] as string | undefined
 		if (!sessionId || !sessionStore.get(sessionId)) {
 			res.status(400).send("Invalid or expired session ID")
@@ -171,10 +169,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 		const transport = sessionStore.get(sessionId)!
 
 		await transport.handleRequest(req, res)
-	}
-
-	// Handle GET requests for server-to-client notifications via SSE
-	app.get("/mcp", handleSessionRequest)
+	})
 
 	// Handle DELETE requests for session termination
 	// https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#session-management
