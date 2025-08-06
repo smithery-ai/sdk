@@ -1,4 +1,4 @@
-speakeasyVersion: 1.580.1
+speakeasyVersion: 1.598.0
 sources:
     Smithery Registry API:
         sourceNamespace: smithery-registry-api
@@ -6,7 +6,7 @@ sources:
         sourceBlobDigest: sha256:abcadabbc87b40fe9da3d66d4457ae6959f9a9908a3e40aa9626b9db7967abf0
         tags:
             - latest
-            - speakeasy-sdk-regen-1752106236
+            - speakeasy-sdk-regen-1754439077
             - 1.0.0
 targets:
     smithery-registry:
@@ -15,7 +15,7 @@ targets:
         sourceRevisionDigest: sha256:331a177609897d7ed6d8a249759a4686191089714f0a4a1ea7107d1f2a54ee54
         sourceBlobDigest: sha256:abcadabbc87b40fe9da3d66d4457ae6959f9a9908a3e40aa9626b9db7967abf0
         codeSamplesNamespace: smithery-registry-api-typescript-code-samples
-        codeSamplesRevisionDigest: sha256:33a75a99e6b8e766abf802ca2b806d4cb1e331fae1d4156fcafbbb9ffac110ce
+        codeSamplesRevisionDigest: sha256:0ee0b23f9f3ca928489494582c539d03ee8b1bccb6b975f2e69a76fdf601c6c0
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
