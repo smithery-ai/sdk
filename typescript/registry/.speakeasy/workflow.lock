@@ -1,4 +1,4 @@
-speakeasyVersion: 1.598.0
+speakeasyVersion: 1.598.3
 sources:
     Smithery Registry API:
         sourceNamespace: smithery-registry-api

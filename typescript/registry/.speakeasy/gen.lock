@@ -3,8 +3,8 @@ id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
   docChecksum: 139424e40f5ce4e3e5ba8905d4762d0c
   docVersion: 1.0.0
-  speakeasyVersion: 1.598.0
-  generationVersion: 2.674.1
+  speakeasyVersion: 1.598.3
+  generationVersion: 2.674.3
   releaseVersion: 0.4.1
   configChecksum: fbc2cfd1b1408129f33d370fcb09c7b1
   repoURL: https://github.com/smithery-ai/sdk.git
@@ -16,7 +16,7 @@ features:
     additionalDependencies: 0.1.0
     additionalProperties: 0.1.1
     constsAndDefaults: 0.1.12
-    core: 3.21.19
+    core: 3.21.20
     defaultEnabledRetries: 0.1.0
     devContainers: 2.90.0
     enumUnions: 0.1.0
