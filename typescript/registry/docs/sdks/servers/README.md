@@ -14,6 +14,7 @@ Retrieves a paginated list of all available servers with optional filtering.
 
 ### Example Usage
 
+<!-- UsageSnippet language="typescript" operationID="listServers" method="get" path="/servers" -->
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
@@ -92,6 +93,7 @@ Retrieves detailed information about a specific server by its qualified name.
 
 ### Example Usage
 
+<!-- UsageSnippet language="typescript" operationID="getServer" method="get" path="/servers/{qualifiedName}" -->
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
