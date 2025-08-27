@@ -35,7 +35,7 @@ export interface StatelessServerOptions<T = Record<string, unknown>> {
  * Creates a stateless server for handling MCP requests.
  * Each request creates a new server instance - no session state is maintained.
  * This is ideal for stateless API integrations and serverless environments.
- * 
+ *
  * @param createMcpServer Function to create an MCP server
  * @param options Configuration options including optional schema validation and Express app
  * @returns Express app
@@ -53,7 +53,7 @@ export function createStatelessServer<T = Record<string, unknown>>(
 		// In stateless mode, create a new instance of transport and server for each request
 		// to ensure complete isolation. A single instance would cause request ID collisions
 		// when multiple clients connect concurrently.
-        
+
 		try {
 			// Validate config for all requests in stateless mode
 			const configResult = parseAndValidateConfig(req, options?.schema)
@@ -76,7 +76,7 @@ export function createStatelessServer<T = Record<string, unknown>>(
 			})
 
 			// Clean up resources when request closes
-			res.on('close', () => {
+			res.on("close", () => {
 				transport.close()
 				server.close()
 			})
