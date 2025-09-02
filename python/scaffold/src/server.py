@@ -10,7 +10,7 @@ from smithery import from_fastmcp
 # Optional: If you have user-level config, define it here
 # This should map to the config in your smithery.yaml file
 class ConfigSchema(BaseModel):
-    debug: bool = False  # Enable debug logging
+    capitalize: bool = True  # Capitalize the greeting
 
 
 def create_server(config: ConfigSchema) -> FastMCP:
@@ -30,9 +30,11 @@ def create_server(config: ConfigSchema) -> FastMCP:
         """Say hello to someone."""
         ctx = server.get_context()
         config = ctx.session_config
-        greeting = f"Hello, {name}!"
-        if config.get("debug", False):
-            greeting += " (Debug mode enabled)"
+        
+        # Apply capitalization based on config
+        display_name = name.upper() if config.get("capitalize", True) else name.lower()
+        greeting = f"Hello, {display_name}!"
+        
         return greeting
 
     # Add a resource
@@ -57,3 +59,15 @@ def create_server(config: ConfigSchema) -> FastMCP:
         ]
 
     return server
+
+
+def main():
+    """Main entry point."""
+    # In a real app, you'd get config from smithery.yaml
+    config = ConfigSchema()
+    server = create_server(config)
+    server.run(transport="streamable-http")
+
+
+if __name__ == "__main__":
+    main()
