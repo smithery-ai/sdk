@@ -13,10 +13,14 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "mcp[cli]>=1.13.1",
+    "smithery",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.uv.sources]
+smithery = { path = "../", editable = true }
 
 [project.scripts]
 my-mcp-server = "src.server:mcp.run"
