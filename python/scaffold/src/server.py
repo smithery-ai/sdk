@@ -29,13 +29,21 @@ def create_server(config: ConfigSchema) -> FastMCP:
     def hello(name: str) -> str:
         """Say hello to someone."""
         ctx = server.get_context()
-        config = ctx.session_config
+        config = ctx.session_config  # Returns validated ConfigSchema instance
         
-        # Apply capitalization based on config
-        display_name = name.upper() if config.get("capitalize", True) else name.lower()
+        # Apply capitalization based on config - clean Pydantic access
+        display_name = name.upper() if config.capitalize else name.lower()
         greeting = f"Hello, {display_name}!"
         
         return greeting
+
+    # Debug tool to check config
+    @server.tool()
+    def get_config() -> str:
+        """Get the current session config for debugging."""
+        ctx = server.get_context()
+        config = ctx.session_config
+        return f"Config: {config}"
 
     # Add a resource
     @server.resource("history://hello-world")
