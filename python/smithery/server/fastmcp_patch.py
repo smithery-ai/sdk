@@ -65,9 +65,9 @@ class _FastMCPWrapper:
             app.add_middleware(
                 CORSMiddleware,
                 allow_origins=["*"],
-                allow_credentials=True,
-                allow_methods=["*"],
-                allow_headers=["*"]
+                allow_methods=["GET", "POST", "DELETE"],
+                allow_headers=["Content-Type", "Accept", "mcp-session-id"],
+                expose_headers=["mcp-session-id"]
             )
             
             # Add session config middleware

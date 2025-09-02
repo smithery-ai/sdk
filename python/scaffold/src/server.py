@@ -1,7 +1,5 @@
 """
 🚀 Welcome to your Smithery project!
-
-To run your server: uv run python -m src.server
 """
 
 from mcp.server.fastmcp import FastMCP
