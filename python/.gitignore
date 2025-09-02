@@ -173,4 +173,7 @@ cython_debug/
 # Ruff cache
 .ruff_cache/
 
+# Scaffold uv.lock (template shouldn't have lock file)
+scaffold/uv.lock
+
 scratch/

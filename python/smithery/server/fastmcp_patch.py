@@ -11,7 +11,6 @@ from typing import Any, Dict, Optional, Type, get_type_hints
 
 from mcp.server.fastmcp import FastMCP, Context
 from pydantic import BaseModel, ValidationError
-from starlette.requests import Request
 from starlette.middleware.cors import CORSMiddleware
 
 
