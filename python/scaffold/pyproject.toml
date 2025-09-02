@@ -12,17 +12,7 @@ authors = [
 
 requires-python = ">=3.10"
 dependencies = [
-    "fastmcp>=0.1.0",
-    "pydantic>=2.0.0",
-    "starlette>=0.27.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "black>=22.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0.0",
+    "mcp[cli]>=1.13.1",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -31,18 +21,4 @@ packages = ["src"]
 [project.scripts]
 my-mcp-server = "src.server:mcp.run"
 
-[tool.black]
-line-length = 88
-target-version = ['py38']
 
-[tool.ruff]
-target-version = "py38"
-line-length = 88
-select = ["E", "F", "W", "I", "N", "UP", "ANN", "S", "B", "A", "COM", "C4", "DTZ", "T10", "EM", "EXE", "ISC", "ICN", "G", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SIM", "TID", "TCH", "ARG", "PTH", "ERA", "PD", "PGH", "PL", "TRY", "NPY", "RUF"]
-ignore = ["ANN101", "ANN102", "S101"]
-
-[tool.mypy]
-python_version = "3.8"
-strict = true
-warn_return_any = true
-warn_unused_configs = true
