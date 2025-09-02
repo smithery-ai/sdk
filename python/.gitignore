@@ -170,4 +170,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# Ruff cache
+.ruff_cache/
+
 scratch/
