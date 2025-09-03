@@ -16,8 +16,7 @@ from pydantic import BaseModel
 from smithery import from_fastmcp
 
 
-# Optional: If you have user-level config, define it here
-# This should map to the config in your smithery.yaml file
+# Optional: If you want to receive session-level config from user, define it here
 class ConfigSchema(BaseModel):
     capitalize: bool = True  # Capitalize the greeting
 
