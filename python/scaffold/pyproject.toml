@@ -19,11 +19,10 @@ dependencies = [
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
 
-[tool.uv.sources]
-smithery = { path = "../", editable = true }
-
 [project.scripts]
-my-mcp-server = "src.server:main"
+# Entry point for Smithery CLI to discover and build
+server = "src.server:create_server"
+# script for local development
 dev = "src.server:main"
 
 
