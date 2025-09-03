@@ -1,8 +1,7 @@
 """
 Smithery FastMCP Patch - Session Config Support
 
-This provides a wrapper for FastMCP that adds middleware for request-scoped configuration support
-for smithery session config and CORS.
+This provides a wrapper for FastMCP that adds middleware for smithery session config and CORS.
 """
 
 from typing import Any
