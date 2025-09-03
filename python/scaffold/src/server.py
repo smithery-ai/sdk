@@ -13,6 +13,7 @@ https://smithery.ai/docs/concepts/cli
 
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel
+
 from smithery import from_fastmcp
 
 
@@ -24,7 +25,7 @@ class ConfigSchema(BaseModel):
 
 def create_server(config: ConfigSchema) -> FastMCP:
     """Create and configure the MCP server."""
-    
+
     # Validate config at startup
     config = ConfigSchema.model_validate(config)
 
@@ -39,11 +40,11 @@ def create_server(config: ConfigSchema) -> FastMCP:
         """Say hello to someone."""
         ctx = server.get_context()
         config = ctx.session_config  # Returns validated ConfigSchema instance
-        
+
         # Apply capitalization to the entire greeting based on config
         base_greeting = f"Hello, {name}!"
         greeting = base_greeting.upper() if config.capitalize else base_greeting.lower()
-        
+
         return greeting
 
     # Add a resource
@@ -73,19 +74,19 @@ def create_server(config: ConfigSchema) -> FastMCP:
 def main():
     """Main entry point with optional port argument."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Run MCP server")
     parser.add_argument("--port", "-p", type=int, default=8000, help="Port to run server on (default: 8000)")
-    
+
     args = parser.parse_args()
-    
+
     # In a real app, you'd get config from smithery.yaml
     config = ConfigSchema()
     server = create_server(config)
-    
+
     # Configure port
     server.settings.port = args.port
-    
+
     server.run(transport="streamable-http")
 
 

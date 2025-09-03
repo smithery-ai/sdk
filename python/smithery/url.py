@@ -1,6 +1,6 @@
-import json
 import base64
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+import json
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 
 def create_smithery_url(base_url, config=None, api_key=None):

@@ -5,11 +5,10 @@ Smithery Python SDK
 SDK for using Smithery in Python.
 """
 
-from .url import create_smithery_url
-
 from .server.fastmcp_patch import (
     from_fastmcp,
 )
+from .url import create_smithery_url
 
 __version__ = "0.1.0"
 
