@@ -13,7 +13,6 @@ https://smithery.ai/docs/concepts/cli
 
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel
-
 from smithery import from_fastmcp
 
 
