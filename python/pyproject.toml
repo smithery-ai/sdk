@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smithery"
-version = "0.1.8"
+version = "0.1.9"
 description = "SDK for using Smithery with Python"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -36,7 +36,7 @@ where = ["src"]
 smithery = ["py.typed"]
 
 [project.scripts]
-smithery = "smithery.cli.build:main"
+smithery = "smithery.cli.main:main"
 
 [tool.ruff]
 target-version = "py310"
