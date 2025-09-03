@@ -7,13 +7,6 @@
 
 Smithery SDK provides utilities to make it easier for you to develop and deploy [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs) with Smithery.
 
-**Key Features**
-
-- **TypeScript**: Library functions to connect to Smithery MCPs and registry client
-- **Python**: Enhanced FastMCP servers with session-scoped configuration support
-- Adapters to transform MCP responses for OpenAI and Anthropic clients
-- Docker-ready scaffolding for easy deployment
-
 To find our registry of MCPs, visit [https://smithery.ai/](https://smithery.ai/).
 
 ## Languages
@@ -23,5 +16,5 @@ To find our registry of MCPs, visit [https://smithery.ai/](https://smithery.ai/)
 - [SDK](typescript/sdk/README.md) — build and deploy MCP servers to the registry
 
 ### Python
-- [SDK](python/README.md) — enhanced FastMCP servers with session-scoped configuration
-- [Scaffold](python/scaffold/) — ready-to-use MCP server template with Docker support
+- [SDK](python/README.md) — FastMCP servers with smithery session configuration support
+- [Scaffold](python/scaffold/) — ready-to-use MCP server template
