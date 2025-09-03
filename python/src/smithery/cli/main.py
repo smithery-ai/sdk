@@ -12,6 +12,7 @@ from typing import List, Optional
 
 from .build import build_server, get_server_ref_from_config
 from .run import run_server
+from .create import create_project
 
 
 def build_command(args: argparse.Namespace) -> None:
@@ -26,6 +27,11 @@ def run_command(args: argparse.Namespace) -> None:
     # Get server function from config if not provided
     server_function = args.server_function or get_server_ref_from_config()
     run_server(server_function, args.transport, args.port, args.host)
+
+
+def create_command(args: argparse.Namespace) -> None:
+    """Handle the 'create' subcommand."""
+    create_project(args.project_name)
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -120,6 +126,26 @@ Examples:
         help="Host to bind to (shttp only, default: 127.0.0.1)"
     )
     run_parser.set_defaults(func=run_command)
+    
+    # Create subcommand
+    create_parser = subparsers.add_parser(
+        "create",
+        help="Create a new Smithery Python MCP project",
+        description="Scaffold a new Smithery Python MCP project with all necessary files",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  smithery create                    # Prompt for project name
+  smithery create my-awesome-server  # Create with specific name
+        """
+    )
+    
+    create_parser.add_argument(
+        "project_name",
+        nargs="?",
+        help="Name of the project to create"
+    )
+    create_parser.set_defaults(func=create_command)
     
     return parser
 

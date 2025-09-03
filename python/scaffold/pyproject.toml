@@ -9,15 +9,11 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "mcp[cli]>=1.13.1",
-    "smithery>=0.1.8",
+    "smithery @ file:///Users/arjun/Documents/github/smithery/sdk/python",
 ]
 
 [tool.smithery]
 # Server function for Smithery to build
 server = "src.server:create_server"
-
-[project.scripts]
-# Script for local development
-dev = "src.server:main"
 
 
