@@ -35,6 +35,7 @@ packages = ["smithery"]
 smithery = ["py.typed"]
 
 [project.scripts]
+smithery = "smithery.cli.build:main"
 server = "src.server:main"
 
 [tool.ruff]

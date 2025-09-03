@@ -79,6 +79,11 @@ def create_server(config: ConfigSchema) -> FastMCP:
     return server
 
 
+# Export for Smithery build system
+default = create_server
+config_schema = ConfigSchema
+
+
 def main():
     """Main entry point with optional port argument."""
     import argparse
