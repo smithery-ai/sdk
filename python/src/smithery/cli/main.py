@@ -8,11 +8,10 @@ Handles subcommands like 'build', 'dev', etc.
 
 import argparse
 import sys
-from typing import List, Optional
 
 from .build import build_server, get_server_ref_from_config
-from .run import run_server
 from .create import create_project
+from .run import run_server
 
 
 def build_command(args: argparse.Namespace) -> None:
@@ -41,21 +40,21 @@ def create_parser() -> argparse.ArgumentParser:
         description="Smithery Python SDK - Build and manage MCP servers",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    
+
     # Add version argument
     parser.add_argument(
-        "--version", 
-        action="version", 
+        "--version",
+        action="version",
         version="smithery 0.1.9"
     )
-    
+
     # Create subparsers
     subparsers = parser.add_subparsers(
         dest="command",
         help="Available commands",
         metavar="COMMAND"
     )
-    
+
     # Build subcommand
     build_parser = subparsers.add_parser(
         "build",
@@ -69,7 +68,7 @@ Examples:
   smithery build --transport stdio         # Build with stdio transport
         """
     )
-    
+
     build_parser.add_argument(
         "server_function",
         nargs="?",
@@ -87,7 +86,7 @@ Examples:
         help="Transport type (default: shttp)"
     )
     build_parser.set_defaults(func=build_command)
-    
+
     # Run subcommand
     run_parser = subparsers.add_parser(
         "run",
@@ -102,7 +101,7 @@ Examples:
   smithery run --port 3000              # Run on custom port (shttp only)
         """
     )
-    
+
     run_parser.add_argument(
         "server_function",
         nargs="?",
@@ -126,7 +125,7 @@ Examples:
         help="Host to bind to (shttp only, default: 127.0.0.1)"
     )
     run_parser.set_defaults(func=run_command)
-    
+
     # Create subcommand
     create_parser = subparsers.add_parser(
         "create",
@@ -139,36 +138,36 @@ Examples:
   smithery create my-awesome-server  # Create with specific name
         """
     )
-    
+
     create_parser.add_argument(
         "project_name",
         nargs="?",
         help="Name of the project to create"
     )
     create_parser.set_defaults(func=create_command)
-    
+
     return parser
 
 
-def main(argv: Optional[List[str]] = None) -> None:
+def main(argv: list[str] | None = None) -> None:
     """Main CLI entry point."""
     parser = create_parser()
-    
+
     # If no arguments provided, show help
     if argv is None:
         argv = sys.argv[1:]
-    
+
     if not argv:
         parser.print_help()
         return
-    
+
     args = parser.parse_args(argv)
-    
+
     # If no subcommand provided, show help
     if not hasattr(args, 'func'):
         parser.print_help()
         return
-    
+
     # Execute the subcommand
     args.func(args)
 

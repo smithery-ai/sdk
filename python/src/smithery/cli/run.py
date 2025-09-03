@@ -6,13 +6,12 @@ Command-line interface for running Smithery Python MCP servers.
 """
 
 import argparse
-import os
 import sys
 from typing import Any
 
 from rich.console import Console
 
-from .build import import_server_module, get_server_ref_from_config
+from .build import get_server_ref_from_config, import_server_module
 
 # Initialize rich console
 console = Console()
@@ -21,22 +20,22 @@ console = Console()
 def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:
     """
     Run a Smithery MCP server directly without building a separate file.
-    
+
     Args:
         server_ref: Module reference in format 'module.path:function'
-        transport: Transport type ('shttp' or 'stdio')  
+        transport: Transport type ('shttp' or 'stdio')
         port: Port to run on (shttp only)
         host: Host to bind to (shttp only)
     """
     console.print(f"[cyan][smithery][/cyan] Starting Python MCP server with {transport} transport...")
     console.print(f"[cyan][smithery][/cyan] Server reference: {server_ref}")
-    
+
     try:
         # Import and validate server module
         server_module = import_server_module(server_ref)
         create_server = server_module['create_server']
         config_schema = server_module.get('config_schema')
-        
+
         # Create config instance
         config: Any = {}
         if config_schema:
@@ -45,34 +44,34 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
                 console.print(f"[cyan][smithery][/cyan] Using config schema: {config_schema.__name__}")
             except Exception as e:
                 console.print(f"[yellow]⚠ Warning: Failed to instantiate config schema: {e}[/yellow]")
-                console.print(f"[yellow]⚠ Proceeding with empty config[/yellow]")
-        
+                console.print("[yellow]⚠ Proceeding with empty config[/yellow]")
+
         # Create server instance
-        console.print(f"[cyan][smithery][/cyan] Creating server instance...")
+        console.print("[cyan][smithery][/cyan] Creating server instance...")
         server = create_server(config)
-        
+
         if transport == "shttp":
             # Set server configuration for HTTP transport
             server.settings.port = port
             server.settings.host = host
-            
+
             console.print(f"[cyan][smithery][/cyan] MCP server starting on {host}:{port}")
-            console.print(f"[cyan][smithery][/cyan] Transport: streamable HTTP")
-            
+            console.print("[cyan][smithery][/cyan] Transport: streamable HTTP")
+
             # Run with streamable HTTP transport
             server.run(transport="streamable-http")
-            
+
         elif transport == "stdio":
-            console.print(f"[cyan][smithery][/cyan] MCP server starting with stdio transport")
-            
+            console.print("[cyan][smithery][/cyan] MCP server starting with stdio transport")
+
             # Run with stdio transport
             server.run(transport="stdio")
-            
+
         else:
             raise ValueError(f"Unsupported transport: {transport}")
-            
+
     except KeyboardInterrupt:
-        console.print(f"\n[cyan][smithery][/cyan] Server stopped by user")
+        console.print("\n[cyan][smithery][/cyan] Server stopped by user")
         sys.exit(0)
     except Exception as e:
         console.print(f"[cyan][smithery][/cyan] Failed to start MCP server: {e}", file=sys.stderr)

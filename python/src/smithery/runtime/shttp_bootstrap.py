@@ -7,7 +7,10 @@ This file is injected by the Smithery build system.
 import os
 import sys
 from importlib import import_module
-from colorama import Fore, Style
+
+from rich.console import Console
+
+console = Console()
 
 
 def main():
@@ -16,15 +19,15 @@ def main():
         # Module and function references injected at build time
         module_name = "$SMITHERY_MODULE"
         function_name = "$SMITHERY_FUNCTION"
-        
-        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Starting Python MCP server...")
-        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Loading server from: {module_name}:{function_name}")
-        
+
+        console.print("[smithery] Starting Python MCP server...", style="cyan")
+        console.print(f"[smithery] Loading server from: {module_name}:{function_name}", style="cyan")
+
         # Ensure current directory is in Python path
         current_dir = os.getcwd()
         if current_dir not in sys.path:
             sys.path.insert(0, current_dir)
-        
+
         # Runtime module resolution (like uvicorn main:app)
         module = import_module(module_name)
         server_fn = getattr(module, function_name)
@@ -42,13 +45,13 @@ def main():
         port = int(os.environ.get("PORT", "8081"))
         server.settings.port = port
 
-        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} MCP server starting on port {port}")
+        console.print(f"[smithery] MCP server starting on port {port}", style="cyan")
 
         # Run with streamable HTTP transport
         server.run(transport="streamable-http")
 
     except Exception as e:
-        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Failed to start MCP server: {e}")
+        console.print(f"[smithery] Failed to start MCP server: {e}", style="cyan")
         sys.exit(1)
 
 
