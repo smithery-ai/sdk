@@ -170,4 +170,10 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# Ruff cache
+.ruff_cache/
+
+# Scaffold uv.lock (template shouldn't have lock file)
+scaffold/uv.lock
+
 scratch/

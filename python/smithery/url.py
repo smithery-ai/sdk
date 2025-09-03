@@ -1,6 +1,38 @@
-import json
 import base64
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+import json
+from typing import Any
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
+
+def encode_config_to_base64(config: dict[str, Any]) -> str:
+    """
+    Encode a configuration dictionary to base64.
+
+    Args:
+        config: Configuration dictionary to encode
+
+    Returns:
+        Base64-encoded JSON string
+    """
+    config_json = json.dumps(config)
+    return base64.b64encode(config_json.encode("utf-8")).decode("utf-8")
+
+
+def decode_config_from_base64(config_b64: str) -> dict[str, Any]:
+    """
+    Decode a base64-encoded configuration string.
+
+    Args:
+        config_b64: Base64-encoded JSON string
+
+    Returns:
+        Configuration dictionary, or empty dict if decoding fails
+    """
+    try:
+        config_json = base64.b64decode(config_b64).decode("utf-8")
+        return json.loads(config_json)
+    except (ValueError, json.JSONDecodeError, UnicodeDecodeError):
+        return {}
 
 
 def create_smithery_url(base_url, config=None, api_key=None):
@@ -23,8 +55,7 @@ def create_smithery_url(base_url, config=None, api_key=None):
 
     # Add config if provided
     if config is not None:
-        config_json = json.dumps(config)
-        config_base64 = base64.b64encode(config_json.encode("utf-8")).decode("utf-8")
+        config_base64 = encode_config_to_base64(config)
         query_params["config"] = [config_base64]
 
     # Add API key if provided
