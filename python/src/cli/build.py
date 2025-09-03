@@ -6,6 +6,7 @@ Build command for Smithery Python servers.
 """
 
 import argparse
+import inspect
 import os
 import sys
 from importlib import import_module
@@ -14,7 +15,7 @@ from typing import Any, Callable, Dict, Optional, Type, TypedDict, Union
 # Required imports - these should always be available in a Smithery project
 from pydantic import BaseModel
 from mcp.server.fastmcp import FastMCP
-from .server.fastmcp_patch import _FastMCPWrapper
+from ..server.fastmcp_patch import _FastMCPWrapper
 
 # Type alias for the server type
 ServerType = _FastMCPWrapper
@@ -26,19 +27,69 @@ class SmitheryModule(TypedDict, total=False):
     config_schema: Optional[Type[BaseModel]]  # Optional: Pydantic config model
 
 
+def _auto_detect_server_function(module) -> Optional[Callable]:
+    """Auto-detect the server function by signature analysis."""
+    candidates = []
+    
+    # Look for functions that return FastMCP
+    for name, obj in inspect.getmembers(module, inspect.isfunction):
+        if name.startswith('_'):  # Skip private functions
+            continue
+            
+        try:
+            sig = inspect.signature(obj)
+            return_annotation = sig.return_annotation
+            
+            # Only check return type - no name biases
+            if return_annotation == FastMCP or return_annotation == ServerType:
+                candidates.append((name, obj))
+                print(f"[smithery] Found function returning FastMCP: {name}")
+        except Exception:
+            continue  # Skip functions we can't inspect
+    
+    if len(candidates) == 1:
+        name, func = candidates[0]
+        print(f"[smithery] Auto-detected server function: {name}")
+        return func
+    elif len(candidates) > 1:
+        print(f"[smithery] Multiple FastMCP functions found: {[name for name, _ in candidates]}")
+        print(f"[smithery] Using first match: {candidates[0][0]}")
+        return candidates[0][1]
+    
+    return None
+
+
 def import_server_module(server_ref: str) -> SmitheryModule:
-    """Import the server module and extract components."""
+    """Import the server module and extract components with improved path resolution."""
     try:
         # Extract module path, ignore function name (always use 'default')
         module_path = server_ref.split(":")[0] if ":" in server_ref else server_ref
+        
+        # Ensure current directory is in Python path for relative imports
+        current_dir = os.getcwd()
+        if current_dir not in sys.path:
+            sys.path.insert(0, current_dir)
+        
+        print(f"[smithery] Importing module: {module_path}")
+        print(f"[smithery] Working directory: {current_dir}")
+        
         module = import_module(module_path)
         
-        # Require default export (like TypeScript)
-        if not hasattr(module, 'default') or not callable(getattr(module, 'default')):
-            raise AttributeError("Module must export 'default' function")
-        
-        default_fn = getattr(module, 'default')
+        # Try to find the server function
+        default_fn = None
         config_schema = getattr(module, 'config_schema', None)
+        
+        # 1. First try explicit 'default' export (matches TypeScript)
+        if hasattr(module, 'default') and callable(getattr(module, 'default')):
+            default_fn = getattr(module, 'default')
+            print(f"[smithery] Found explicit 'default' function")
+        
+        # 2. If no default, auto-detect by function signature
+        if default_fn is None:
+            default_fn = _auto_detect_server_function(module)
+        
+        if default_fn is None:
+            raise AttributeError("No valid server function found")
         
         print(f"[smithery] Setting up server")
         if config_schema and issubclass(config_schema, BaseModel):
@@ -48,10 +99,19 @@ def import_server_module(server_ref: str) -> SmitheryModule:
             'default': default_fn,
             'config_schema': config_schema,
         }
+    except ModuleNotFoundError as e:
+        print(f"✗ Failed to import server module '{server_ref}': {e}", file=sys.stderr)
+        print("✗ Module resolution tips:")
+        print(f"  - Ensure you're running from the project root directory")
+        print(f"  - Current working directory: {os.getcwd()}")
+        print(f"  - Looking for module: {module_path}")
+        print(f"  - Python path: {sys.path[:3]}...")
+        sys.exit(1)
     except Exception as e:
         print(f"✗ Failed to import server module '{server_ref}': {e}", file=sys.stderr)
         print("✗ Expected module contract:")
-        print("  - default = function(config) -> FastMCP  # Required")
+        print("  - default = function(config) -> FastMCP  # Explicit export (matches TypeScript)")
+        print("  - OR any function returning FastMCP type")
         print("  - config_schema = class(BaseModel)  # Optional")
         sys.exit(1)
 
