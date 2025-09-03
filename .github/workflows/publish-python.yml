@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'python/**'
-      - '!python/scaffold/**'
+      - 'python/pyproject.toml'  # Only trigger on version changes
   workflow_dispatch:  # Allows manual triggering
 
 concurrency:
