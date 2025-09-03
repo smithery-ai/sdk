@@ -13,7 +13,7 @@ from starlette.middleware.cors import CORSMiddleware
 from ..utils.url import decode_config_from_base64
 
 
-class _FastMCPWrapper:
+class SmitheryFastMCP:
     """Wrapper that adds session config and CORS to FastMCP."""
 
     def __init__(self, fastmcp_instance: FastMCP, config_schema: type[BaseModel] | None = None):
@@ -123,7 +123,7 @@ def from_fastmcp(
     fastmcp_instance: FastMCP,
     *,
     config_schema: type[BaseModel] | None = None
-) -> FastMCP:
+) -> SmitheryFastMCP:
     """
     Add session config support and CORS to a FastMCP instance.
 
@@ -131,7 +131,7 @@ def from_fastmcp(
     and accessed through ctx.session_config.
 
     Args:
-        fastmcp_instance: FastMCP instance to enhance
+        fastmcp_instance: FastMCP instance to patch
         config_schema: Optional Pydantic model for config validation and schema generation.
 
     Returns:
@@ -160,7 +160,7 @@ def from_fastmcp(
         # Access validated config in your tools via ctx.session_config
         ```
     """
-    return _FastMCPWrapper(fastmcp_instance, config_schema)
+    return SmitheryFastMCP(fastmcp_instance, config_schema)
 
 
 

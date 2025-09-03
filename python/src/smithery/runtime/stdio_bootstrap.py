@@ -32,7 +32,7 @@ def main():
         server.run(transport="stdio")
 
     except Exception as e:
-        print(f"✗ [smithery] Failed to start MCP server: {e}", file=sys.stderr)
+        print(f"\033[36m[smithery]\033[0m Failed to start MCP server: {e}", file=sys.stderr)
         sys.exit(1)
 
 

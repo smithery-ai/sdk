@@ -7,6 +7,7 @@ This file is injected by the Smithery build system.
 import os
 import sys
 from importlib import import_module
+from colorama import Fore, Style
 
 
 def main():
@@ -16,8 +17,8 @@ def main():
         module_name = "$SMITHERY_MODULE"
         function_name = "$SMITHERY_FUNCTION"
         
-        print("[smithery] Starting Python MCP server...")
-        print(f"[smithery] Loading server from: {module_name}:{function_name}")
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Starting Python MCP server...")
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Loading server from: {module_name}:{function_name}")
         
         # Ensure current directory is in Python path
         current_dir = os.getcwd()
@@ -41,13 +42,13 @@ def main():
         port = int(os.environ.get("PORT", "8081"))
         server.settings.port = port
 
-        print(f"✓ [smithery] MCP server starting on port {port}")
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} MCP server starting on port {port}")
 
         # Run with streamable HTTP transport
         server.run(transport="streamable-http")
 
     except Exception as e:
-        print(f"✗ [smithery] Failed to start MCP server: {e}")
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Failed to start MCP server: {e}")
         sys.exit(1)
 
 
