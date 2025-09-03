@@ -46,14 +46,6 @@ def create_server(config: ConfigSchema) -> FastMCP:
 
         return greeting
 
-    # Debug tool to check config
-    @server.tool()
-    def get_config() -> str:
-        """Get the current session configuration for debugging."""
-        ctx = server.get_context()
-        config = ctx.session_config
-        return f"Config: {config}, Type: {type(config)}, Capitalize: {config.capitalize if hasattr(config, 'capitalize') else 'N/A'}"
-
     # Add a resource
     @server.resource("history://hello-world")
     def hello_world() -> str:
@@ -81,26 +73,3 @@ def create_server(config: ConfigSchema) -> FastMCP:
 # Export for Smithery build system
 default = create_server
 config_schema = ConfigSchema
-
-
-def main():
-    """Main entry point with optional port argument."""
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Run MCP server")
-    parser.add_argument("--port", "-p", type=int, default=8000, help="Port to run server on (default: 8000)")
-
-    args = parser.parse_args()
-
-    # In a real app, you'd get config from smithery.yaml
-    config = ConfigSchema()
-    server = create_server(config)
-
-    # Configure port
-    server.settings.port = args.port
-
-    server.run(transport="streamable-http")
-
-
-if __name__ == "__main__":
-    main()
