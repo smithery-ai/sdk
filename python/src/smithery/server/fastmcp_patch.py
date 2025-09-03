@@ -47,7 +47,7 @@ class SmitheryFastMCP:
             app.add_middleware(
                 CORSMiddleware,
                 allow_origins=["*"],
-                allow_methods=["GET", "POST", "DELETE"],
+                allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
                 allow_headers=["Content-Type", "Accept", "mcp-session-id"],
                 expose_headers=["mcp-session-id"]
             )
