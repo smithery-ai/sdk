@@ -47,6 +47,14 @@ def create_server(config: ConfigSchema) -> FastMCP:
 
         return greeting
 
+    # Debug tool to check config
+    @server.tool()
+    def get_config() -> str:
+        """Get the current session configuration for debugging."""
+        ctx = server.get_context()
+        config = ctx.session_config
+        return f"Config: {config}, Type: {type(config)}, Capitalize: {config.capitalize if hasattr(config, 'capitalize') else 'N/A'}"
+
     # Add a resource
     @server.resource("history://hello-world")
     def hello_world() -> str:

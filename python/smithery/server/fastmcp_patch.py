@@ -1,19 +1,21 @@
 """
 Smithery FastMCP Patch - Session Config Support
 
-This provides a wrapper for FastMCP that adds session-scoped configuration support.
+This provides a wrapper for FastMCP that adds middleware for request-scoped configuration support 
+for smithery session config and CORS.
 """
 
-import json
 from typing import Any
 
 from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 
+from ..url import decode_config_from_base64
+
 
 class _FastMCPWrapper:
-    """Internal wrapper that adds session config support to FastMCP."""
+    """Wrapper that adds session config and CORS to FastMCP."""
 
     def __init__(self, fastmcp_instance: FastMCP, config_schema: type[BaseModel] | None = None):
         self._fastmcp = fastmcp_instance
@@ -22,29 +24,18 @@ class _FastMCPWrapper:
         # Patch the instance methods
         self._patch_streamable_http_app()
 
-        # Forward all FastMCP attributes and methods
-        self._forward_attributes()
-
-    def _forward_attributes(self):
-        """Forward essential FastMCP attributes and methods to this wrapper."""
-        # Forward essential methods that are commonly used
-        essential_methods = ['get_context', 'run', 'tool', 'resource', 'prompt']
-
-        for method_name in essential_methods:
-            if hasattr(self._fastmcp, method_name):
-                method = getattr(self._fastmcp, method_name)
-                def make_forwarder(m):
-                    def forwarder(*args, **kwargs):
-                        return m(*args, **kwargs)
-                    return forwarder
-                setattr(self, method_name, make_forwarder(method))
-
-        # Forward settings as a lazy property
-        @property
-        def settings(self):
-            return self._fastmcp.settings
-
-        self.__class__.settings = settings
+    def __getattr__(self, name: str):
+        """Forward all attribute access to the wrapped FastMCP instance."""
+        # First check if the attribute exists on the wrapped instance
+        if hasattr(self._fastmcp, name):
+            attr = getattr(self._fastmcp, name)
+            
+            # If it's a callable (method), return it directly
+            # Python will handle the binding automatically
+            return attr
+        
+        # If attribute doesn't exist on wrapped instance, raise AttributeError
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
     def _patch_streamable_http_app(self):
         """Patch the StreamableHTTP app to add CORS and session config middleware."""
@@ -112,29 +103,21 @@ class SessionConfigMiddleware:
         await self.app(scope, receive, send)
 
     def _parse_config_from_url(self, scope) -> dict[str, Any]:
-        """Parse config from URL query parameters."""
-        config = {}
-
+        """Parse config from base64-encoded URL parameter."""
         # Extract query string from scope
         query_string = scope.get("query_string", b"").decode("utf-8")
         if not query_string:
-            return config
+            return {}
 
         # Parse query parameters
         from urllib.parse import parse_qsl
         query_params = dict(parse_qsl(query_string))
 
-        # Convert query parameters to config dict
-        for key, value in query_params.items():
-            # Try to parse as JSON for proper typing
-            try:
-                parsed_value = json.loads(value)
-            except (json.JSONDecodeError, ValueError):
-                parsed_value = value
+        # Look for base64-encoded config parameter
+        if "config" in query_params:
+            return decode_config_from_base64(query_params["config"])
 
-            config[key] = parsed_value
-
-        return config
+        return {}
 
 
 def from_fastmcp(
@@ -145,28 +128,37 @@ def from_fastmcp(
     """
     Add session config support and CORS to a FastMCP instance.
 
-    Config is passed via URL parameters and accessed through ctx.session_config.
+    Config is passed via base64-encoded URL parameter (standard Smithery format) 
+    and accessed through ctx.session_config.
 
     Args:
         fastmcp_instance: FastMCP instance to enhance
-        config_schema: Pydantic model for config validation
+        config_schema: Optional Pydantic model for config validation and schema generation.
 
     Returns:
         Enhanced FastMCP instance
 
     Example:
         ```python
-        class Config(BaseModel):
-            debug: bool = False
+        from smithery.url import encode_config_to_base64
+        
+        # Define what config your server accepts
+        class ConfigSchema(BaseModel):
+            api_key: str
+            default_location: str = "New York"
+            units: str = "celsius"
 
-        app = from_fastmcp(FastMCP(), config_schema=Config)
+        app = from_fastmcp(FastMCP(), config_schema=ConfigSchema)
 
         @app.tool()
-        def my_tool() -> str:
+        def get_weather(location: str = None) -> str:
             config = app.get_context().session_config
-            return f"Debug: {config.debug}"
+            # Use user's config values
+            loc = location or config.default_location
+            return f"Weather in {loc}: 22°{config.units[0].upper()} (using API key: {config.api_key[:8]}...)"
 
-        # Usage: POST /mcp?debug=true
+        # User's session config is received via: POST /mcp?config=BASE64_JSON
+        # Access validated config in your tools via ctx.session_config
         ```
     """
     return _FastMCPWrapper(fastmcp_instance, config_schema)
