@@ -30,7 +30,7 @@ dev = [
 
 [tool.setuptools]
 packages = ["smithery"]
-package-dir = {"" = "src"}
+package-dir = {"smithery" = "src"}
 
 [tool.setuptools.package-data]
 smithery = ["py.typed"]
