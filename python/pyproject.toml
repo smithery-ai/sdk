@@ -30,13 +30,13 @@ dev = [
 
 [tool.setuptools]
 packages = ["smithery"]
+package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
 smithery = ["py.typed"]
 
 [project.scripts]
 smithery = "smithery.cli.build:main"
-server = "src.server:main"
 
 [tool.ruff]
 target-version = "py310"

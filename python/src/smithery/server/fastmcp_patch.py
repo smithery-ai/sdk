@@ -10,7 +10,7 @@ from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 
-from ..url import decode_config_from_base64
+from ..utils.url import decode_config_from_base64
 
 
 class _FastMCPWrapper:
@@ -139,7 +139,7 @@ def from_fastmcp(
 
     Example:
         ```python
-        from smithery.url import encode_config_to_base64
+        from smithery.utils.url import encode_config_to_base64
 
         # Define what config your server accepts
         class ConfigSchema(BaseModel):
