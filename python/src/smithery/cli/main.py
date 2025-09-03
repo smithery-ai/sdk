@@ -11,6 +11,7 @@ import sys
 from typing import List, Optional
 
 from .build import build_server, get_server_ref_from_config
+from .run import run_server
 
 
 def build_command(args: argparse.Namespace) -> None:
@@ -18,6 +19,13 @@ def build_command(args: argparse.Namespace) -> None:
     # Get server function from config if not provided
     server_function = args.server_function or get_server_ref_from_config()
     build_server(server_function, args.output, args.transport)
+
+
+def run_command(args: argparse.Namespace) -> None:
+    """Handle the 'run' subcommand."""
+    # Get server function from config if not provided
+    server_function = args.server_function or get_server_ref_from_config()
+    run_server(server_function, args.transport, args.port, args.host)
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -73,6 +81,45 @@ Examples:
         help="Transport type (default: shttp)"
     )
     build_parser.set_defaults(func=build_command)
+    
+    # Run subcommand
+    run_parser = subparsers.add_parser(
+        "run",
+        help="Run MCP server directly (like uvicorn)",
+        description="Run a Smithery MCP server directly without building",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  smithery run                          # Read from pyproject.toml [tool.smithery].server
+  smithery run src.server:create_server # Run specific server function
+  smithery run --transport stdio        # Run with stdio transport
+  smithery run --port 3000              # Run on custom port (shttp only)
+        """
+    )
+    
+    run_parser.add_argument(
+        "server_function",
+        nargs="?",
+        help="Path to your server function (e.g., src.server:create_server). Read from pyproject.toml [tool.smithery].server if not provided."
+    )
+    run_parser.add_argument(
+        "--transport",
+        choices=["shttp", "stdio"],
+        default="shttp",
+        help="Transport type (default: shttp)"
+    )
+    run_parser.add_argument(
+        "--port",
+        type=int,
+        default=8081,
+        help="Port to run on (shttp only, default: 8081)"
+    )
+    run_parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Host to bind to (shttp only, default: 127.0.0.1)"
+    )
+    run_parser.set_defaults(func=run_command)
     
     return parser
 
