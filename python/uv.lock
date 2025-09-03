@@ -517,8 +517,6 @@ version = "0.1.4"
 source = { editable = "." }
 dependencies = [
     { name = "mcp" },
-    { name = "pydantic" },
-    { name = "starlette" },
 ]
 
 [package.optional-dependencies]
@@ -529,9 +527,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "mcp", specifier = ">=1.13.1" },
-    { name = "pydantic", specifier = ">=2.7.2,<3.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.12.11" },
-    { name = "starlette", specifier = ">=0.27" },
 ]
 
 [[package]]
