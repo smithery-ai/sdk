@@ -21,18 +21,15 @@ from mcp.server.fastmcp import FastMCP
 # Core dependencies required by all Smithery Python projects
 from pydantic import BaseModel
 
-from ..server.fastmcp_patch import _FastMCPWrapper
+from ..server.fastmcp_patch import SmitheryFastMCP
 
 # Initialize colorama for cross-platform color support
 colorama.init()
 
-# Type alias for enhanced FastMCP server
-ServerType = _FastMCPWrapper
-
 
 class SmitheryModule(TypedDict, total=False):
     """Type definition for a Smithery Python module contract."""
-    default: Callable[[BaseModel | dict[str, Any]], ServerType]  # Server factory function
+    create_server: Callable[[BaseModel | dict[str, Any]], SmitheryFastMCP]  # Server creation function
     config_schema: type[BaseModel] | None  # Optional Pydantic config model
 
 
@@ -85,10 +82,10 @@ def import_server_module(server_ref: str) -> SmitheryModule:
             
             # Check if return type annotation is present and correct
             if return_annotation != inspect.Signature.empty:
-                if return_annotation not in (FastMCP, ServerType, _FastMCPWrapper):
-                    print(f"{Fore.YELLOW}⚠ Warning: Function return type is {return_annotation.__name__ if hasattr(return_annotation, '__name__') else return_annotation}, expected FastMCP{Style.RESET_ALL}")
+                if return_annotation != SmitheryFastMCP:
+                    print(f"{Fore.YELLOW}⚠ Warning: Function return type is {return_annotation.__name__ if hasattr(return_annotation, '__name__') else return_annotation}, expected SmitheryFastMCP{Style.RESET_ALL}")
             else:
-                print(f"{Fore.YELLOW}⚠ Warning: No return type annotation found. Expected: -> FastMCP{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}⚠ Warning: No return type annotation found. Expected: -> SmitheryFastMCP{Style.RESET_ALL}")
             
             # Check parameter signature
             params = list(sig.parameters.values())
@@ -104,7 +101,7 @@ def import_server_module(server_ref: str) -> SmitheryModule:
         config_schema = getattr(module, 'config_schema', None)
 
         return {
-            'default': server_function,
+            'create_server': server_function,
             'config_schema': config_schema,
         }
     except ModuleNotFoundError as e:

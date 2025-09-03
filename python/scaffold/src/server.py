@@ -14,6 +14,7 @@ https://smithery.ai/docs/concepts/cli
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel
 from smithery import from_fastmcp
+from smithery.server.fastmcp_patch import SmitheryFastMCP
 
 
 # Optional: If you want to receive session-level config from user, define it here
@@ -21,7 +22,7 @@ class ConfigSchema(BaseModel):
     capitalize: bool = True  # Capitalize the greeting
 
 
-def create_server(config: ConfigSchema) -> FastMCP:
+def create_server(config: ConfigSchema) -> SmitheryFastMCP:
     """Create and configure the MCP server."""
 
     # Validate config at startup
