@@ -6,19 +6,28 @@ This file is injected by the Smithery build system.
 
 import os
 import sys
-
-# This import will be replaced by the build system
-from smithery.virtual.user_module import config_schema, default
+from importlib import import_module
 
 
 def main():
     """Main entry point for the MCP server."""
     try:
+        # Module and function references injected at build time
+        module_name = "$SMITHERY_MODULE"
+        function_name = "$SMITHERY_FUNCTION"
+        
         print("[smithery] Starting Python MCP server...")
-
-        # Server function and config schema imported at module level
-        server_fn = default
-        server_config_schema = config_schema
+        print(f"[smithery] Loading server from: {module_name}:{function_name}")
+        
+        # Ensure current directory is in Python path
+        current_dir = os.getcwd()
+        if current_dir not in sys.path:
+            sys.path.insert(0, current_dir)
+        
+        # Runtime module resolution (like uvicorn main:app)
+        module = import_module(module_name)
+        server_fn = getattr(module, function_name)
+        server_config_schema = getattr(module, 'config_schema', None)
 
         # Create config instance
         config = {}

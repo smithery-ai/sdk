@@ -165,11 +165,9 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
     module_path = server_ref.split(":")[0] if ":" in server_ref else server_ref
     function_name = server_ref.split(":")[1] if ":" in server_ref else "default"
 
-    # Replace virtual import with actual import (similar to TypeScript approach)
-    server_content = bootstrap_content.replace(
-        "from smithery.virtual.user_module import default, config_schema",
-        f"from {module_path} import {function_name} as default, config_schema"
-    )
+    # Replace placeholders with actual values (like uvicorn approach)
+    server_content = bootstrap_content.replace("$SMITHERY_MODULE", module_path)
+    server_content = server_content.replace("$SMITHERY_FUNCTION", function_name)
 
     # Write output file
     output_path = Path(output_file)
