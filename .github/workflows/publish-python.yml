@@ -37,4 +37,4 @@ jobs:
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: dist/
+          packages-dir: python/dist/
