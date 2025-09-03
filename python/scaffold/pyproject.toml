@@ -23,6 +23,7 @@ packages = ["src"]
 smithery = { path = "../", editable = true }
 
 [project.scripts]
-my-mcp-server = "src.server:mcp.run"
+my-mcp-server = "src.server:main"
+dev = "src.server:main"
 
 

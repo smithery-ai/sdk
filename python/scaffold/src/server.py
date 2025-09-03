@@ -1,5 +1,14 @@
 """
-🚀 Welcome to your Smithery project!
+👋 Welcome to your Smithery project!
+To run your server, run "uv run dev"
+
+You might find these resources useful:
+
+🧑‍💻 MCP's Python SDK (helps you define your server)
+https://github.com/modelcontextprotocol/python-sdk
+
+💻 smithery CLI (run "npx @smithery/cli dev" or explore other commands below)
+https://smithery.ai/docs/concepts/cli
 """
 
 from mcp.server.fastmcp import FastMCP
@@ -31,19 +40,11 @@ def create_server(config: ConfigSchema) -> FastMCP:
         ctx = server.get_context()
         config = ctx.session_config  # Returns validated ConfigSchema instance
         
-        # Apply capitalization based on config - clean Pydantic access
-        display_name = name.upper() if config.capitalize else name.lower()
-        greeting = f"Hello, {display_name}!"
+        # Apply capitalization to the entire greeting based on config
+        base_greeting = f"Hello, {name}!"
+        greeting = base_greeting.upper() if config.capitalize else base_greeting.lower()
         
         return greeting
-
-    # Debug tool to check config
-    @server.tool()
-    def get_config() -> str:
-        """Get the current session config for debugging."""
-        ctx = server.get_context()
-        config = ctx.session_config
-        return f"Config: {config}"
 
     # Add a resource
     @server.resource("history://hello-world")
@@ -70,10 +71,21 @@ def create_server(config: ConfigSchema) -> FastMCP:
 
 
 def main():
-    """Main entry point."""
+    """Main entry point with optional port argument."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Run MCP server")
+    parser.add_argument("--port", "-p", type=int, default=8000, help="Port to run server on (default: 8000)")
+    
+    args = parser.parse_args()
+    
     # In a real app, you'd get config from smithery.yaml
     config = ConfigSchema()
     server = create_server(config)
+    
+    # Configure port
+    server.settings.port = args.port
+    
     server.run(transport="streamable-http")
 
 
