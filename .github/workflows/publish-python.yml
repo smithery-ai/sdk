@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'python/**'
+      - '!python/scaffold/**'
   workflow_dispatch:  # Allows manual triggering
 
 concurrency:
