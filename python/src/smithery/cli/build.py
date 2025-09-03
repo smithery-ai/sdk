@@ -14,12 +14,17 @@ from collections.abc import Callable
 from importlib import import_module
 from typing import Any, TypedDict
 
+import colorama
+from colorama import Fore, Style
 from mcp.server.fastmcp import FastMCP
 
 # Core dependencies required by all Smithery Python projects
 from pydantic import BaseModel
 
 from ..server.fastmcp_patch import _FastMCPWrapper
+
+# Initialize colorama for cross-platform color support
+colorama.init()
 
 # Type alias for enhanced FastMCP server
 ServerType = _FastMCPWrapper
@@ -31,39 +36,7 @@ class SmitheryModule(TypedDict, total=False):
     config_schema: type[BaseModel] | None  # Optional Pydantic config model
 
 
-def _auto_detect_server_function(module) -> Callable | None:
-    """
-    Auto-detect server function by analyzing return type annotations.
 
-    Looks for functions that return FastMCP or ServerType.
-    Returns the first match if multiple candidates are found.
-    """
-    candidates = []
-
-    for name, obj in inspect.getmembers(module, inspect.isfunction):
-        if name.startswith('_'):
-            continue
-
-        try:
-            sig = inspect.signature(obj)
-            return_annotation = sig.return_annotation
-
-            if return_annotation == FastMCP or return_annotation == ServerType:
-                candidates.append((name, obj))
-                print(f"[smithery] Found function returning FastMCP: {name}")
-        except Exception:
-            continue
-
-    if len(candidates) == 1:
-        name, func = candidates[0]
-        print(f"[smithery] Auto-detected server function: {name}")
-        return func
-    elif len(candidates) > 1:
-        print(f"[smithery] Multiple FastMCP functions found: {[name for name, _ in candidates]}")
-        print(f"[smithery] Using first match: {candidates[0][0]}")
-        return candidates[0][1]
-
-    return None
 
 
 def import_server_module(server_ref: str) -> SmitheryModule:
@@ -71,66 +44,85 @@ def import_server_module(server_ref: str) -> SmitheryModule:
     Import and validate a Smithery server module.
 
     Args:
-        server_ref: Module reference in format 'module.path' or 'module.path:function'
+        server_ref: Module reference in format 'module.path:function'
 
     Returns:
         SmitheryModule containing the server function and optional config schema
 
     Raises:
         ModuleNotFoundError: If the module cannot be imported
-        AttributeError: If no valid server function is found
+        AttributeError: If the specified function is not found
     """
     try:
-        module_path = server_ref.split(":")[0] if ":" in server_ref else server_ref
+        if ":" not in server_ref:
+            raise ValueError(f"Server reference must include function name: '{server_ref}'. Expected format: 'module.path:function_name'")
+        
+        module_path, function_name = server_ref.split(":", 1)
 
         # Ensure current directory is in Python path for relative imports
         current_dir = os.getcwd()
         if current_dir not in sys.path:
             sys.path.insert(0, current_dir)
 
-        print(f"[smithery] Importing module: {module_path}")
-        print(f"[smithery] Working directory: {current_dir}")
+        print(f"{Fore.CYAN}[smithery] Importing module: {module_path}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}[smithery] Looking for function: {function_name}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}[smithery] Working directory: {current_dir}{Style.RESET_ALL}")
 
         module = import_module(module_path)
 
-        # Locate the server function
-        default_fn = None
+        # Get the specified server function
+        if not hasattr(module, function_name):
+            raise AttributeError(f"Function '{function_name}' not found in module '{module_path}'")
+        
+        server_function = getattr(module, function_name)
+        if not callable(server_function):
+            raise AttributeError(f"'{function_name}' is not callable in module '{module_path}'")
+
+        # Validate function signature and return type
+        try:
+            sig = inspect.signature(server_function)
+            return_annotation = sig.return_annotation
+            
+            # Check if return type annotation is present and correct
+            if return_annotation != inspect.Signature.empty:
+                if return_annotation not in (FastMCP, ServerType, _FastMCPWrapper):
+                    print(f"{Fore.YELLOW}⚠ Warning: Function return type is {return_annotation.__name__ if hasattr(return_annotation, '__name__') else return_annotation}, expected FastMCP{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.YELLOW}⚠ Warning: No return type annotation found. Expected: -> FastMCP{Style.RESET_ALL}")
+            
+            # Check parameter signature
+            params = list(sig.parameters.values())
+            if len(params) != 1:
+                print(f"{Fore.YELLOW}⚠ Warning: Expected exactly 1 parameter (config), found {len(params)}{Style.RESET_ALL}")
+            elif params[0].name not in ('config', 'cfg', 'configuration'):
+                print(f"{Fore.YELLOW}⚠ Warning: Parameter name '{params[0].name}' should be 'config' for clarity{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.YELLOW}⚠ Warning: Could not validate function signature: {e}{Style.RESET_ALL}")
+
+        # Get optional config schema
         config_schema = getattr(module, 'config_schema', None)
 
-        # Try explicit 'default' export first (matches TypeScript convention)
-        if hasattr(module, 'default') and callable(module.default):
-            default_fn = module.default
-            print("[smithery] Found explicit 'default' function")
-
-        # Fallback to auto-detection by function signature
-        if default_fn is None:
-            default_fn = _auto_detect_server_function(module)
-
-        if default_fn is None:
-            raise AttributeError("No valid server function found")
-
-        print("[smithery] Setting up server")
-        if config_schema and issubclass(config_schema, BaseModel):
-            print(f"[smithery] Using config schema: {config_schema.__name__}")
-
         return {
-            'default': default_fn,
+            'default': server_function,
             'config_schema': config_schema,
         }
     except ModuleNotFoundError as e:
-        print(f"✗ Failed to import server module '{server_ref}': {e}", file=sys.stderr)
-        print("✗ Module resolution tips:")
-        print("  - Ensure you're running from the project root directory")
+        print(f"{Fore.RED}✗ Failed to import server module '{server_ref}': {e}{Style.RESET_ALL}", file=sys.stderr)
+        print(f"{Fore.YELLOW}✗ Module resolution tips:{Style.RESET_ALL}")
+        print(f"  - Ensure you're running from the project root directory")
         print(f"  - Current working directory: {os.getcwd()}")
         print(f"  - Looking for module: {module_path}")
         print(f"  - Python path: {sys.path[:3]}...")
         sys.exit(1)
     except Exception as e:
-        print(f"✗ Failed to import server module '{server_ref}': {e}", file=sys.stderr)
-        print("✗ Expected module contract:")
-        print("  - default = function(config) -> FastMCP  # Explicit export (matches TypeScript)")
-        print("  - OR any function returning FastMCP type")
-        print("  - config_schema = class(BaseModel)  # Optional")
+        print(f"{Fore.RED}✗ Failed to import server module '{server_ref}': {e}{Style.RESET_ALL}", file=sys.stderr)
+        print(f"{Fore.YELLOW}✗ Expected configuration in pyproject.toml:{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  [tool.smithery]{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  server = \"module.path:function_name\"{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}✗ Expected module contract:{Style.RESET_ALL}")
+        print(f"  - function_name = function(config) -> FastMCP")
+        print(f"  - config_schema = class(BaseModel)  # Optional")
         sys.exit(1)
 
 
@@ -178,21 +170,18 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
     if os.name != 'nt':
         os.chmod(output_path, 0o755)
 
-    print(f"✓ [smithery] Python server created: {output_file}")
+    print(f"{Fore.GREEN}✓ [smithery] Python server created: {output_file}{Style.RESET_ALL}")
 
 
-def auto_detect_server_ref() -> str:
+def get_server_ref_from_config() -> str:
     """
-    Auto-detect server reference from pyproject.toml configuration.
-
-    Looks for the 'server' entry in [project.scripts] section.
+    Get server reference from pyproject.toml [tool.smithery] configuration.
 
     Returns:
-        Server reference string
+        Server reference string from [tool.smithery].server
 
     Raises:
-        FileNotFoundError: If pyproject.toml is not found
-        RuntimeError: If server reference cannot be determined
+        SystemExit: If configuration is missing or invalid
     """
     from pathlib import Path
 
@@ -200,16 +189,28 @@ def auto_detect_server_ref() -> str:
 
     pyproject_path = Path("pyproject.toml")
     if not pyproject_path.exists():
-        raise FileNotFoundError("pyproject.toml not found. Please run from project root.")
+        print(f"{Fore.RED}✗ pyproject.toml not found. Please run from project root.{Style.RESET_ALL}", file=sys.stderr)
+        sys.exit(1)
 
     try:
         pyproject = toml.load(pyproject_path)
-        server_ref = pyproject.get("project", {}).get("scripts", {}).get("server")
-        if not server_ref:
-            raise KeyError("No 'server' entry found in [project.scripts]")
-        return server_ref
     except Exception as e:
-        raise RuntimeError(f"Failed to parse pyproject.toml: {e}") from e
+        print(f"{Fore.RED}✗ Failed to parse pyproject.toml: {e}{Style.RESET_ALL}", file=sys.stderr)
+        sys.exit(1)
+    
+    # Check [tool.smithery] configuration
+    smithery_config = pyproject.get("tool", {}).get("smithery", {})
+    server_ref = smithery_config.get("server")
+    
+    if not server_ref:
+        print(f"{Fore.RED}✗ Server reference not found in pyproject.toml{Style.RESET_ALL}", file=sys.stderr)
+        print(f"{Fore.YELLOW}✗ Please add [tool.smithery] section with your server function:{Style.RESET_ALL}", file=sys.stderr)
+        print(f"{Fore.CYAN}  [tool.smithery]{Style.RESET_ALL}", file=sys.stderr)
+        print(f"{Fore.CYAN}  server = \"src.server:your_server_function\"{Style.RESET_ALL}", file=sys.stderr)
+        print(f"  # Example: server = \"src.server:create_server\"", file=sys.stderr)
+        sys.exit(1)
+    
+    return server_ref
 
 
 def main() -> None:
@@ -219,7 +220,7 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  smithery build                           # Auto-detect from pyproject.toml
+  smithery build                           # Read from pyproject.toml [tool.smithery].server
   smithery build src.server:create_server  # Explicit server reference
   smithery build --transport stdio         # Build with stdio transport
         """
@@ -228,7 +229,7 @@ Examples:
     parser.add_argument(
         "server_ref",
         nargs="?",
-        help="Server reference (module:function). Auto-detected from pyproject.toml if not provided."
+        help="Server reference (module:function). Read from pyproject.toml [tool.smithery].server if not provided."
     )
     parser.add_argument(
         "-o", "--output",
@@ -244,8 +245,8 @@ Examples:
 
     args = parser.parse_args()
 
-    # Auto-detect server reference if not provided
-    server_ref = args.server_ref or auto_detect_server_ref()
+    # Get server reference from config if not provided explicitly
+    server_ref = args.server_ref or get_server_ref_from_config()
 
     build_server(server_ref, args.output, args.transport)
 

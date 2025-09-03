@@ -9,6 +9,7 @@ description = "SDK for using Smithery with Python"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "colorama>=0.4.6",
     "mcp>=1.13.1",
     "toml>=0.10.2",
 ]

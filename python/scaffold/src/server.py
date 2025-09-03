@@ -74,26 +74,26 @@ default = create_server
 config_schema = ConfigSchema
 
 
-def main():
-    """Main entry point to run the server with streamable HTTP transport."""
-    import os
+# def main():
+#     """Main entry point to run the server with streamable HTTP transport."""
+#     import os
     
-    # Create config instance with defaults
-    config = ConfigSchema()
+#     # Create config instance with defaults
+#     config = ConfigSchema()
     
-    # Create server instance
-    server = create_server(config)
+#     # Create server instance
+#     server = create_server(config)
     
-    # Get port from environment or default to 8081
-    port = int(os.environ.get("PORT", "8081"))
-    server.settings.port = port
+#     # Get port from environment or default to 8081
+#     port = int(os.environ.get("PORT", "8081"))
+#     server.settings.port = port
     
-    print(f"🚀 Starting MCP server on port {port}")
-    print("📡 Using streamable HTTP transport")
+#     print(f"🚀 Starting MCP server on port {port}")
+#     print("📡 Using streamable HTTP transport")
     
-    # Run with streamable HTTP transport
-    server.run(transport="streamable-http")
+#     # Run with streamable HTTP transport
+#     server.run(transport="streamable-http")
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

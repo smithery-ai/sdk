@@ -1,7 +1,3 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "my-mcp-server"
 version = "0.1.0"
@@ -16,13 +12,12 @@ dependencies = [
     "smithery>=0.1.8",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src"]
+[tool.smithery]
+# Server function for Smithery to build
+server = "src.server:create_server"
 
 [project.scripts]
-# entry point for Smithery CLI to discover and build your server
-server = "src.server:create_server"
-# script for local development
+# Script for local development
 dev = "src.server:main"
 
 

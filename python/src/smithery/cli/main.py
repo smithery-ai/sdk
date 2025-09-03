@@ -10,14 +10,14 @@ import argparse
 import sys
 from typing import List, Optional
 
-from .build import build_server, auto_detect_server_ref
+from .build import build_server, get_server_ref_from_config
 
 
 def build_command(args: argparse.Namespace) -> None:
     """Handle the 'build' subcommand."""
-    # Auto-detect server reference if not provided
-    server_ref = args.server_ref or auto_detect_server_ref()
-    build_server(server_ref, args.output, args.transport)
+    # Get server function from config if not provided
+    server_function = args.server_function or get_server_ref_from_config()
+    build_server(server_function, args.output, args.transport)
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -46,19 +46,20 @@ def create_parser() -> argparse.ArgumentParser:
     build_parser = subparsers.add_parser(
         "build",
         help="Build standalone MCP server from Python module",
+        description="Build a standalone MCP server executable from your Python module",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  smithery build                           # Auto-detect from pyproject.toml
-  smithery build src.server:create_server  # Explicit server reference  
+  smithery build                           # Read from pyproject.toml [tool.smithery].server
+  smithery build src.server:create_server  # Specify your server function
   smithery build --transport stdio         # Build with stdio transport
         """
     )
     
     build_parser.add_argument(
-        "server_ref",
+        "server_function",
         nargs="?",
-        help="Server reference (module:function). Auto-detected from pyproject.toml if not provided."
+        help="Path to your server function (e.g., src.server:create_server). Read from pyproject.toml [tool.smithery].server if not provided."
     )
     build_parser.add_argument(
         "-o", "--output",
@@ -79,18 +80,20 @@ Examples:
 def main(argv: Optional[List[str]] = None) -> None:
     """Main CLI entry point."""
     parser = create_parser()
+    
+    # If no arguments provided, show help
+    if argv is None:
+        argv = sys.argv[1:]
+    
+    if not argv:
+        parser.print_help()
+        return
+    
     args = parser.parse_args(argv)
     
-    # If no subcommand provided, default to build for backwards compatibility
+    # If no subcommand provided, show help
     if not hasattr(args, 'func'):
-        # Treat all arguments as if they were passed to build subcommand
-        # This maintains backwards compatibility with `smithery` (no subcommand)
-        build_args = argparse.Namespace(
-            server_ref=getattr(args, 'server_ref', None),
-            output=".smithery/server.py",
-            transport="shttp"
-        )
-        build_command(build_args)
+        parser.print_help()
         return
     
     # Execute the subcommand
