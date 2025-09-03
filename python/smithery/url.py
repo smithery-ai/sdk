@@ -1,16 +1,16 @@
 import base64
 import json
-from typing import Any, Dict
+from typing import Any
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 
-def encode_config_to_base64(config: Dict[str, Any]) -> str:
+def encode_config_to_base64(config: dict[str, Any]) -> str:
     """
     Encode a configuration dictionary to base64.
-    
+
     Args:
         config: Configuration dictionary to encode
-        
+
     Returns:
         Base64-encoded JSON string
     """
@@ -18,13 +18,13 @@ def encode_config_to_base64(config: Dict[str, Any]) -> str:
     return base64.b64encode(config_json.encode("utf-8")).decode("utf-8")
 
 
-def decode_config_from_base64(config_b64: str) -> Dict[str, Any]:
+def decode_config_from_base64(config_b64: str) -> dict[str, Any]:
     """
     Decode a base64-encoded configuration string.
-    
+
     Args:
         config_b64: Base64-encoded JSON string
-        
+
     Returns:
         Configuration dictionary, or empty dict if decoding fails
     """

@@ -1,7 +1,7 @@
 """
 Smithery FastMCP Patch - Session Config Support
 
-This provides a wrapper for FastMCP that adds middleware for request-scoped configuration support 
+This provides a wrapper for FastMCP that adds middleware for request-scoped configuration support
 for smithery session config and CORS.
 """
 
@@ -29,11 +29,11 @@ class _FastMCPWrapper:
         # First check if the attribute exists on the wrapped instance
         if hasattr(self._fastmcp, name):
             attr = getattr(self._fastmcp, name)
-            
+
             # If it's a callable (method), return it directly
             # Python will handle the binding automatically
             return attr
-        
+
         # If attribute doesn't exist on wrapped instance, raise AttributeError
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
@@ -128,7 +128,7 @@ def from_fastmcp(
     """
     Add session config support and CORS to a FastMCP instance.
 
-    Config is passed via base64-encoded URL parameter (standard Smithery format) 
+    Config is passed via base64-encoded URL parameter (standard Smithery format)
     and accessed through ctx.session_config.
 
     Args:
@@ -141,7 +141,7 @@ def from_fastmcp(
     Example:
         ```python
         from smithery.url import encode_config_to_base64
-        
+
         # Define what config your server accepts
         class ConfigSchema(BaseModel):
             api_key: str
