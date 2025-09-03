@@ -29,8 +29,8 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
         port: Port to run on (shttp only)
         host: Host to bind to (shttp only)
     """
-    print(f"{Fore.CYAN}[smithery] Starting Python MCP server with {transport} transport...{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}[smithery] Server reference: {server_ref}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Starting Python MCP server with {transport} transport...")
+    print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Server reference: {server_ref}")
     
     try:
         # Import and validate server module
@@ -43,13 +43,13 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
         if config_schema:
             try:
                 config = config_schema()
-                print(f"{Fore.GREEN}✓ [smithery] Using config schema: {config_schema.__name__}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Using config schema: {config_schema.__name__}")
             except Exception as e:
                 print(f"{Fore.YELLOW}⚠ Warning: Failed to instantiate config schema: {e}{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}⚠ Proceeding with empty config{Style.RESET_ALL}")
         
         # Create server instance
-        print(f"{Fore.CYAN}[smithery] Creating server instance...{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Creating server instance...")
         server = create_server(config)
         
         if transport == "shttp":
@@ -57,14 +57,14 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
             server.settings.port = port
             server.settings.host = host
             
-            print(f"{Fore.GREEN}✓ [smithery] MCP server starting on {host}:{port}{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}[smithery] Transport: streamable HTTP{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} MCP server starting on {host}:{port}")
+            print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Transport: streamable HTTP")
             
             # Run with streamable HTTP transport
             server.run(transport="streamable-http")
             
         elif transport == "stdio":
-            print(f"{Fore.GREEN}✓ [smithery] MCP server starting with stdio transport{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} MCP server starting with stdio transport")
             
             # Run with stdio transport
             server.run(transport="stdio")
@@ -73,10 +73,10 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
             raise ValueError(f"Unsupported transport: {transport}")
             
     except KeyboardInterrupt:
-        print(f"\n{Fore.YELLOW}[smithery] Server stopped by user{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}[smithery]{Style.RESET_ALL} Server stopped by user")
         sys.exit(0)
     except Exception as e:
-        print(f"{Fore.RED}✗ [smithery] Failed to start MCP server: {e}{Style.RESET_ALL}", file=sys.stderr)
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Failed to start MCP server: {e}", file=sys.stderr)
         sys.exit(1)
 
 

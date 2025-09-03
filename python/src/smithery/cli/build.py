@@ -61,9 +61,9 @@ def import_server_module(server_ref: str) -> SmitheryModule:
         if current_dir not in sys.path:
             sys.path.insert(0, current_dir)
 
-        print(f"{Fore.CYAN}[smithery] Importing module: {module_path}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}[smithery] Looking for function: {function_name}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}[smithery] Working directory: {current_dir}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Importing module: {module_path}")
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Looking for function: {function_name}")
+        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Working directory: {current_dir}")
 
         module = import_module(module_path)
 
@@ -137,8 +137,8 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
     """
     from pathlib import Path
 
-    print(f"[smithery] Building Python MCP server with {transport} transport...")
-    print(f"[smithery] Server reference: {server_ref}")
+    print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Building Python MCP server with {transport} transport...")
+    print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Server reference: {server_ref}")
 
     # Select appropriate bootstrap template
     bootstrap_file = "shttp_bootstrap.py" if transport == "shttp" else "stdio_bootstrap.py"
@@ -167,7 +167,7 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
     if os.name != 'nt':
         os.chmod(output_path, 0o755)
 
-    print(f"{Fore.GREEN}✓ [smithery] Python server created: {output_file}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Python server created: {output_file}")
 
 
 def get_server_ref_from_config() -> str:
