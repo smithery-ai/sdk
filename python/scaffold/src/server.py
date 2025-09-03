@@ -13,12 +13,10 @@ https://smithery.ai/docs/concepts/cli
 
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel
-
 from smithery import from_fastmcp
 
 
-# Optional: If you have user-level config, define it here
-# This should map to the config in your smithery.yaml file
+# Optional: If you want to receive session-level config from user, define it here
 class ConfigSchema(BaseModel):
     capitalize: bool = True  # Capitalize the greeting
 
@@ -47,14 +45,6 @@ def create_server(config: ConfigSchema) -> FastMCP:
 
         return greeting
 
-    # Debug tool to check config
-    @server.tool()
-    def get_config() -> str:
-        """Get the current session configuration for debugging."""
-        ctx = server.get_context()
-        config = ctx.session_config
-        return f"Config: {config}, Type: {type(config)}, Capitalize: {config.capitalize if hasattr(config, 'capitalize') else 'N/A'}"
-
     # Add a resource
     @server.resource("history://hello-world")
     def hello_world() -> str:
@@ -79,22 +69,29 @@ def create_server(config: ConfigSchema) -> FastMCP:
     return server
 
 
+# Export for Smithery build system
+default = create_server
+config_schema = ConfigSchema
+
+
 def main():
-    """Main entry point with optional port argument."""
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Run MCP server")
-    parser.add_argument("--port", "-p", type=int, default=8000, help="Port to run server on (default: 8000)")
-
-    args = parser.parse_args()
-
-    # In a real app, you'd get config from smithery.yaml
+    """Main entry point to run the server with streamable HTTP transport."""
+    import os
+    
+    # Create config instance with defaults
     config = ConfigSchema()
+    
+    # Create server instance
     server = create_server(config)
-
-    # Configure port
-    server.settings.port = args.port
-
+    
+    # Get port from environment or default to 8081
+    port = int(os.environ.get("PORT", "8081"))
+    server.settings.port = port
+    
+    print(f"🚀 Starting MCP server on port {port}")
+    print("📡 Using streamable HTTP transport")
+    
+    # Run with streamable HTTP transport
     server.run(transport="streamable-http")
 
 
