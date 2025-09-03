@@ -46,7 +46,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version", 
         action="version", 
-        version="smithery 0.1.8"
+        version="smithery 0.1.9"
     )
     
     # Create subparsers

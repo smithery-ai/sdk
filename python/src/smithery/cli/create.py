@@ -7,7 +7,6 @@ Similar to create-react-app or create-next-app.
 """
 
 import argparse
-import os
 import shutil
 import subprocess
 import sys
@@ -172,31 +171,29 @@ def install_dependencies(project_name: str) -> None:
 
 def show_success_message(project_name: str) -> None:
     """Show success message with next steps."""
-    # Create a simple box around the message
-    message_lines = [
-        f"Welcome to your MCP server! To get started, run:",
-        "",
-        f"cd {project_name} && uv run smithery run",
-        "",
-        "Try saying something like 'Say hello to John' to execute your tool!"
-    ]
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.text import Text
     
-    # Calculate box width
-    max_width = max(len(line) for line in message_lines)
-    box_width = max_width + 4  # Add padding
+    console = Console()
     
-    # Create box
-    print("\n")
-    print("┌" + "─" * (box_width - 2) + "┐")
-    for line in message_lines:
-        padding = box_width - len(line) - 4
-        if "cd " in line:
-            # Highlight the command
-            print(f"│  {Fore.CYAN}{line}{Style.RESET_ALL}{' ' * padding} │")
-        else:
-            print(f"│  {line}{' ' * padding} │")
-    print("└" + "─" * (box_width - 2) + "┘")
-    print()
+    # Create formatted message with highlighting
+    message = Text()
+    message.append("Welcome to your MCP server! To get started, run:\n\n")
+    message.append(f"cd {project_name} && uv run smithery run", style="cyan bold")
+    message.append("\n\nTry saying something like 'Say hello to John' to execute your tool!")
+    
+    # Create panel with the message
+    panel = Panel(
+        message,
+        title="Success!",
+        border_style="green",
+        padding=(1, 2)
+    )
+    
+    console.print()
+    console.print(panel)
+    console.print()
 
 
 def create_project(project_name: Optional[str] = None) -> None:

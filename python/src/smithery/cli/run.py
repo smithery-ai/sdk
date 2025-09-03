@@ -10,13 +10,12 @@ import os
 import sys
 from typing import Any
 
-import colorama
-from colorama import Fore, Style
+from rich.console import Console
 
 from .build import import_server_module, get_server_ref_from_config
 
-# Initialize colorama for cross-platform color support
-colorama.init()
+# Initialize rich console
+console = Console()
 
 
 def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:
@@ -29,8 +28,8 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
         port: Port to run on (shttp only)
         host: Host to bind to (shttp only)
     """
-    print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Starting Python MCP server with {transport} transport...")
-    print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Server reference: {server_ref}")
+    console.print(f"[cyan][smithery][/cyan] Starting Python MCP server with {transport} transport...")
+    console.print(f"[cyan][smithery][/cyan] Server reference: {server_ref}")
     
     try:
         # Import and validate server module
@@ -43,13 +42,13 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
         if config_schema:
             try:
                 config = config_schema()
-                print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Using config schema: {config_schema.__name__}")
+                console.print(f"[cyan][smithery][/cyan] Using config schema: {config_schema.__name__}")
             except Exception as e:
-                print(f"{Fore.YELLOW}⚠ Warning: Failed to instantiate config schema: {e}{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}⚠ Proceeding with empty config{Style.RESET_ALL}")
+                console.print(f"[yellow]⚠ Warning: Failed to instantiate config schema: {e}[/yellow]")
+                console.print(f"[yellow]⚠ Proceeding with empty config[/yellow]")
         
         # Create server instance
-        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Creating server instance...")
+        console.print(f"[cyan][smithery][/cyan] Creating server instance...")
         server = create_server(config)
         
         if transport == "shttp":
@@ -57,14 +56,14 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
             server.settings.port = port
             server.settings.host = host
             
-            print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} MCP server starting on {host}:{port}")
-            print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Transport: streamable HTTP")
+            console.print(f"[cyan][smithery][/cyan] MCP server starting on {host}:{port}")
+            console.print(f"[cyan][smithery][/cyan] Transport: streamable HTTP")
             
             # Run with streamable HTTP transport
             server.run(transport="streamable-http")
             
         elif transport == "stdio":
-            print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} MCP server starting with stdio transport")
+            console.print(f"[cyan][smithery][/cyan] MCP server starting with stdio transport")
             
             # Run with stdio transport
             server.run(transport="stdio")
@@ -73,10 +72,10 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
             raise ValueError(f"Unsupported transport: {transport}")
             
     except KeyboardInterrupt:
-        print(f"\n{Fore.CYAN}[smithery]{Style.RESET_ALL} Server stopped by user")
+        console.print(f"\n[cyan][smithery][/cyan] Server stopped by user")
         sys.exit(0)
     except Exception as e:
-        print(f"{Fore.CYAN}[smithery]{Style.RESET_ALL} Failed to start MCP server: {e}", file=sys.stderr)
+        console.print(f"[cyan][smithery][/cyan] Failed to start MCP server: {e}", file=sys.stderr)
         sys.exit(1)
 
 
