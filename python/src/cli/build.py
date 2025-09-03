@@ -1,8 +1,9 @@
 """
-Smithery Build System
-====================
+Smithery Python Build System
+============================
 
-Build command for Smithery Python servers.
+Command-line interface for building and running Smithery Python MCP servers.
+Provides build and run commands with support for multiple transports.
 """
 
 import argparse
@@ -12,40 +13,43 @@ import sys
 from importlib import import_module
 from typing import Any, Callable, Dict, Optional, Type, TypedDict, Union
 
-# Required imports - these should always be available in a Smithery project
+# Core dependencies required by all Smithery Python projects
 from pydantic import BaseModel
 from mcp.server.fastmcp import FastMCP
 from ..server.fastmcp_patch import _FastMCPWrapper
 
-# Type alias for the server type
+# Type alias for enhanced FastMCP server
 ServerType = _FastMCPWrapper
 
 
 class SmitheryModule(TypedDict, total=False):
     """Type definition for a Smithery Python module contract."""
-    default: Callable[[Union[BaseModel, Dict[str, Any]]], ServerType]  # Required: function that takes config and creates server
-    config_schema: Optional[Type[BaseModel]]  # Optional: Pydantic config model
+    default: Callable[[Union[BaseModel, Dict[str, Any]]], ServerType]  # Server factory function
+    config_schema: Optional[Type[BaseModel]]  # Optional Pydantic config model
 
 
 def _auto_detect_server_function(module) -> Optional[Callable]:
-    """Auto-detect the server function by signature analysis."""
+    """
+    Auto-detect server function by analyzing return type annotations.
+    
+    Looks for functions that return FastMCP or ServerType.
+    Returns the first match if multiple candidates are found.
+    """
     candidates = []
     
-    # Look for functions that return FastMCP
     for name, obj in inspect.getmembers(module, inspect.isfunction):
-        if name.startswith('_'):  # Skip private functions
+        if name.startswith('_'):
             continue
             
         try:
             sig = inspect.signature(obj)
             return_annotation = sig.return_annotation
             
-            # Only check return type - no name biases
             if return_annotation == FastMCP or return_annotation == ServerType:
                 candidates.append((name, obj))
                 print(f"[smithery] Found function returning FastMCP: {name}")
         except Exception:
-            continue  # Skip functions we can't inspect
+            continue
     
     if len(candidates) == 1:
         name, func = candidates[0]
@@ -60,9 +64,20 @@ def _auto_detect_server_function(module) -> Optional[Callable]:
 
 
 def import_server_module(server_ref: str) -> SmitheryModule:
-    """Import the server module and extract components with improved path resolution."""
+    """
+    Import and validate a Smithery server module.
+    
+    Args:
+        server_ref: Module reference in format 'module.path' or 'module.path:function'
+        
+    Returns:
+        SmitheryModule containing the server function and optional config schema
+        
+    Raises:
+        ModuleNotFoundError: If the module cannot be imported
+        AttributeError: If no valid server function is found
+    """
     try:
-        # Extract module path, ignore function name (always use 'default')
         module_path = server_ref.split(":")[0] if ":" in server_ref else server_ref
         
         # Ensure current directory is in Python path for relative imports
@@ -75,16 +90,16 @@ def import_server_module(server_ref: str) -> SmitheryModule:
         
         module = import_module(module_path)
         
-        # Try to find the server function
+        # Locate the server function
         default_fn = None
         config_schema = getattr(module, 'config_schema', None)
         
-        # 1. First try explicit 'default' export (matches TypeScript)
+        # Try explicit 'default' export first (matches TypeScript convention)
         if hasattr(module, 'default') and callable(getattr(module, 'default')):
             default_fn = getattr(module, 'default')
             print(f"[smithery] Found explicit 'default' function")
         
-        # 2. If no default, auto-detect by function signature
+        # Fallback to auto-detection by function signature
         if default_fn is None:
             default_fn = _auto_detect_server_function(module)
         
@@ -146,42 +161,64 @@ def run_server(server_ref: str, transport: str = "shttp") -> None:
 
 
 def build_server(server_ref: str, output_file: str = ".smithery/server.py", transport: str = "shttp") -> None:
-    """Build a standalone server file by injecting server reference into bootstrap."""
+    """
+    Build a standalone server executable from a server reference.
+    
+    Args:
+        server_ref: Module reference to build
+        output_file: Path where the built server will be written
+        transport: Transport type ('shttp' or 'stdio')
+    """
     from pathlib import Path
-    import os
     
     print(f"[smithery] Building Python MCP server with {transport} transport...")
     print(f"[smithery] Server reference: {server_ref}")
     
-    # Get the bootstrap template
+    # Select appropriate bootstrap template
     bootstrap_file = "shttp_bootstrap.py" if transport == "shttp" else "stdio_bootstrap.py"
     bootstrap_path = Path(__file__).parent.parent / "runtime" / bootstrap_file
     
     if not bootstrap_path.exists():
         raise FileNotFoundError(f"Bootstrap template not found: {bootstrap_path}")
     
-    # Read bootstrap template
+    # Generate server content from template
     bootstrap_content = bootstrap_path.read_text()
     
-    # Inject server reference
-    server_content = bootstrap_content.replace("SMITHERY_SERVER_REF", server_ref)
+    # Parse server reference
+    module_path = server_ref.split(":")[0] if ":" in server_ref else server_ref
+    function_name = server_ref.split(":")[1] if ":" in server_ref else "default"
     
-    # Ensure output directory exists
+    # Replace virtual import with actual import (similar to TypeScript approach)
+    server_content = bootstrap_content.replace(
+        "from smithery.virtual.user_module import default, config_schema",
+        f"from {module_path} import {function_name} as default, config_schema"
+    )
+    
+    # Write output file
     output_path = Path(output_file)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    # Write the server file
     output_path.write_text(server_content)
     
-    # Make it executable on Unix systems
-    if os.name != 'nt':  # Not Windows
+    # Make executable on Unix systems
+    if os.name != 'nt':
         os.chmod(output_path, 0o755)
     
     print(f"✓ [smithery] Python server created: {output_file}")
 
 
 def auto_detect_server_ref() -> str:
-    """Auto-detect server reference from pyproject.toml."""
+    """
+    Auto-detect server reference from pyproject.toml configuration.
+    
+    Looks for the 'server' entry in [project.scripts] section.
+    
+    Returns:
+        Server reference string
+        
+    Raises:
+        FileNotFoundError: If pyproject.toml is not found
+        RuntimeError: If server reference cannot be determined
+    """
     from pathlib import Path
     import toml
     
@@ -200,12 +237,41 @@ def auto_detect_server_ref() -> str:
 
 
 def main() -> None:
-    """CLI entry point for smithery commands."""
-    parser = argparse.ArgumentParser(description="Smithery Python MCP server tools")
-    parser.add_argument("command", nargs="?", default="build", choices=["build", "run"], help="Command to run (default: build)")
-    parser.add_argument("server_ref", nargs="?", help="Server reference (module:function). Auto-detected from pyproject.toml if not provided.")
-    parser.add_argument("-o", "--output", default=".smithery/server.py", help="Output file path (build only)")
-    parser.add_argument("--transport", choices=["shttp", "stdio"], default="shttp", help="Transport type")
+    """CLI entry point for Smithery Python build commands."""
+    parser = argparse.ArgumentParser(
+        description="Smithery Python MCP server build tools",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  smithery build                           # Auto-detect from pyproject.toml
+  smithery build src.server:create_server  # Explicit server reference
+  smithery run src.server --transport stdio # Run with stdio transport
+        """
+    )
+    
+    parser.add_argument(
+        "command", 
+        nargs="?", 
+        default="build", 
+        choices=["build", "run"], 
+        help="Command to run (default: build)"
+    )
+    parser.add_argument(
+        "server_ref", 
+        nargs="?", 
+        help="Server reference (module:function). Auto-detected from pyproject.toml if not provided."
+    )
+    parser.add_argument(
+        "-o", "--output", 
+        default=".smithery/server.py", 
+        help="Output file path (build only)"
+    )
+    parser.add_argument(
+        "--transport", 
+        choices=["shttp", "stdio"], 
+        default="shttp", 
+        help="Transport type"
+    )
     
     args = parser.parse_args()
     
