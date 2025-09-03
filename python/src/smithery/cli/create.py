@@ -12,13 +12,11 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Optional
 
-import colorama
-from colorama import Fore, Style
+from rich.console import Console
+from rich.text import Text
 
-# Initialize colorama for cross-platform color support
-colorama.init()
+console = Console()
 
 
 def prompt_for_project_name() -> str:
@@ -27,17 +25,17 @@ def prompt_for_project_name() -> str:
         try:
             project_name = input("What is your project name? ").strip()
             if not project_name:
-                print(f"{Fore.RED}✗ Project name cannot be empty{Style.RESET_ALL}")
+                console.print("✗ Project name cannot be empty", style="red")
                 continue
-            
+
             # Basic validation for valid directory name
             if any(char in project_name for char in ['/', '\\', ':', '*', '?', '"', '<', '>', '|']):
-                print(f"{Fore.RED}✗ Project name contains invalid characters{Style.RESET_ALL}")
+                console.print("✗ Project name contains invalid characters", style="red")
                 continue
-                
+
             return project_name
         except (KeyboardInterrupt, EOFError):
-            print(f"\n{Fore.YELLOW}Operation cancelled{Style.RESET_ALL}")
+            console.print("\nOperation cancelled", style="yellow")
             sys.exit(0)
 
 
@@ -45,23 +43,23 @@ def show_spinner(message: str, end_message: str, command_func):
     """Show a simple spinner while running a command."""
     import threading
     import time
-    
+
     # Simple loading animation
     loading_chars = ["|", "/", "-", "\\"]
     loading_index = 0
     stop_loading = threading.Event()
-    
+
     def spinner():
         nonlocal loading_index
         while not stop_loading.is_set():
             print(f"\r[ {loading_chars[loading_index]} ] {message}", end="", flush=True)
             loading_index = (loading_index + 1) % len(loading_chars)
             time.sleep(0.25)
-    
+
     # Start spinner in background
     spinner_thread = threading.Thread(target=spinner, daemon=True)
     spinner_thread.start()
-    
+
     try:
         result = command_func()
         stop_loading.set()
@@ -77,38 +75,38 @@ def show_spinner(message: str, end_message: str, command_func):
 
 def clone_scaffold(project_name: str) -> None:
     """Clone the scaffold repository and extract the Python scaffold."""
-    
+
     def clone_and_extract():
         # Create temporary directory for cloning
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             clone_path = temp_path / "smithery-sdk"
-            
+
             # Clone the SDK repository
             subprocess.run([
                 "git", "clone", "--depth", "1",
                 "https://github.com/smithery-ai/sdk.git",
                 str(clone_path)
             ], check=True, capture_output=True, text=True)
-            
+
             # Path to Python scaffold
             scaffold_source = clone_path / "python" / "scaffold"
-            
+
             if not scaffold_source.exists():
                 raise FileNotFoundError(f"Python scaffold not found at {scaffold_source}")
-            
+
             # Copy scaffold to project directory
             project_path = Path(project_name)
             if project_path.exists():
                 raise FileExistsError(f"Directory '{project_name}' already exists")
-            
+
             shutil.copytree(scaffold_source, project_path)
-            
+
             # Remove .git directory if it exists
             git_dir = project_path / ".git"
             if git_dir.exists():
                 shutil.rmtree(git_dir)
-    
+
     show_spinner(
         "Cloning scaffold from GitHub...",
         "Scaffold cloned successfully",
@@ -118,26 +116,26 @@ def clone_scaffold(project_name: str) -> None:
 
 def update_project_files(project_name: str) -> None:
     """Update project files with the actual project name."""
-    
+
     def update_files():
         project_path = Path(project_name)
-        
+
         # Update pyproject.toml
         pyproject_path = project_path / "pyproject.toml"
         if pyproject_path.exists():
             content = pyproject_path.read_text()
-            
+
             # Replace project name
             content = content.replace('name = "my-mcp-server"', f'name = "{project_name}"')
-            
+
             # Update smithery dependency to use published version instead of local path
             content = content.replace(
                 'smithery @ file:///Users/arjun/Documents/github/smithery/sdk/python',
                 'smithery>=0.1.8'
             )
-            
+
             pyproject_path.write_text(content)
-    
+
     show_spinner(
         "Updating project configuration...",
         "Project configuration updated",
@@ -147,21 +145,21 @@ def update_project_files(project_name: str) -> None:
 
 def install_dependencies(project_name: str) -> None:
     """Install project dependencies using uv."""
-    
+
     def install():
         project_path = Path(project_name)
-        
+
         # Check if uv is available
         try:
             subprocess.run(["uv", "--version"], check=True, capture_output=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            raise RuntimeError("uv is required but not installed. Please install uv: https://docs.astral.sh/uv/getting-started/installation/")
-        
+        except (subprocess.CalledProcessError, FileNotFoundError) as err:
+            raise RuntimeError("uv is required but not installed. Please install uv: https://docs.astral.sh/uv/getting-started/installation/") from err
+
         # Install dependencies
         subprocess.run([
             "uv", "sync"
         ], cwd=project_path, check=True, capture_output=True, text=True)
-    
+
     show_spinner(
         "Installing dependencies...",
         "Dependencies installed successfully",
@@ -173,16 +171,15 @@ def show_success_message(project_name: str) -> None:
     """Show success message with next steps."""
     from rich.console import Console
     from rich.panel import Panel
-    from rich.text import Text
-    
+
     console = Console()
-    
+
     # Create formatted message with highlighting
     message = Text()
     message.append("Welcome to your MCP server! To get started, run:\n\n")
     message.append(f"cd {project_name} && uv run smithery run", style="cyan bold")
     message.append("\n\nTry saying something like 'Say hello to John' to execute your tool!")
-    
+
     # Create panel with the message
     panel = Panel(
         message,
@@ -190,16 +187,16 @@ def show_success_message(project_name: str) -> None:
         border_style="green",
         padding=(1, 2)
     )
-    
+
     console.print()
     console.print(panel)
     console.print()
 
 
-def create_project(project_name: Optional[str] = None) -> None:
+def create_project(project_name: str | None = None) -> None:
     """
     Create a new Smithery Python MCP project.
-    
+
     Args:
         project_name: Name of the project. If None, will prompt user.
     """
@@ -208,39 +205,39 @@ def create_project(project_name: Optional[str] = None) -> None:
         project_name = prompt_for_project_name()
     else:
         print(f"Creating project: {project_name}")
-    
+
     try:
         # Clone scaffold
         clone_scaffold(project_name)
-        
+
         # Update project files
         update_project_files(project_name)
-        
+
         # Install dependencies
         install_dependencies(project_name)
-        
+
         # Show success message
         show_success_message(project_name)
-        
+
     except KeyboardInterrupt:
-        print(f"\n{Fore.YELLOW}Operation cancelled{Style.RESET_ALL}")
+        console.print("\nOperation cancelled", style="yellow")
         # Clean up partial project if it exists
         project_path = Path(project_name)
         if project_path.exists():
             try:
                 shutil.rmtree(project_path)
-                print(f"{Fore.YELLOW}Cleaned up partial project directory{Style.RESET_ALL}")
+                console.print("Cleaned up partial project directory", style="yellow")
             except Exception:
                 pass
         sys.exit(0)
     except Exception as e:
-        print(f"{Fore.RED}✗ Failed to create project: {e}{Style.RESET_ALL}", file=sys.stderr)
+        console.print(f"✗ Failed to create project: {e}", style="red")
         # Clean up partial project if it exists
         project_path = Path(project_name)
         if project_path.exists():
             try:
                 shutil.rmtree(project_path)
-                print(f"{Fore.YELLOW}Cleaned up partial project directory{Style.RESET_ALL}")
+                console.print("Cleaned up partial project directory", style="yellow")
             except Exception:
                 pass
         sys.exit(1)
@@ -257,13 +254,13 @@ Examples:
   smithery create my-awesome-server  # Create with specific name
         """
     )
-    
+
     parser.add_argument(
         "project_name",
         nargs="?",
         help="Name of the project to create"
     )
-    
+
     args = parser.parse_args()
     create_project(args.project_name)
 
