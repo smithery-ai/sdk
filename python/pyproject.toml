@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smithery"
-version = "0.1.5"
+version = "0.1.6"
 description = "SDK for using Smithery with Python"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -28,9 +28,8 @@ dev = [
 "Homepage" = "https://github.com/smithery-ai/python-sdk"
 "Bug Tracker" = "https://github.com/smithery-ai/python-sdk/issues"
 
-[tool.setuptools]
-packages = ["smithery"]
-package-dir = {"smithery" = "src"}
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.package-data]
 smithery = ["py.typed"]
