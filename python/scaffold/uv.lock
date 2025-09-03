@@ -219,7 +219,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "mcp", extras = ["cli"], specifier = ">=1.13.1" },
-    { name = "smithery", editable = "../" },
+    { name = "smithery", specifier = ">=0.1.4" },
 ]
 
 [[package]]
@@ -561,19 +561,13 @@ wheels = [
 [[package]]
 name = "smithery"
 version = "0.1.4"
-source = { editable = "../" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mcp" },
-    { name = "pydantic" },
-    { name = "starlette" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "mcp", specifier = ">=1.13.1" },
-    { name = "pydantic", specifier = ">=2.7.2,<3.0.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.12.11" },
-    { name = "starlette", specifier = ">=0.27" },
+sdist = { url = "https://files.pythonhosted.org/packages/da/69/e359b8f00b56c4ecf21fa847e835db05710e7d4537298efd2f9ca10538e8/smithery-0.1.4.tar.gz", hash = "sha256:addd13ebaa2347213de38c9bd39b68c346d8dacca8397f98f1f2adeb75c887a4", size = 2985 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d3/02/3f61634c2065fb39f3c40299240dc0001db1c926a8af2f388b562fe0c228/smithery-0.1.4-py3-none-any.whl", hash = "sha256:6d3a307f5d2e55bacec6eeb77e7db0d260a8dd6666458da637bf8891fca54246", size = 3106 },
 ]
 
 [[package]]

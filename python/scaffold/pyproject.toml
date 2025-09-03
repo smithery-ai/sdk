@@ -13,14 +13,14 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "mcp[cli]>=1.13.1",
-    "smithery>0.1.4",
+    "smithery>=0.1.4",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
 
 [project.scripts]
-# Entry point for Smithery CLI to discover and build
+# entry point for Smithery CLI to discover and build
 server = "src.server:create_server"
 # script for local development
 dev = "src.server:main"
