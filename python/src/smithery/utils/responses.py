@@ -11,7 +11,7 @@ def create_error_response(
     detail: str,
     validation_error: ValidationError | None = None
 ) -> JSONResponse:
-        """Create standardized error response. Includes validation details if provided."""
+    """Create standardized error response. Includes validation details if provided."""
     content = {"title": title, "status": status, "detail": detail}
 
     if validation_error:
