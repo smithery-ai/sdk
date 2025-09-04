@@ -19,6 +19,7 @@ from pydantic import BaseModel
 
 from ..server.fastmcp_patch import SmitheryFastMCP
 from ..utils.console import Colors, console
+from .helpers import ColoredHelpFormatter, create_base_parser
 
 
 class SmitheryModule(TypedDict, total=False):
@@ -164,51 +165,15 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
     console.success(f"Built {output_file}")
 
 
-def get_server_ref_from_config() -> str:
-    """
-    Get server reference from pyproject.toml [tool.smithery] configuration.
-
-    Returns:
-        Server reference string from [tool.smithery].server
-
-    Raises:
-        SystemExit: If configuration is missing or invalid
-    """
-    from pathlib import Path
-
-    import toml
-
-    pyproject_path = Path("pyproject.toml")
-    if not pyproject_path.exists():
-        console.error("pyproject.toml not found. Please run from project root.")
-        sys.exit(1)
-
-    try:
-        pyproject = toml.load(pyproject_path)
-    except Exception as e:
-        console.error(f"Failed to parse pyproject.toml: {e}")
-        sys.exit(1)
-
-    # Check [tool.smithery] configuration
-    smithery_config = pyproject.get("tool", {}).get("smithery", {})
-    server_ref = smithery_config.get("server")
-
-    if not server_ref:
-        console.error("Server reference not found in pyproject.toml")
-        console.nested("Please add [tool.smithery] section with your server function:", color=Colors.YELLOW)
-        console.indented("[tool.smithery]")
-        console.indented('server = "src.server:your_server_function"')
-        console.indented('# Example: server = "src.server:create_server"', color=Colors.GRAY)
-        sys.exit(1)
-
-    return server_ref
 
 
 def main() -> None:
     """CLI entry point for Smithery Python build system."""
-    parser = argparse.ArgumentParser(
+    from .helpers import get_server_ref_from_config
+    
+    parser = create_base_parser(
+        prog="smithery build",
         description="Build standalone MCP servers from Python modules",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   smithery build                           # Read from pyproject.toml [tool.smithery].server

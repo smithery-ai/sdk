@@ -9,70 +9,27 @@ Handles subcommands like 'build', 'dev', etc.
 import argparse
 import sys
 
-from ..utils.console import console, Colors
-from .build import build_server, get_server_ref_from_config
-from .create import create_project
+from ..utils.console import Colors, console
+from .build import build_server
+from .init import create_project
+from .helpers import ColoredHelpFormatter, resolve_server_ref
 from .run import run_server
-
-
-class ColoredHelpFormatter(argparse.RawDescriptionHelpFormatter):
-    """Custom help formatter with uv-inspired colors."""
-    
-    def _format_usage(self, usage, actions, groups, prefix):
-        if prefix is None:
-            prefix = f'{Colors.CYAN}usage:{Colors.RESET} '
-        return super()._format_usage(usage, actions, groups, prefix)
-    
-    def add_usage(self, usage, actions, groups, prefix=None):
-        if prefix is None:
-            prefix = f'{Colors.CYAN}usage:{Colors.RESET} '
-        return super().add_usage(usage, actions, groups, prefix)
-    
-    def start_section(self, heading):
-        if heading == 'positional arguments':
-            heading = f'{Colors.CYAN}Commands:{Colors.RESET}'
-        elif heading == 'options':
-            heading = f'{Colors.CYAN}Options:{Colors.RESET}'
-        return super().start_section(heading)
-        
-    def _format_action(self, action):
-        # Get the original formatted action
-        result = super()._format_action(action)
-        
-        # Color command names (subparsers)
-        if hasattr(action, 'dest') and action.dest in ('build', 'run', 'create'):
-            # Find and color the command name
-            lines = result.split('\n')
-            if lines:
-                first_line = lines[0]
-                # Color the command name at the beginning
-                parts = first_line.split(None, 1)
-                if len(parts) >= 2:
-                    command = parts[0]
-                    description = parts[1]
-                    colored_line = f'  {Colors.GREEN}{command}{Colors.RESET}  {description}'
-                    lines[0] = colored_line
-                    result = '\n'.join(lines)
-        
-        return result
 
 
 def build_command(args: argparse.Namespace) -> None:
     """Handle the 'build' subcommand."""
-    # Get server function from config if not provided
-    server_function = args.server_function or get_server_ref_from_config()
+    server_function = resolve_server_ref(args)
     build_server(server_function, args.output, args.transport)
 
 
 def run_command(args: argparse.Namespace) -> None:
     """Handle the 'run' subcommand."""
-    # Get server function from config if not provided
-    server_function = args.server_function or get_server_ref_from_config()
+    server_function = resolve_server_ref(args)
     run_server(server_function, args.transport, args.port, args.host)
 
 
-def create_command(args: argparse.Namespace) -> None:
-    """Handle the 'create' subcommand."""
+def init_command(args: argparse.Namespace) -> None:
+    """Handle the 'init' subcommand."""
     create_project(args.project_name)
 
 
@@ -169,25 +126,25 @@ Examples:
     )
     run_parser.set_defaults(func=run_command)
 
-    # Create subcommand
-    create_parser = subparsers.add_parser(
-        "create",
-        help="Create a new Smithery Python MCP project",
+    # Init subcommand
+    init_parser = subparsers.add_parser(
+        "init",
+        help="Initialize a new Smithery Python MCP project",
         description="Scaffold a new Smithery Python MCP project with all necessary files",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  smithery create                    # Prompt for project name
-  smithery create my-awesome-server  # Create with specific name
+  smithery init                    # Prompt for project name
+  smithery init my-awesome-server  # Initialize with specific name
         """
     )
 
-    create_parser.add_argument(
+    init_parser.add_argument(
         "project_name",
         nargs="?",
-        help="Name of the project to create"
+        help="Name of the project to initialize"
     )
-    create_parser.set_defaults(func=create_command)
+    init_parser.set_defaults(func=init_command)
 
     return parser
 
@@ -200,8 +157,8 @@ def print_colored_help():
     console.plain("")
     console.plain(f"{Colors.CYAN}Commands:{Colors.RESET}")
     console.plain(f"  {Colors.GREEN}build{Colors.RESET}   Build standalone MCP server from Python module")
-    console.plain(f"  {Colors.GREEN}run{Colors.RESET}     Run MCP server directly (like uvicorn)")  
-    console.plain(f"  {Colors.GREEN}create{Colors.RESET}  Create a new Smithery Python MCP project")
+    console.plain(f"  {Colors.GREEN}run{Colors.RESET}     Run MCP server directly (like uvicorn)")
+    console.plain(f"  {Colors.GREEN}init{Colors.RESET}   Initialize a new Smithery Python MCP project")
     console.plain("")
     console.plain(f"{Colors.CYAN}Options:{Colors.RESET}")
     console.plain(f"  {Colors.GRAY}-h, --help{Colors.RESET}     Show this help message and exit")

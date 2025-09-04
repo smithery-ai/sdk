@@ -3,7 +3,6 @@ Smithery Python Create Command
 ==============================
 
 Scaffold creation command for new Smithery Python MCP projects.
-Similar to create-react-app or create-next-app.
 """
 
 import argparse
@@ -13,10 +12,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-from rich.console import Console
-from rich.text import Text
-
-console = Console()
+from ..utils.console import console
+from .helpers import create_base_parser, handle_common_errors
 
 
 def prompt_for_project_name() -> str:
@@ -25,17 +22,17 @@ def prompt_for_project_name() -> str:
         try:
             project_name = input("What is your project name? ").strip()
             if not project_name:
-                console.print("✗ Project name cannot be empty", style="red")
+                console.error("Project name cannot be empty")
                 continue
 
             # Basic validation for valid directory name
             if any(char in project_name for char in ['/', '\\', ':', '*', '?', '"', '<', '>', '|']):
-                console.print("✗ Project name contains invalid characters", style="red")
+                console.error("Project name contains invalid characters")
                 continue
 
             return project_name
         except (KeyboardInterrupt, EOFError):
-            console.print("\nOperation cancelled", style="yellow")
+            console.warning("Operation cancelled")
             sys.exit(0)
 
 
@@ -169,33 +166,18 @@ def install_dependencies(project_name: str) -> None:
 
 def show_success_message(project_name: str) -> None:
     """Show success message with next steps."""
-    from rich.console import Console
-    from rich.panel import Panel
-
-    console = Console()
-
-    # Create formatted message with highlighting
-    message = Text()
-    message.append("Welcome to your MCP server! To get started, run:\n\n")
-    message.append(f"cd {project_name} && uv run smithery run", style="cyan bold")
-    message.append("\n\nTry saying something like 'Say hello to John' to execute your tool!")
-
-    # Create panel with the message
-    panel = Panel(
-        message,
-        title="Success!",
-        border_style="green",
-        padding=(1, 2)
-    )
-
-    console.print()
-    console.print(panel)
-    console.print()
+    console.success("Project initialized successfully!")
+    console.plain("")
+    console.info("Next steps:")
+    console.plain(f"  cd {project_name}")
+    console.plain("  uv run smithery run")
+    console.plain("")
+    console.muted("Tip: Try 'Say hello to John' to exercise your tool.")
 
 
 def create_project(project_name: str | None = None) -> None:
     """
-    Create a new Smithery Python MCP project.
+    Initialize a new Smithery Python MCP project.
 
     Args:
         project_name: Name of the project. If None, will prompt user.
@@ -204,7 +186,7 @@ def create_project(project_name: str | None = None) -> None:
     if not project_name:
         project_name = prompt_for_project_name()
     else:
-        print(f"Creating project: {project_name}")
+        print(f"Initializing project: {project_name}")
 
     try:
         # Clone scaffold
@@ -220,45 +202,46 @@ def create_project(project_name: str | None = None) -> None:
         show_success_message(project_name)
 
     except KeyboardInterrupt:
-        console.print("\nOperation cancelled", style="yellow")
+        console.warning("Operation cancelled")
         # Clean up partial project if it exists
         project_path = Path(project_name)
         if project_path.exists():
             try:
                 shutil.rmtree(project_path)
-                console.print("Cleaned up partial project directory", style="yellow")
+                console.warning("Cleaned up partial project directory")
             except Exception:
                 pass
         sys.exit(0)
     except Exception as e:
-        console.print(f"✗ Failed to create project: {e}", style="red")
+        console.error(f"Failed to initialize project: {e}")
         # Clean up partial project if it exists
         project_path = Path(project_name)
         if project_path.exists():
             try:
                 shutil.rmtree(project_path)
-                console.print("Cleaned up partial project directory", style="yellow")
+                console.warning("Cleaned up partial project directory")
             except Exception:
                 pass
         sys.exit(1)
 
 
+@handle_common_errors
 def main() -> None:
-    """CLI entry point for Smithery Python create command."""
-    parser = argparse.ArgumentParser(
-        description="Create a new Smithery Python MCP project",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+    """CLI entry point for Smithery Python init command."""
+    parser = create_base_parser(
+        prog="smithery init",
+        description="Initialize a new Smithery Python MCP project",
         epilog="""
 Examples:
-  smithery create                    # Prompt for project name
-  smithery create my-awesome-server  # Create with specific name
+  smithery init                    # Prompt for project name
+  smithery init my-awesome-server  # Initialize with specific name
         """
     )
 
     parser.add_argument(
         "project_name",
         nargs="?",
-        help="Name of the project to create"
+        help="Name of the project to initialize"
     )
 
     args = parser.parse_args()

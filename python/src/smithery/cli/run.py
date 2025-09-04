@@ -9,8 +9,9 @@ import argparse
 import sys
 from typing import Any
 
-from ..utils.console import console
-from .build import get_server_ref_from_config, import_server_module
+from ..utils.console import Colors, console
+from .build import import_server_module
+from .helpers import ColoredHelpFormatter, create_base_parser, get_server_ref_from_config
 
 
 def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:
@@ -76,9 +77,9 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
 
 def main() -> None:
     """CLI entry point for Smithery Python run system."""
-    parser = argparse.ArgumentParser(
+    parser = create_base_parser(
+        prog="smithery run",
         description="Run Smithery MCP servers directly (like uvicorn)",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   smithery run                          # Read from pyproject.toml [tool.smithery].server

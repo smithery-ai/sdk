@@ -1,6 +1,6 @@
 """
 👋 Welcome to your Smithery project!
-To run your server, run "uv run dev"
+To run your server, run "uvx smithery run"
 
 You might find these resources useful:
 
