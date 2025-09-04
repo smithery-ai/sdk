@@ -1,6 +1,5 @@
 """
 Smithery Python CLI
-===================
 
 Main command-line interface for the Smithery Python SDK.
 """
@@ -11,7 +10,7 @@ import typer
 
 from .. import __version__
 from ..utils.console import console
-from .helpers import get_server_ref_from_config
+from ..utils.project import get_server_ref_from_config
 from .init import create_project
 from .run import run_server
 

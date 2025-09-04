@@ -1,6 +1,5 @@
 """
-Smithery Python Create Command
-==============================
+Smithery Python Init
 
 Scaffold creation command for new Smithery Python MCP projects.
 """

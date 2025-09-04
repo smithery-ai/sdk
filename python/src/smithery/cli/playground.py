@@ -1,6 +1,5 @@
 """
-Smithery Python Playground Command
-==================================
+Smithery Python Playground
 
 Interactive playground that runs the MCP server and connects the Smithery CLI client.
 """
@@ -34,7 +33,7 @@ def main() -> None:
 
 def start_playground(server_function: str | None, port: int) -> None:
     """Start the playground with given parameters."""
-    from .helpers import get_server_ref_from_config
+    from ..utils.project import get_server_ref_from_config
 
     # Get server reference from config if not provided
     server_ref = server_function or get_server_ref_from_config()

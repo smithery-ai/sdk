@@ -1,6 +1,5 @@
 """
-Smithery Python Run System
-===========================
+Smithery Python Run
 
 Command-line interface for running Smithery Python MCP servers.
 """
@@ -16,7 +15,7 @@ from pydantic import BaseModel
 
 from ..server.fastmcp_patch import SmitheryFastMCP
 from ..utils.console import console
-from .helpers import get_server_ref_from_config
+from ..utils.project import get_server_ref_from_config
 
 
 class SmitheryModule(TypedDict, total=False):
