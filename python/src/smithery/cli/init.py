@@ -46,7 +46,7 @@ def show_spinner(message: str, end_message: str, command_func):
     def spinner():
         nonlocal loading_index
         while not stop_loading.is_set():
-            print(f"\r[ {loading_chars[loading_index]} ] {message}", end="", flush=True)
+            print(f"\r[{loading_chars[loading_index]}] {message}", end="", flush=True)
             loading_index = (loading_index + 1) % len(loading_chars)
             time.sleep(0.25)
 
@@ -63,7 +63,7 @@ def show_spinner(message: str, end_message: str, command_func):
     except Exception as e:
         stop_loading.set()
         spinner_thread.join(timeout=0.1)
-        print(f"\r\x1b[K[ ✗ ] Failed: {e}")
+        print(f"\r\x1b[K[✗] Failed: {e}")
         raise
 
 
@@ -212,9 +212,9 @@ def show_success_message(project_name: str) -> None:
     console.success("Project initialized successfully!")
     console.plain("")
     console.info("Next steps:")
-    console.plain(f"  \x1b[36m1.\x1b[0m cd {project_name}")
-    console.plain("  \x1b[36m2.\x1b[0m uv run playground  # Interactive testing")
-    console.plain("  \x1b[36m   or\x1b[0m uv run dev        # Just run the server")
+    console.rich_console.print(f"  [cyan]1.[/cyan] cd {project_name}")
+    console.rich_console.print("  [cyan]2.[/cyan] uv run playground  # Interactive testing")
+    console.rich_console.print("  [cyan]   or[/cyan] uv run dev        # Just run the server")
     console.plain("")
     muted("Tip: Use playground to test your tools interactively!")
     console.plain("")
