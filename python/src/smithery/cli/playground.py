@@ -60,7 +60,7 @@ def start_playground(server_function: str | None, port: int) -> None:
     try:
         console.info(f"Starting Smithery CLI client connected to port {port}")
         subprocess.run([
-            "npx", "-y", "@smithery/cli", "--port", str(port)
+            "npx", "-y", "@smithery/cli", "playground", "--port", str(port)
         ], check=True)
     except KeyboardInterrupt:
         console.info("Playground stopped by user")
