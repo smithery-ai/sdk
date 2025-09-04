@@ -17,10 +17,11 @@ dependencies = [
 ]
 
 [project.scripts]
-dev = "hello_server.server:main"
+dev = "smithery.cli.run:main"
+playground = "smithery.cli.playground:main"
 
 [tool.smithery]
-# Server function for Smithery to build
+# Function that returns a patched FastMCP server
 server = "hello_server.server:create_server"
 
 
