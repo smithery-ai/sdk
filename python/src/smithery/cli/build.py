@@ -31,19 +31,7 @@ class SmitheryModule(TypedDict, total=False):
 
 
 def import_server_module(server_ref: str) -> SmitheryModule:
-    """
-    Import and validate a Smithery server module.
-
-    Args:
-        server_ref: Module reference in format 'module.path:function'
-
-    Returns:
-        SmitheryModule containing the server function and optional config schema
-
-    Raises:
-        ModuleNotFoundError: If the module cannot be imported
-        AttributeError: If the specified function is not found
-    """
+    """Import and validate Smithery server module."""
     try:
         if ":" not in server_ref:
             raise ValueError(f"Server reference must include function name: '{server_ref}'. Expected format: 'module.path:function_name'")
@@ -121,14 +109,7 @@ def import_server_module(server_ref: str) -> SmitheryModule:
 
 
 def build_server(server_ref: str, output_file: str = ".smithery/server.py", transport: str = "shttp") -> None:
-    """
-    Build a standalone server executable from a server reference.
-
-    Args:
-        server_ref: Module reference to build
-        output_file: Path where the built server will be written
-        transport: Transport type ('shttp' or 'stdio')
-    """
+    """Build standalone server executable."""
     from pathlib import Path
 
     console.info(f"Building Python MCP server with {transport} transport...")
@@ -167,7 +148,7 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
 
 
 def main() -> None:
-    """CLI entry point for Smithery Python build system."""
+    """CLI entry point for build command."""
     from .helpers import get_server_ref_from_config
 
     parser = create_base_parser(

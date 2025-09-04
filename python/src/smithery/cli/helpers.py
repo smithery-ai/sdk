@@ -14,7 +14,7 @@ from ..utils.console import Colors, console
 
 
 class ColoredHelpFormatter(argparse.RawDescriptionHelpFormatter):
-    """Custom help formatter with uv-inspired colors."""
+    """Custom colored help formatter."""
 
     def _format_usage(self, usage, actions, groups, prefix):
         if prefix is None:
@@ -58,17 +58,7 @@ class ColoredHelpFormatter(argparse.RawDescriptionHelpFormatter):
 
 
 def create_base_parser(prog: str, description: str, epilog: str = "") -> argparse.ArgumentParser:
-    """
-    Create a base argument parser with consistent styling.
-
-    Args:
-        prog: Program name
-        description: Program description (will be colored gray)
-        epilog: Optional epilog text
-
-    Returns:
-        Configured ArgumentParser instance
-    """
+    """Create base argument parser with consistent styling."""
     return argparse.ArgumentParser(
         prog=prog,
         description=f"{Colors.GRAY}{description}{Colors.RESET}",
@@ -78,15 +68,7 @@ def create_base_parser(prog: str, description: str, epilog: str = "") -> argpars
 
 
 def get_server_ref_from_config() -> str:
-    """
-    Get server reference from pyproject.toml [tool.smithery] configuration.
-
-    Returns:
-        Server reference string from [tool.smithery].server
-
-    Raises:
-        SystemExit: If configuration is missing or invalid
-    """
+    """Get server reference from pyproject.toml config."""
     import toml
 
     pyproject_path = Path("pyproject.toml")
@@ -116,13 +98,7 @@ def get_server_ref_from_config() -> str:
 
 
 def add_server_ref_argument(parser: argparse.ArgumentParser, help_text: str = None) -> None:
-    """
-    Add a server reference argument to a parser.
-
-    Args:
-        parser: ArgumentParser to add the argument to
-        help_text: Custom help text, or None for default
-    """
+    """Add server reference argument to parser."""
     if help_text is None:
         help_text = "Server reference (module:function). Read from pyproject.toml [tool.smithery].server if not provided."
 
@@ -134,13 +110,7 @@ def add_server_ref_argument(parser: argparse.ArgumentParser, help_text: str = No
 
 
 def add_transport_argument(parser: argparse.ArgumentParser, default: str = "shttp") -> None:
-    """
-    Add a transport argument to a parser.
-
-    Args:
-        parser: ArgumentParser to add the argument to
-        default: Default transport type
-    """
+    """Add transport argument to parser."""
     parser.add_argument(
         "--transport",
         choices=["shttp", "stdio"],
@@ -150,22 +120,12 @@ def add_transport_argument(parser: argparse.ArgumentParser, default: str = "shtt
 
 
 def resolve_server_ref(args: argparse.Namespace) -> str:
-    """
-    Resolve server reference from args or config.
-
-    Args:
-        args: Parsed arguments containing server_function attribute
-
-    Returns:
-        Server reference string
-    """
+    """Resolve server reference from args or config."""
     return args.server_function or get_server_ref_from_config()
 
 
 def handle_common_errors(func):
-    """
-    Decorator to handle common CLI errors gracefully.
-    """
+    """Handle common CLI errors gracefully."""
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)

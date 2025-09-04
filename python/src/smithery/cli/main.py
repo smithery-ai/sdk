@@ -17,24 +17,24 @@ from .run import run_server
 
 
 def build_command(args: argparse.Namespace) -> None:
-    """Handle the 'build' subcommand."""
+    """Handle build command."""
     server_function = resolve_server_ref(args)
     build_server(server_function, args.output, args.transport)
 
 
 def run_command(args: argparse.Namespace) -> None:
-    """Handle the 'run' subcommand."""
+    """Handle run command."""
     server_function = resolve_server_ref(args)
     run_server(server_function, args.transport, args.port, args.host)
 
 
 def init_command(args: argparse.Namespace) -> None:
-    """Handle the 'init' subcommand."""
+    """Handle init command."""
     create_project(args.project_name)
 
 
 def create_parser() -> argparse.ArgumentParser:
-    """Create the main argument parser with subcommands."""
+    """Create main argument parser."""
     parser = argparse.ArgumentParser(
         prog="smithery",
         description=f"{Colors.GRAY}Smithery Python SDK - Build and manage MCP servers{Colors.RESET}",
@@ -150,7 +150,7 @@ Examples:
 
 
 def print_colored_help():
-    """Print colored help message when no command is provided."""
+    """Print colored help when no command provided."""
     console.plain(f"{Colors.CYAN}usage:{Colors.RESET} smithery [OPTIONS] <COMMAND>")
     console.plain("")
     console.plain(f"{Colors.GRAY}Smithery Python SDK - Build and manage MCP servers{Colors.RESET}")

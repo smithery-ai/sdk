@@ -14,15 +14,7 @@ from .helpers import create_base_parser, get_server_ref_from_config
 
 
 def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:
-    """
-    Run a Smithery MCP server directly without building a separate file.
-
-    Args:
-        server_ref: Module reference in format 'module.path:function'
-        transport: Transport type ('shttp' or 'stdio')
-        port: Port to run on (shttp only)
-        host: Host to bind to (shttp only)
-    """
+    """Run Smithery MCP server directly."""
     console.print(f"[cyan][smithery][/cyan] Starting Python MCP server with {transport} transport...")
     console.print(f"[cyan][smithery][/cyan] Server reference: {server_ref}")
 
@@ -75,7 +67,7 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
 
 
 def main() -> None:
-    """CLI entry point for Smithery Python run system."""
+    """CLI entry point for run command."""
     parser = create_base_parser(
         prog="smithery run",
         description="Run Smithery MCP servers directly (like uvicorn)",
