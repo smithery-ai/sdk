@@ -1,6 +1,5 @@
 """
-Smithery Python Create Command
-==============================
+Smithery Python Init
 
 Scaffold creation command for new Smithery Python MCP projects.
 """
@@ -12,7 +11,6 @@ import tempfile
 from pathlib import Path
 
 from ..utils.console import console, muted
-from .helpers import create_base_parser, handle_common_errors
 
 
 def prompt_for_project_name() -> str:
@@ -124,12 +122,6 @@ def update_project_files(project_name: str) -> None:
             # Replace project name
             content = content.replace('name = "my-mcp-server"', f'name = "{project_name}"')
 
-            # Update smithery dependency to use published version instead of local path
-            content = content.replace(
-                'smithery @ file:///Users/arjun/Documents/github/smithery/sdk/python',
-                'smithery>=0.1.13'
-            )
-
             pyproject_path.write_text(content)
 
         # Update README.md
@@ -173,6 +165,24 @@ def install_dependencies(project_name: str) -> None:
     )
 
 
+def build_project(project_name: str) -> None:
+    """Build project using uv."""
+
+    def build():
+        project_path = Path(project_name)
+
+        # Build the project
+        subprocess.run([
+            "uv", "build"
+        ], cwd=project_path, check=True, capture_output=True, text=True)
+
+    show_spinner(
+        "Building project...",
+        "Project built successfully",
+        build
+    )
+
+
 def initialize_git(project_name: str) -> None:
     """Initialize git repository."""
 
@@ -203,9 +213,10 @@ def show_success_message(project_name: str) -> None:
     console.plain("")
     console.info("Next steps:")
     console.plain(f"  \x1b[36m1.\x1b[0m cd {project_name}")
-    console.plain("  \x1b[36m2.\x1b[0m uvx smithery run")
+    console.plain("  \x1b[36m2.\x1b[0m uv run playground  # Interactive testing")
+    console.plain("  \x1b[36m   or\x1b[0m uv run dev        # Just run the server")
     console.plain("")
-    muted("Tip: Try 'Say hello to John' to use your tool.")
+    muted("Tip: Use playground to test your tools interactively!")
     console.plain("")
     muted("Your project is ready with git initialized and dependencies installed!")
 
@@ -232,6 +243,9 @@ def create_project(project_name: str | None = None) -> None:
 
         # Install dependencies
         install_dependencies(project_name)
+
+        # Build project
+        build_project(project_name)
 
         # Initialize git repository
         initialize_git(project_name)
@@ -263,27 +277,21 @@ def create_project(project_name: str | None = None) -> None:
         sys.exit(1)
 
 
-@handle_common_errors
 def main() -> None:
     """CLI entry point for Smithery Python init command."""
-    parser = create_base_parser(
-        prog="smithery init",
-        description="Initialize a new Smithery Python MCP project",
-        epilog="""
-Examples:
-  smithery init                    # Prompt for project name
-  smithery init my-awesome-server  # Initialize with specific name
-        """
-    )
 
-    parser.add_argument(
-        "project_name",
-        nargs="?",
-        help="Name of the project to initialize"
-    )
+    import typer
 
-    args = parser.parse_args()
-    create_project(args.project_name)
+    app = typer.Typer()
+
+    @app.command()
+    def init_cmd(
+        project_name: str | None = typer.Argument(None, help="Name of the project to initialize")
+    ):
+        """Initialize a new Smithery Python MCP project."""
+        create_project(project_name)
+
+    app()
 
 
 if __name__ == "__main__":

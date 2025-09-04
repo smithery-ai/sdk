@@ -13,14 +13,17 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "mcp[cli]>=1.13.1",
-    "smithery>=0.1.13",
+    "smithery>=0.1.14",
 ]
 
 [project.scripts]
-dev = "hello_server.server:main"
+# Run the MCP server in development mode
+dev = "smithery.cli.run:main"
+# Run server with interactive testing playground
+playground = "smithery.cli.playground:main"
 
 [tool.smithery]
-# Server function for Smithery to build
+# Function that returns a patched FastMCP server
 server = "hello_server.server:create_server"
 
 

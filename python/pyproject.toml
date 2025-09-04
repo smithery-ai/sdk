@@ -4,20 +4,18 @@ build-backend = "uv_build"
 
 [project]
 name = "smithery"
-version = "0.1.13"
+version = "0.1.14"
 description = "SDK for using Smithery with Python"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "mcp>=1.13.1",
     "toml>=0.10.2",
-    "colorama>=0.4.0",
+    "typer>=0.17.3",
 ]
 authors = [{ name = "Smithery Team", email = "contact@smithery.ai" }]
 license = "MIT"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Operating System :: OS Independent",
 ]
 

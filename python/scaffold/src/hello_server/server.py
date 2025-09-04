@@ -1,14 +1,12 @@
 """
 👋 Welcome to your Smithery project!
-To run your server, run "uvx smithery run"
+To run your server, use "uv run dev"
+To test interactively, use "uv run playground"
 
-You might find these resources useful:
+You might find this resources useful:
 
 🧑‍💻 MCP's Python SDK (helps you define your server)
 https://github.com/modelcontextprotocol/python-sdk
-
-💻 smithery CLI (run "npx @smithery/cli dev" or explore other commands below)
-https://smithery.ai/docs/concepts/cli
 """
 
 from mcp.server.fastmcp import FastMCP
