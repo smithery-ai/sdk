@@ -3,7 +3,7 @@
 import sys
 from pathlib import Path
 
-from .console import Colors, console
+from .console import console
 
 
 def get_server_ref_from_config() -> str:
@@ -27,10 +27,10 @@ def get_server_ref_from_config() -> str:
 
     if not server_ref:
         console.error("Server reference not found in pyproject.toml")
-        console.nested("Please add [tool.smithery] section with your server function:", color=Colors.YELLOW)
+        console.nested("Please add [tool.smithery] section with your server function:", color="yellow")
         console.indented("[tool.smithery]")
         console.indented('server = "src.server:your_server_function"')
-        console.indented('# Example: server = "src.server:create_server"', color=Colors.GRAY)
+        console.indented('# Example: server = "src.server:create_server"', color="dim")
         sys.exit(1)
 
     return server_ref
