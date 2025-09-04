@@ -18,7 +18,7 @@ from .run import run_server
 # Create the main Typer app
 app = typer.Typer(
     name="smithery",
-    help="[cyan]Smithery Python SDK[/cyan] - Develop and run MCP servers",
+    help="[cyan]Smithery Python SDK[/cyan] - Develop and run python MCP servers",
     no_args_is_help=True,
     rich_markup_mode="rich",
 )
@@ -38,6 +38,7 @@ def main(
     )
 ):
     """Smithery Python SDK - Develop and run MCP servers"""
+    # version parameter is handled by callback
     pass
 
 
