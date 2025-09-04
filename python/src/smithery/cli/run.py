@@ -9,12 +9,8 @@ import argparse
 import sys
 from typing import Any
 
-from rich.console import Console
-
+from ..utils.console import console
 from .build import get_server_ref_from_config, import_server_module
-
-# Initialize rich console
-console = Console()
 
 
 def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:

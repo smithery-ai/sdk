@@ -10,6 +10,7 @@ from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 
+from ..utils.responses import create_error_response
 from ..utils.url import decode_config_from_base64
 
 
@@ -88,9 +89,11 @@ class SessionConfigMiddleware:
             if self.config_schema:
                 try:
                     config_instance = self.config_schema(**raw_config)
-                except ValidationError:
-                    # Validation failed, use defaults
-                    config_instance = self.config_schema()
+                except ValidationError as e:
+                    # Return 422 validation error
+                    error_response = create_error_response(422, "Invalid configuration", "Config validation failed", e)
+                    await error_response(scope, receive, send)
+                    return
             else:
                 # No schema, store raw dict
                 config_instance = raw_config
@@ -98,8 +101,14 @@ class SessionConfigMiddleware:
             # Store validated config instance in scope
             scope["session_config"] = config_instance
 
-        except Exception:
-            # Any error - use default config
+        except Exception as e:
+            # Config parsing failed - return 400 error or use defaults
+            if self.config_schema and "config" in str(e).lower():
+                error_response = create_error_response(400, "Invalid config", "Failed to parse config parameter")
+                await error_response(scope, receive, send)
+                return
+
+            # Use default config for other errors
             config_instance = self.config_schema() if self.config_schema else {}
             scope["session_config"] = config_instance
 
