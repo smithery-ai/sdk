@@ -92,10 +92,11 @@ class SessionConfigMiddleware:
                     config_schema_dict = get_config_schema_dict(self.config_schema)
                     error_response = create_error_response(
                         422,
-                        "Configuration required",
-                        "This server requires configuration parameters",
+                        "Invalid configuration parameters",
+                        "One or more config parameters are invalid.",
                         None,
-                        config_schema_dict
+                        config_schema_dict,
+                        instance="/mcp"
                     )
                     await error_response(scope, receive, send)
                     return
@@ -106,11 +107,12 @@ class SessionConfigMiddleware:
                     # Return 422 validation error with config schema for frontend
                     config_schema_dict = get_config_schema_dict(self.config_schema)
                     error_response = create_error_response(
-                        422, 
-                        "Invalid configuration", 
-                        "Config validation failed", 
-                        e, 
-                        config_schema_dict
+                        422,
+                        "Invalid configuration parameters",
+                        "One or more config parameters are invalid.",
+                        e,
+                        config_schema_dict,
+                        instance="/mcp"
                     )
                     await error_response(scope, receive, send)
                     return

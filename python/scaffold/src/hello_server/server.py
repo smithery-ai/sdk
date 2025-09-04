@@ -10,7 +10,7 @@ https://github.com/modelcontextprotocol/python-sdk
 """
 
 from mcp.server.fastmcp import FastMCP
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from smithery import from_fastmcp
 from smithery.server.fastmcp_patch import SmitheryFastMCP
@@ -18,14 +18,12 @@ from smithery.server.fastmcp_patch import SmitheryFastMCP
 
 # Optional: If you want to receive session-level config from user, define it here
 class ConfigSchema(BaseModel):
-    capitalize: bool = True  # Capitalize the greeting
+    access_token: str = Field(..., description="Your access token for authentication")
+    capitalize: bool = Field(True, description="Whether to capitalize the greeting")
 
 
 def create_server(config: ConfigSchema) -> SmitheryFastMCP:
     """Create and configure the MCP server."""
-
-    # Validate config at startup
-    config = ConfigSchema.model_validate(config)
 
     server = from_fastmcp(
         FastMCP(name="Say Hello"),
@@ -38,6 +36,10 @@ def create_server(config: ConfigSchema) -> SmitheryFastMCP:
         """Say hello to someone."""
         ctx = server.get_context()
         config = ctx.session_config  # Returns validated ConfigSchema instance
+
+        # Verify access token is provided (it's required, so should always be present)
+        if not config.access_token:
+            return "Error: Access token required"
 
         # Apply capitalization to the entire greeting based on config
         base_greeting = f"Hello, {name}!"
