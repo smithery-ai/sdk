@@ -18,7 +18,7 @@ from typing import Any, TypedDict
 from pydantic import BaseModel
 
 from ..server.fastmcp_patch import SmitheryFastMCP
-from ..utils.console import console, Colors
+from ..utils.console import Colors, console
 
 
 class SmitheryModule(TypedDict, total=False):
