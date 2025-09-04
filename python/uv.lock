@@ -565,10 +565,9 @@ wheels = [
 
 [[package]]
 name = "smithery"
-version = "0.1.13"
+version = "0.1.14"
 source = { editable = "." }
 dependencies = [
-    { name = "colorama" },
     { name = "mcp" },
     { name = "toml" },
     { name = "typer" },
@@ -581,7 +580,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "colorama", specifier = ">=0.4.0" },
     { name = "mcp", specifier = ">=1.13.1" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.12.11" },
     { name = "toml", specifier = ">=0.10.2" },
