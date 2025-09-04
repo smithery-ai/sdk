@@ -1,8 +1,5 @@
 """
-Smithery Python SDK
-==================
-
-SDK for using Smithery in Python.
+Smithery Python SDK and CLI
 """
 
 from .server.fastmcp_patch import (
@@ -10,7 +7,7 @@ from .server.fastmcp_patch import (
 )
 from .utils.url import create_smithery_url
 
-__version__ = "0.1.4"
+__version__ = "0.1.17"
 
 __all__ = [
     "create_smithery_url",
