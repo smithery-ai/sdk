@@ -9,36 +9,36 @@ Handles subcommands like 'build', 'dev', etc.
 import argparse
 import sys
 
-from .build import build_server, get_server_ref_from_config
-from .create import create_project
+from ..utils.console import Colors, console
+from .build import build_server
+from .helpers import ColoredHelpFormatter, resolve_server_ref
+from .init import create_project
 from .run import run_server
 
 
 def build_command(args: argparse.Namespace) -> None:
-    """Handle the 'build' subcommand."""
-    # Get server function from config if not provided
-    server_function = args.server_function or get_server_ref_from_config()
+    """Handle build command."""
+    server_function = resolve_server_ref(args)
     build_server(server_function, args.output, args.transport)
 
 
 def run_command(args: argparse.Namespace) -> None:
-    """Handle the 'run' subcommand."""
-    # Get server function from config if not provided
-    server_function = args.server_function or get_server_ref_from_config()
+    """Handle run command."""
+    server_function = resolve_server_ref(args)
     run_server(server_function, args.transport, args.port, args.host)
 
 
-def create_command(args: argparse.Namespace) -> None:
-    """Handle the 'create' subcommand."""
+def init_command(args: argparse.Namespace) -> None:
+    """Handle init command."""
     create_project(args.project_name)
 
 
 def create_parser() -> argparse.ArgumentParser:
-    """Create the main argument parser with subcommands."""
+    """Create main argument parser."""
     parser = argparse.ArgumentParser(
         prog="smithery",
-        description="Smithery Python SDK - Build and manage MCP servers",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=f"{Colors.GRAY}Smithery Python SDK - Build and manage MCP servers{Colors.RESET}",
+        formatter_class=ColoredHelpFormatter,
     )
 
     # Add version argument
@@ -126,46 +126,62 @@ Examples:
     )
     run_parser.set_defaults(func=run_command)
 
-    # Create subcommand
-    create_parser = subparsers.add_parser(
-        "create",
-        help="Create a new Smithery Python MCP project",
+    # Init subcommand
+    init_parser = subparsers.add_parser(
+        "init",
+        help="Initialize a new Smithery Python MCP project",
         description="Scaffold a new Smithery Python MCP project with all necessary files",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  smithery create                    # Prompt for project name
-  smithery create my-awesome-server  # Create with specific name
+  smithery init                    # Prompt for project name
+  smithery init my-awesome-server  # Initialize with specific name
         """
     )
 
-    create_parser.add_argument(
+    init_parser.add_argument(
         "project_name",
         nargs="?",
-        help="Name of the project to create"
+        help="Name of the project to initialize"
     )
-    create_parser.set_defaults(func=create_command)
+    init_parser.set_defaults(func=init_command)
 
     return parser
+
+
+def print_colored_help():
+    """Print colored help when no command provided."""
+    console.plain(f"{Colors.CYAN}usage:{Colors.RESET} smithery [OPTIONS] <COMMAND>")
+    console.plain("")
+    console.plain(f"{Colors.GRAY}Smithery Python SDK - Build and manage MCP servers{Colors.RESET}")
+    console.plain("")
+    console.plain(f"{Colors.CYAN}Commands:{Colors.RESET}")
+    console.plain(f"  {Colors.GREEN}build{Colors.RESET}   Build standalone MCP server from Python module")
+    console.plain(f"  {Colors.GREEN}run{Colors.RESET}     Run MCP server directly (like uvicorn)")
+    console.plain(f"  {Colors.GREEN}init{Colors.RESET}   Initialize a new Smithery Python MCP project")
+    console.plain("")
+    console.plain(f"{Colors.CYAN}Options:{Colors.RESET}")
+    console.plain(f"  {Colors.GRAY}-h, --help{Colors.RESET}     Show this help message and exit")
+    console.plain(f"  {Colors.GRAY}--version{Colors.RESET}      Show program's version number and exit")
 
 
 def main(argv: list[str] | None = None) -> None:
     """Main CLI entry point."""
     parser = create_parser()
 
-    # If no arguments provided, show help
+    # If no arguments provided, show colored help
     if argv is None:
         argv = sys.argv[1:]
 
     if not argv:
-        parser.print_help()
+        print_colored_help()
         return
 
     args = parser.parse_args(argv)
 
-    # If no subcommand provided, show help
+    # If no subcommand provided, show colored help
     if not hasattr(args, 'func'):
-        parser.print_help()
+        print_colored_help()
         return
 
     # Execute the subcommand

@@ -1,6 +1,6 @@
 """
 👋 Welcome to your Smithery project!
-To run your server, run "uv run dev"
+To run your server, run "uvx smithery run"
 
 You might find these resources useful:
 
@@ -74,28 +74,3 @@ def create_server(config: ConfigSchema) -> SmitheryFastMCP:
 # Export for Smithery build system
 default = create_server
 config_schema = ConfigSchema
-
-
-# def main():
-#     """Main entry point to run the server with streamable HTTP transport."""
-#     import os
-
-#     # Create config instance with defaults
-#     config = ConfigSchema()
-
-#     # Create server instance
-#     server = create_server(config)
-
-#     # Get port from environment or default to 8081
-#     port = int(os.environ.get("PORT", "8081"))
-#     server.settings.port = port
-
-#     print(f"🚀 Starting MCP server on port {port}")
-#     print("📡 Using streamable HTTP transport")
-
-#     # Run with streamable HTTP transport
-#     server.run(transport="streamable-http")
-
-
-# if __name__ == "__main__":
-#     main()

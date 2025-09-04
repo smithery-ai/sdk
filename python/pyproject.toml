@@ -1,17 +1,17 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"
 
 [project]
 name = "smithery"
-version = "0.1.12"
+version = "0.1.13"
 description = "SDK for using Smithery with Python"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "mcp>=1.13.1",
-    "rich>=14.1.0",
     "toml>=0.10.2",
+    "colorama>=0.4.0",
 ]
 authors = [{ name = "Smithery Team", email = "contact@smithery.ai" }]
 license = "MIT"
@@ -29,12 +29,6 @@ dev = [
 [project.urls]
 "Homepage" = "https://github.com/smithery-ai/python-sdk"
 "Bug Tracker" = "https://github.com/smithery-ai/python-sdk/issues"
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-data]
-smithery = ["py.typed"]
 
 [project.scripts]
 smithery = "smithery.cli.main:main"

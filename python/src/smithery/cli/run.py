@@ -5,30 +5,18 @@ Smithery Python Run System
 Command-line interface for running Smithery Python MCP servers.
 """
 
-import argparse
 import sys
 from typing import Any
 
-from rich.console import Console
-
-from .build import get_server_ref_from_config, import_server_module
-
-# Initialize rich console
-console = Console()
+from ..utils.console import console
+from .build import import_server_module
+from .helpers import create_base_parser, get_server_ref_from_config
 
 
 def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:
-    """
-    Run a Smithery MCP server directly without building a separate file.
-
-    Args:
-        server_ref: Module reference in format 'module.path:function'
-        transport: Transport type ('shttp' or 'stdio')
-        port: Port to run on (shttp only)
-        host: Host to bind to (shttp only)
-    """
-    console.print(f"[cyan][smithery][/cyan] Starting Python MCP server with {transport} transport...")
-    console.print(f"[cyan][smithery][/cyan] Server reference: {server_ref}")
+    """Run Smithery MCP server directly."""
+    console.info(f"Starting Python MCP server with {transport} transport...")
+    console.info(f"Server reference: {server_ref}")
 
     try:
         # Import and validate server module
@@ -41,13 +29,13 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
         if config_schema:
             try:
                 config = config_schema()
-                console.print(f"[cyan][smithery][/cyan] Using config schema: {config_schema.__name__}")
+                console.info(f"Using config schema: {config_schema.__name__}")
             except Exception as e:
-                console.print(f"[yellow]⚠ Warning: Failed to instantiate config schema: {e}[/yellow]")
-                console.print("[yellow]⚠ Proceeding with empty config[/yellow]")
+                console.warning(f"Failed to instantiate config schema: {e}")
+                console.warning("Proceeding with empty config")
 
         # Create server instance
-        console.print("[cyan][smithery][/cyan] Creating server instance...")
+        console.info("Creating server instance...")
         server = create_server(config)
 
         if transport == "shttp":
@@ -55,14 +43,14 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
             server.settings.port = port
             server.settings.host = host
 
-            console.print(f"[cyan][smithery][/cyan] MCP server starting on {host}:{port}")
-            console.print("[cyan][smithery][/cyan] Transport: streamable HTTP")
+            console.info(f"MCP server starting on {host}:{port}")
+            console.info("Transport: streamable HTTP")
 
             # Run with streamable HTTP transport
             server.run(transport="streamable-http")
 
         elif transport == "stdio":
-            console.print("[cyan][smithery][/cyan] MCP server starting with stdio transport")
+            console.info("MCP server starting with stdio transport")
 
             # Run with stdio transport
             server.run(transport="stdio")
@@ -71,18 +59,18 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
             raise ValueError(f"Unsupported transport: {transport}")
 
     except KeyboardInterrupt:
-        console.print("\n[cyan][smithery][/cyan] Server stopped by user")
+        console.info("\nServer stopped by user")
         sys.exit(0)
     except Exception as e:
-        console.print(f"[cyan][smithery][/cyan] Failed to start MCP server: {e}", file=sys.stderr)
+        console.error(f"Failed to start MCP server: {e}")
         sys.exit(1)
 
 
 def main() -> None:
-    """CLI entry point for Smithery Python run system."""
-    parser = argparse.ArgumentParser(
+    """CLI entry point for run command."""
+    parser = create_base_parser(
+        prog="smithery run",
         description="Run Smithery MCP servers directly (like uvicorn)",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   smithery run                          # Read from pyproject.toml [tool.smithery].server

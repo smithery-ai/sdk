@@ -8,10 +8,6 @@ import os
 import sys
 from importlib import import_module
 
-from rich.console import Console
-
-console = Console()
-
 
 def main():
     """Main entry point for the MCP server."""
@@ -20,8 +16,8 @@ def main():
         module_name = "$SMITHERY_MODULE"
         function_name = "$SMITHERY_FUNCTION"
 
-        console.print("[smithery] Starting Python MCP server...", style="cyan")
-        console.print(f"[smithery] Loading server from: {module_name}:{function_name}", style="cyan")
+        print("\033[36m[smithery]\033[0m Starting Python MCP server...")
+        print(f"\033[36m[smithery]\033[0m Loading server from: {module_name}:{function_name}")
 
         # Ensure current directory is in Python path
         current_dir = os.getcwd()
@@ -45,13 +41,13 @@ def main():
         port = int(os.environ.get("PORT", "8081"))
         server.settings.port = port
 
-        console.print(f"[smithery] MCP server starting on port {port}", style="cyan")
+        print(f"\033[36m[smithery]\033[0m MCP server starting on port {port}")
 
         # Run with streamable HTTP transport
         server.run(transport="streamable-http")
 
     except Exception as e:
-        console.print(f"[smithery] Failed to start MCP server: {e}", style="cyan")
+        print(f"\033[36m[smithery]\033[0m Failed to start MCP server: {e}", file=sys.stderr)
         sys.exit(1)
 
 
