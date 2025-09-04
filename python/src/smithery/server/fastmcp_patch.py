@@ -43,13 +43,17 @@ class SmitheryFastMCP:
         def patched_streamable_http_app():
             app = original_method()
 
-            # Add CORS middleware first (outer layer)
+            # Add CORS middleware - minimal configuration for MCP compatibility
+            # Key finding: mcp-protocol-version header is ESSENTIAL for tunnel/browser requests
+            # OPTIONS method is handled automatically by Starlette CORS middleware
             app.add_middleware(
                 CORSMiddleware,
                 allow_origins=["*"],
-                allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-                allow_headers=["Content-Type", "Accept", "mcp-session-id"],
-                expose_headers=["mcp-session-id"]
+                allow_credentials=True,
+                allow_methods=["GET", "POST"],
+                allow_headers=["Content-Type", "Accept", "mcp-session-id", "mcp-protocol-version"],
+                expose_headers=["mcp-session-id", "mcp-protocol-version"],
+                max_age=86400,
             )
 
             # Add session config middleware to extract config from URL
