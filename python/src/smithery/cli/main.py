@@ -9,9 +9,52 @@ Handles subcommands like 'build', 'dev', etc.
 import argparse
 import sys
 
+from ..utils.console import console, Colors
 from .build import build_server, get_server_ref_from_config
 from .create import create_project
 from .run import run_server
+
+
+class ColoredHelpFormatter(argparse.RawDescriptionHelpFormatter):
+    """Custom help formatter with uv-inspired colors."""
+    
+    def _format_usage(self, usage, actions, groups, prefix):
+        if prefix is None:
+            prefix = f'{Colors.CYAN}usage:{Colors.RESET} '
+        return super()._format_usage(usage, actions, groups, prefix)
+    
+    def add_usage(self, usage, actions, groups, prefix=None):
+        if prefix is None:
+            prefix = f'{Colors.CYAN}usage:{Colors.RESET} '
+        return super().add_usage(usage, actions, groups, prefix)
+    
+    def start_section(self, heading):
+        if heading == 'positional arguments':
+            heading = f'{Colors.CYAN}Commands:{Colors.RESET}'
+        elif heading == 'options':
+            heading = f'{Colors.CYAN}Options:{Colors.RESET}'
+        return super().start_section(heading)
+        
+    def _format_action(self, action):
+        # Get the original formatted action
+        result = super()._format_action(action)
+        
+        # Color command names (subparsers)
+        if hasattr(action, 'dest') and action.dest in ('build', 'run', 'create'):
+            # Find and color the command name
+            lines = result.split('\n')
+            if lines:
+                first_line = lines[0]
+                # Color the command name at the beginning
+                parts = first_line.split(None, 1)
+                if len(parts) >= 2:
+                    command = parts[0]
+                    description = parts[1]
+                    colored_line = f'  {Colors.GREEN}{command}{Colors.RESET}  {description}'
+                    lines[0] = colored_line
+                    result = '\n'.join(lines)
+        
+        return result
 
 
 def build_command(args: argparse.Namespace) -> None:
@@ -37,8 +80,8 @@ def create_parser() -> argparse.ArgumentParser:
     """Create the main argument parser with subcommands."""
     parser = argparse.ArgumentParser(
         prog="smithery",
-        description="Smithery Python SDK - Build and manage MCP servers",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=f"{Colors.GRAY}Smithery Python SDK - Build and manage MCP servers{Colors.RESET}",
+        formatter_class=ColoredHelpFormatter,
     )
 
     # Add version argument
@@ -149,23 +192,39 @@ Examples:
     return parser
 
 
+def print_colored_help():
+    """Print colored help message when no command is provided."""
+    console.plain(f"{Colors.CYAN}usage:{Colors.RESET} smithery [OPTIONS] <COMMAND>")
+    console.plain("")
+    console.plain(f"{Colors.GRAY}Smithery Python SDK - Build and manage MCP servers{Colors.RESET}")
+    console.plain("")
+    console.plain(f"{Colors.CYAN}Commands:{Colors.RESET}")
+    console.plain(f"  {Colors.GREEN}build{Colors.RESET}   Build standalone MCP server from Python module")
+    console.plain(f"  {Colors.GREEN}run{Colors.RESET}     Run MCP server directly (like uvicorn)")  
+    console.plain(f"  {Colors.GREEN}create{Colors.RESET}  Create a new Smithery Python MCP project")
+    console.plain("")
+    console.plain(f"{Colors.CYAN}Options:{Colors.RESET}")
+    console.plain(f"  {Colors.GRAY}-h, --help{Colors.RESET}     Show this help message and exit")
+    console.plain(f"  {Colors.GRAY}--version{Colors.RESET}      Show program's version number and exit")
+
+
 def main(argv: list[str] | None = None) -> None:
     """Main CLI entry point."""
     parser = create_parser()
 
-    # If no arguments provided, show help
+    # If no arguments provided, show colored help
     if argv is None:
         argv = sys.argv[1:]
 
     if not argv:
-        parser.print_help()
+        print_colored_help()
         return
 
     args = parser.parse_args(argv)
 
-    # If no subcommand provided, show help
+    # If no subcommand provided, show colored help
     if not hasattr(args, 'func'):
-        parser.print_help()
+        print_colored_help()
         return
 
     # Execute the subcommand

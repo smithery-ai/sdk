@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "smithery"
-version = "0.1.13"
+version = "0.1.12"
 description = "SDK for using Smithery with Python"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -29,12 +29,6 @@ dev = [
 [project.urls]
 "Homepage" = "https://github.com/smithery-ai/python-sdk"
 "Bug Tracker" = "https://github.com/smithery-ai/python-sdk/issues"
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-data]
-smithery = ["py.typed"]
 
 [project.scripts]
 smithery = "smithery.cli.main:main"
