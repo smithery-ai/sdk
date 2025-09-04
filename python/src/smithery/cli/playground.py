@@ -60,10 +60,12 @@ def start_playground(server_function: str | None, port: int) -> None:
     try:
         console.info(f"Starting Smithery CLI client connected to port {port}")
         subprocess.run([
-            "npx", "-y", "@smithery/cli", "--port", str(port)
+            "npx", "-y", "@smithery/cli", "playground", "--port", str(port)
         ], check=True)
     except KeyboardInterrupt:
         console.info("Playground stopped by user")
+        console.plain("")
+        console.info("🚀 Deploy this server: https://smithery.ai/new")
     except subprocess.CalledProcessError as e:
         console.error(f"Failed to start Smithery CLI: {e}")
         console.info("Make sure you have Node.js installed and @smithery/cli is available")

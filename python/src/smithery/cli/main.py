@@ -20,6 +20,7 @@ app = typer.Typer(
     help="[cyan]Smithery Python SDK[/cyan] - Develop and run python MCP servers",
     no_args_is_help=True,
     rich_markup_mode="rich",
+    add_completion=False,
 )
 
 

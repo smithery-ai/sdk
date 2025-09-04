@@ -11,7 +11,7 @@ from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 
 from ..utils.config import parse_config_from_asgi_scope
-from ..utils.responses import create_error_response
+from ..utils.responses import create_error_response, get_config_schema_dict
 
 
 class SmitheryFastMCP:
@@ -87,11 +87,33 @@ class SessionConfigMiddleware:
 
             # Validate and create ConfigSchema instance
             if self.config_schema:
+                # If no config provided but schema exists, return 422 with schema
+                if not raw_config:
+                    config_schema_dict = get_config_schema_dict(self.config_schema)
+                    error_response = create_error_response(
+                        422,
+                        "Invalid configuration parameters",
+                        "One or more config parameters are invalid.",
+                        None,
+                        config_schema_dict,
+                        instance="/mcp"
+                    )
+                    await error_response(scope, receive, send)
+                    return
+
                 try:
                     config_instance = self.config_schema(**raw_config)
                 except ValidationError as e:
-                    # Return 422 validation error
-                    error_response = create_error_response(422, "Invalid configuration", "Config validation failed", e)
+                    # Return 422 validation error with config schema for frontend
+                    config_schema_dict = get_config_schema_dict(self.config_schema)
+                    error_response = create_error_response(
+                        422,
+                        "Invalid configuration parameters",
+                        "One or more config parameters are invalid.",
+                        e,
+                        config_schema_dict,
+                        instance="/mcp"
+                    )
                     await error_response(scope, receive, send)
                     return
             else:
