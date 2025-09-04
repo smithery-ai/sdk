@@ -136,10 +136,10 @@ def update_project_files(project_name: str) -> None:
         readme_path = project_path / "README.md"
         if readme_path.exists():
             content = readme_path.read_text()
-            
+
             # Replace "Hello Server" with actual project name
             content = content.replace('# Hello Server', f'# {project_name}')
-            
+
             readme_path.write_text(content)
 
     show_spinner(
