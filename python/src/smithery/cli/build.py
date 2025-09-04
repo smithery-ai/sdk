@@ -16,12 +16,9 @@ from typing import Any, TypedDict
 
 # Core dependencies required by all Smithery Python projects
 from pydantic import BaseModel
-from rich.console import Console
 
 from ..server.fastmcp_patch import SmitheryFastMCP
-
-# Initialize rich console
-console = Console()
+from ..utils.console import console, Colors
 
 
 class SmitheryModule(TypedDict, total=False):
@@ -58,9 +55,9 @@ def import_server_module(server_ref: str) -> SmitheryModule:
         if current_dir not in sys.path:
             sys.path.insert(0, current_dir)
 
-        console.print(f"[cyan][smithery][/cyan] Importing module: {module_path}")
-        console.print(f"[cyan][smithery][/cyan] Looking for function: {function_name}")
-        console.print(f"[cyan][smithery][/cyan] Working directory: {current_dir}")
+        console.info(f"Importing module: {module_path}", muted=True)
+        console.info(f"Looking for function: {function_name}", muted=True)
+        console.info(f"Working directory: {current_dir}", muted=True)
 
         module = import_module(module_path)
 
@@ -80,19 +77,19 @@ def import_server_module(server_ref: str) -> SmitheryModule:
             # Check if return type annotation is present and correct
             if return_annotation != inspect.Signature.empty:
                 if return_annotation != SmitheryFastMCP:
-                    console.print(f"[yellow]⚠ Warning: Function return type is {return_annotation.__name__ if hasattr(return_annotation, '__name__') else return_annotation}, expected SmitheryFastMCP[/yellow]")
+                    console.warning(f"Function return type is {return_annotation.__name__ if hasattr(return_annotation, '__name__') else return_annotation}, expected SmitheryFastMCP")
             else:
-                console.print("[yellow]⚠ Warning: No return type annotation found. Expected: -> SmitheryFastMCP[/yellow]")
+                console.warning("No return type annotation found. Expected: -> SmitheryFastMCP")
 
             # Check parameter signature
             params = list(sig.parameters.values())
             if len(params) != 1:
-                console.print(f"[yellow]⚠ Warning: Expected exactly 1 parameter (config), found {len(params)}[/yellow]")
+                console.warning(f"Expected exactly 1 parameter (config), found {len(params)}")
             elif params[0].name not in ('config', 'cfg', 'configuration'):
-                console.print(f"[yellow]⚠ Warning: Parameter name '{params[0].name}' should be 'config' for clarity[/yellow]")
+                console.warning(f"Parameter name '{params[0].name}' should be 'config' for clarity")
 
         except Exception as e:
-            console.print(f"[yellow]⚠ Warning: Could not validate function signature: {e}[/yellow]")
+            console.warning(f"Could not validate function signature: {e}")
 
         # Get optional config schema
         config_schema = getattr(module, 'config_schema', None)
@@ -102,21 +99,21 @@ def import_server_module(server_ref: str) -> SmitheryModule:
             'config_schema': config_schema,
         }
     except ModuleNotFoundError as e:
-        console.print(f"[red]✗ Failed to import server module '{server_ref}': {e}[/red]", file=sys.stderr)
-        console.print("[yellow]✗ Module resolution tips:[/yellow]")
-        console.print("  - Ensure you're running from the project root directory")
-        console.print(f"  - Current working directory: {os.getcwd()}")
-        console.print(f"  - Looking for module: {module_path}")
-        console.print(f"  - Python path: {sys.path[:3]}...")
+        console.error(f"Failed to import server module '{server_ref}': {e}")
+        console.nested("Module resolution tips:")
+        console.indented("Ensure you're running from the project root directory")
+        console.indented(f"Current working directory: {os.getcwd()}")
+        console.indented(f"Looking for module: {module_path}")
+        console.indented(f"Python path: {sys.path[:3]}...")
         sys.exit(1)
     except Exception as e:
-        console.print(f"[red]✗ Failed to import server module '{server_ref}': {e}[/red]", file=sys.stderr)
-        console.print("[yellow]✗ Expected configuration in pyproject.toml:[/yellow]")
-        console.print("[cyan]  [tool.smithery][/cyan]")
-        console.print("[cyan]  server = \"module.path:function_name\"[/cyan]")
-        console.print("[yellow]✗ Expected module contract:[/yellow]")
-        console.print("  - function_name = function(config) -> FastMCP")
-        console.print("  - config_schema = class(BaseModel)  # Optional")
+        console.error(f"Failed to import server module '{server_ref}': {e}")
+        console.nested("Expected configuration in pyproject.toml:")
+        console.indented("[tool.smithery]")
+        console.indented('server = "module.path:function_name"')
+        console.nested("Expected module contract:")
+        console.indented("function_name = function(config) -> FastMCP")
+        console.indented("config_schema = class(BaseModel)  # Optional")
         sys.exit(1)
 
 
@@ -134,8 +131,8 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
     """
     from pathlib import Path
 
-    console.print(f"[cyan][smithery][/cyan] Building Python MCP server with {transport} transport...")
-    console.print(f"[cyan][smithery][/cyan] Server reference: {server_ref}")
+    console.info(f"Building Python MCP server with {transport} transport...")
+    console.info(f"Server reference: {server_ref}", muted=True)
 
     # Select appropriate bootstrap template
     bootstrap_file = "shttp_bootstrap.py" if transport == "shttp" else "stdio_bootstrap.py"
@@ -164,7 +161,7 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
     if os.name != 'nt':
         os.chmod(output_path, 0o755)
 
-    console.print(f"[cyan][smithery][/cyan] Python server created: {output_file}")
+    console.success(f"Built {output_file}")
 
 
 def get_server_ref_from_config() -> str:
@@ -183,13 +180,13 @@ def get_server_ref_from_config() -> str:
 
     pyproject_path = Path("pyproject.toml")
     if not pyproject_path.exists():
-        console.print("[red]✗ pyproject.toml not found. Please run from project root.[/red]", file=sys.stderr)
+        console.error("pyproject.toml not found. Please run from project root.")
         sys.exit(1)
 
     try:
         pyproject = toml.load(pyproject_path)
     except Exception as e:
-        console.print(f"[red]✗ Failed to parse pyproject.toml: {e}[/red]", file=sys.stderr)
+        console.error(f"Failed to parse pyproject.toml: {e}")
         sys.exit(1)
 
     # Check [tool.smithery] configuration
@@ -197,11 +194,11 @@ def get_server_ref_from_config() -> str:
     server_ref = smithery_config.get("server")
 
     if not server_ref:
-        console.print("[red]✗ Server reference not found in pyproject.toml[/red]", file=sys.stderr)
-        console.print("[yellow]✗ Please add [tool.smithery] section with your server function:[/yellow]", file=sys.stderr)
-        console.print("[cyan]  [tool.smithery][/cyan]", file=sys.stderr)
-        console.print("[cyan]  server = \"src.server:your_server_function\"[/cyan]", file=sys.stderr)
-        console.print("  # Example: server = \"src.server:create_server\"", file=sys.stderr)
+        console.error("Server reference not found in pyproject.toml")
+        console.nested("Please add [tool.smithery] section with your server function:", color=Colors.YELLOW)
+        console.indented("[tool.smithery]")
+        console.indented('server = "src.server:your_server_function"')
+        console.indented('# Example: server = "src.server:create_server"', color=Colors.GRAY)
         sys.exit(1)
 
     return server_ref
