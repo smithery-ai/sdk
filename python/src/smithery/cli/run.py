@@ -5,7 +5,6 @@ Command-line interface for running Smithery Python MCP servers.
 """
 
 import inspect
-import os
 import sys
 from collections.abc import Callable
 from importlib import import_module
@@ -32,14 +31,8 @@ def import_server_module(server_ref: str) -> SmitheryModule:
 
         module_path, function_name = server_ref.split(":", 1)
 
-        # Ensure current directory is in Python path for relative imports
-        current_dir = os.getcwd()
-        if current_dir not in sys.path:
-            sys.path.insert(0, current_dir)
-
         console.info(f"Importing module: {module_path}", muted=True)
         console.info(f"Looking for function: {function_name}", muted=True)
-        console.info(f"Working directory: {current_dir}", muted=True)
 
         module = import_module(module_path)
 
@@ -59,7 +52,8 @@ def import_server_module(server_ref: str) -> SmitheryModule:
             # Check if return type annotation is present and correct
             if return_annotation != inspect.Signature.empty:
                 if return_annotation != SmitheryFastMCP:
-                    console.warning(f"Function return type is {return_annotation.__name__ if hasattr(return_annotation, '__name__') else return_annotation}, expected SmitheryFastMCP")
+                    annotation_name = getattr(return_annotation, '__name__', str(return_annotation))
+                    console.warning(f"Function return type is {annotation_name}, expected SmitheryFastMCP")
             else:
                 console.warning("No return type annotation found. Expected: -> SmitheryFastMCP")
 
@@ -67,7 +61,7 @@ def import_server_module(server_ref: str) -> SmitheryModule:
             params = list(sig.parameters.values())
             if len(params) != 1:
                 console.warning(f"Expected exactly 1 parameter (config), found {len(params)}")
-            elif params[0].name not in ('config', 'cfg', 'configuration'):
+            elif len(params) == 1 and params[0].name not in ('config', 'cfg', 'configuration'):
                 console.warning(f"Parameter name '{params[0].name}' should be 'config' for clarity")
 
         except Exception as e:
@@ -75,6 +69,8 @@ def import_server_module(server_ref: str) -> SmitheryModule:
 
         # Get optional config schema
         config_schema = getattr(module, 'config_schema', None)
+        if config_schema and not (inspect.isclass(config_schema) and issubclass(config_schema, BaseModel)):
+            console.warning(f"config_schema should be a Pydantic BaseModel class, got {type(config_schema).__name__}")
 
         return {
             'create_server': server_function,
@@ -83,10 +79,11 @@ def import_server_module(server_ref: str) -> SmitheryModule:
     except ModuleNotFoundError as e:
         console.error(f"Failed to import server module '{server_ref}': {e}")
         console.nested("Module resolution tips:")
-        console.indented("Ensure you're running from the project root directory")
-        console.indented(f"Current working directory: {os.getcwd()}")
-        console.indented(f"Looking for module: {module_path}")
-        console.indented(f"Python path: {sys.path[:3]}...")
+        console.indented("Make sure your package is built and installed:")
+        console.indented("  uv sync    # Install dependencies")
+        console.indented("  uv build   # Build the package")
+        console.indented("Or run in development mode:")
+        console.indented("  uv run dev # Uses editable install")
         sys.exit(1)
     except Exception as e:
         console.error(f"Failed to import server module '{server_ref}': {e}")
@@ -100,9 +97,9 @@ def import_server_module(server_ref: str) -> SmitheryModule:
 
 
 def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:
-    """Run Smithery MCP server directly."""
-    console.info(f"Starting Python MCP server with {transport} transport...")
-    console.info(f"Server reference: {server_ref}")
+    """Run Smithery MCP server."""
+    console.rich_console.print(f"Starting [cyan]Python MCP server[/cyan] with [yellow]{transport}[/yellow] transport...")
+    console.rich_console.print(f"Server reference: [green]{server_ref}[/green]")
 
     try:
         # Import and validate server module
@@ -115,7 +112,7 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
         if config_schema:
             try:
                 config = config_schema()
-                console.info(f"Using config schema: {config_schema.__name__}")
+                console.rich_console.print(f"Using config schema: [blue]{config_schema.__name__}[/blue]")
             except Exception as e:
                 console.warning(f"Failed to instantiate config schema: {e}")
                 console.warning("Proceeding with empty config")
@@ -129,14 +126,14 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
             server.settings.port = port
             server.settings.host = host
 
-            console.info(f"MCP server starting on {host}:{port}")
-            console.info("Transport: streamable HTTP")
+            console.rich_console.print(f"MCP server starting on [green]{host}:{port}[/green]")
+            console.rich_console.print("Transport: [cyan]streamable HTTP[/cyan]")
 
             # Run with streamable HTTP transport
             server.run(transport="streamable-http")
 
         elif transport == "stdio":
-            console.info("MCP server starting with stdio transport")
+            console.rich_console.print("MCP server starting with [cyan]stdio[/cyan] transport")
 
             # Run with stdio transport
             server.run(transport="stdio")
