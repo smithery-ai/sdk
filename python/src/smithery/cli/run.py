@@ -95,7 +95,7 @@ def import_server_module(server_ref: str) -> SmitheryModule:
         console.indented("[tool.smithery]")
         console.indented('server = "module.path:function_name"')
         console.nested("Expected module contract:")
-        console.indented("function_name = function(config) -> FastMCP")
+        console.indented("function_name = function(config) -> SmitheryFastMCP")
         console.indented("config_schema = class(BaseModel)  # Optional")
         sys.exit(1)
 
