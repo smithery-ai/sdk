@@ -11,7 +11,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from ..utils.console import console
+from ..utils.console import console, muted
 from .helpers import create_base_parser, handle_common_errors
 
 
@@ -60,7 +60,7 @@ def show_spinner(message: str, end_message: str, command_func):
         result = command_func()
         stop_loading.set()
         spinner_thread.join(timeout=0.1)
-        print(f"\r\x1b[K[ ✓ ] {end_message}")
+        print(f"\r\x1b[K[\x1b[32m✓\x1b[0m] {end_message}")
         return result
     except Exception as e:
         stop_loading.set()
@@ -127,7 +127,7 @@ def update_project_files(project_name: str) -> None:
             # Update smithery dependency to use published version instead of local path
             content = content.replace(
                 'smithery @ file:///Users/arjun/Documents/github/smithery/sdk/python',
-                'smithery>=0.1.8'
+                'smithery>=0.1.13'
             )
 
             pyproject_path.write_text(content)
@@ -202,12 +202,12 @@ def show_success_message(project_name: str) -> None:
     console.success("Project initialized successfully!")
     console.plain("")
     console.info("Next steps:")
-    console.plain(f"  cd {project_name}")
-    console.plain("  uv run smithery run")
+    console.plain(f"  \x1b[36m1.\x1b[0m cd {project_name}")
+    console.plain("  \x1b[36m2.\x1b[0m uvx smithery run")
     console.plain("")
-    console.muted("Tip: Try 'Say hello to John' to use your tool.")
+    muted("Tip: Try 'Say hello to John' to use your tool.")
     console.plain("")
-    console.muted("Your project is ready with git initialized and dependencies installed!")
+    muted("Your project is ready with git initialized and dependencies installed!")
 
 
 def create_project(project_name: str | None = None) -> None:
