@@ -10,8 +10,8 @@ from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 
+from ..utils.config import parse_config_from_asgi_scope
 from ..utils.responses import create_error_response
-from ..utils.url import decode_config_from_base64
 
 
 class SmitheryFastMCP:
@@ -25,7 +25,7 @@ class SmitheryFastMCP:
         self._patch_streamable_http_app()
 
     def __getattr__(self, name: str):
-        """Forward all attribute access to the wrapped FastMCP instance."""
+        """Forward attribute access to wrapped FastMCP instance."""
         # First check if the attribute exists on the wrapped instance
         if hasattr(self._fastmcp, name):
             attr = getattr(self._fastmcp, name)
@@ -38,7 +38,7 @@ class SmitheryFastMCP:
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
     def _patch_streamable_http_app(self):
-        """Patch the StreamableHTTP app to add CORS and session config middleware."""
+        """Add CORS and session config middleware to StreamableHTTP app."""
         original_method = self._fastmcp.streamable_http_app
 
         def patched_streamable_http_app():
@@ -69,7 +69,7 @@ class SmitheryFastMCP:
 
 
 class SessionConfigMiddleware:
-    """Middleware to extract config from URL parameters and store in request scope."""
+    """Extract config from URL parameters and validate with schema."""
 
     def __init__(self, app, config_schema=None):
         self.app = app
@@ -83,7 +83,7 @@ class SessionConfigMiddleware:
 
         # Parse config from URL parameters and store in scope
         try:
-            raw_config = self._parse_config_from_url(scope)
+            raw_config = parse_config_from_asgi_scope(scope)
 
             # Validate and create ConfigSchema instance
             if self.config_schema:
@@ -101,35 +101,19 @@ class SessionConfigMiddleware:
             # Store validated config instance in scope
             scope["session_config"] = config_instance
 
-        except Exception as e:
-            # Config parsing failed - return 400 error or use defaults
-            if self.config_schema and "config" in str(e).lower():
-                error_response = create_error_response(400, "Invalid config", "Failed to parse config parameter")
+        except ValueError as e:
+            # Config parsing failed - return 400 error
+            if "config" in str(e).lower():
+                error_response = create_error_response(400, "Invalid config", str(e))
                 await error_response(scope, receive, send)
                 return
-
-            # Use default config for other errors
+            raise
+        except Exception:
+            # Other unexpected errors - use default config for backward compatibility
             config_instance = self.config_schema() if self.config_schema else {}
             scope["session_config"] = config_instance
 
         await self.app(scope, receive, send)
-
-    def _parse_config_from_url(self, scope) -> dict[str, Any]:
-        """Parse config from base64-encoded URL parameter."""
-        # Extract query string from scope
-        query_string = scope.get("query_string", b"").decode("utf-8")
-        if not query_string:
-            return {}
-
-        # Parse query parameters
-        from urllib.parse import parse_qsl
-        query_params = dict(parse_qsl(query_string))
-
-        # Look for base64-encoded config parameter
-        if "config" in query_params:
-            return decode_config_from_base64(query_params["config"])
-
-        return {}
 
 
 def from_fastmcp(
@@ -137,42 +121,7 @@ def from_fastmcp(
     *,
     config_schema: type[BaseModel] | None = None
 ) -> SmitheryFastMCP:
-    """
-    Add session config support and CORS to a FastMCP instance.
-
-    Config is passed via base64-encoded URL parameter (standard Smithery format)
-    and accessed through ctx.session_config.
-
-    Args:
-        fastmcp_instance: FastMCP instance to patch
-        config_schema: Optional Pydantic model for config validation and schema generation.
-
-    Returns:
-        Enhanced FastMCP instance
-
-    Example:
-        ```python
-        from smithery.utils.url import encode_config_to_base64
-
-        # Define what config your server accepts
-        class ConfigSchema(BaseModel):
-            api_key: str
-            default_location: str = "New York"
-            units: str = "celsius"
-
-        app = from_fastmcp(FastMCP(), config_schema=ConfigSchema)
-
-        @app.tool()
-        def get_weather(location: str = None) -> str:
-            config = app.get_context().session_config
-            # Use user's config values
-            loc = location or config.default_location
-            return f"Weather in {loc}: 22°{config.units[0].upper()} (using API key: {config.api_key[:8]}...)"
-
-        # User's session config is received via: POST /mcp?config=BASE64_JSON
-        # Access validated config in your tools via ctx.session_config
-        ```
-    """
+    """Add session config support and CORS to FastMCP. Config accessed via ctx.session_config."""
     return SmitheryFastMCP(fastmcp_instance, config_schema)
 
 
@@ -180,11 +129,11 @@ def from_fastmcp(
 
 # Patch the Context class to include session config
 def patch_context_with_session_config():
-    """Patch the FastMCP Context class to include session_config property."""
+    """Add session_config property to FastMCP Context class."""
 
     @property
     def session_config(self) -> Any:
-        """Get the session configuration from request scope."""
+        """Get session config from request scope."""
         try:
             # Get config from request scope (set by middleware)
             if hasattr(self.request_context, 'request') and hasattr(self.request_context.request, 'scope'):

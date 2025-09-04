@@ -11,18 +11,7 @@ def create_error_response(
     detail: str,
     validation_error: ValidationError | None = None
 ) -> JSONResponse:
-    """
-    Create standardized error response.
-
-    Args:
-        status: HTTP status code
-        title: Error title
-        detail: Error detail message
-        validation_error: Optional Pydantic validation error for detailed error info
-
-    Returns:
-        JSONResponse with standardized error format
-    """
+        """Create standardized error response. Includes validation details if provided."""
     content = {"title": title, "status": status, "detail": detail}
 
     if validation_error:
