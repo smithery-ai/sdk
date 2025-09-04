@@ -6,7 +6,6 @@ Command-line interface for building and running Smithery Python MCP servers.
 Provides build and run commands with support for multiple transports.
 """
 
-import argparse
 import inspect
 import os
 import sys
@@ -18,8 +17,8 @@ from typing import Any, TypedDict
 from pydantic import BaseModel
 
 from ..server.fastmcp_patch import SmitheryFastMCP
-from ..utils.console import Colors, console
-from .helpers import ColoredHelpFormatter, create_base_parser
+from ..utils.console import console
+from .helpers import create_base_parser
 
 
 class SmitheryModule(TypedDict, total=False):
@@ -170,7 +169,7 @@ def build_server(server_ref: str, output_file: str = ".smithery/server.py", tran
 def main() -> None:
     """CLI entry point for Smithery Python build system."""
     from .helpers import get_server_ref_from_config
-    
+
     parser = create_base_parser(
         prog="smithery build",
         description="Build standalone MCP servers from Python modules",

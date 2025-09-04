@@ -60,12 +60,12 @@ class ColoredHelpFormatter(argparse.RawDescriptionHelpFormatter):
 def create_base_parser(prog: str, description: str, epilog: str = "") -> argparse.ArgumentParser:
     """
     Create a base argument parser with consistent styling.
-    
+
     Args:
         prog: Program name
         description: Program description (will be colored gray)
         epilog: Optional epilog text
-    
+
     Returns:
         Configured ArgumentParser instance
     """
@@ -118,14 +118,14 @@ def get_server_ref_from_config() -> str:
 def add_server_ref_argument(parser: argparse.ArgumentParser, help_text: str = None) -> None:
     """
     Add a server reference argument to a parser.
-    
+
     Args:
         parser: ArgumentParser to add the argument to
         help_text: Custom help text, or None for default
     """
     if help_text is None:
         help_text = "Server reference (module:function). Read from pyproject.toml [tool.smithery].server if not provided."
-    
+
     parser.add_argument(
         "server_function",
         nargs="?",
@@ -136,7 +136,7 @@ def add_server_ref_argument(parser: argparse.ArgumentParser, help_text: str = No
 def add_transport_argument(parser: argparse.ArgumentParser, default: str = "shttp") -> None:
     """
     Add a transport argument to a parser.
-    
+
     Args:
         parser: ArgumentParser to add the argument to
         default: Default transport type
@@ -152,10 +152,10 @@ def add_transport_argument(parser: argparse.ArgumentParser, default: str = "shtt
 def resolve_server_ref(args: argparse.Namespace) -> str:
     """
     Resolve server reference from args or config.
-    
+
     Args:
         args: Parsed arguments containing server_function attribute
-    
+
     Returns:
         Server reference string
     """

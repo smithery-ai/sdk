@@ -5,7 +5,6 @@ Smithery Python Create Command
 Scaffold creation command for new Smithery Python MCP projects.
 """
 
-import argparse
 import shutil
 import subprocess
 import sys
@@ -133,6 +132,16 @@ def update_project_files(project_name: str) -> None:
 
             pyproject_path.write_text(content)
 
+        # Update README.md
+        readme_path = project_path / "README.md"
+        if readme_path.exists():
+            content = readme_path.read_text()
+            
+            # Replace "Hello Server" with actual project name
+            content = content.replace('# Hello Server', f'# {project_name}')
+            
+            readme_path.write_text(content)
+
     show_spinner(
         "Updating project configuration...",
         "Project configuration updated",
@@ -164,6 +173,30 @@ def install_dependencies(project_name: str) -> None:
     )
 
 
+def initialize_git(project_name: str) -> None:
+    """Initialize git repository."""
+
+    def git_init():
+        project_path = Path(project_name)
+
+        # Check if git is available
+        try:
+            subprocess.run(["git", "--version"], check=True, capture_output=True)
+        except (subprocess.CalledProcessError, FileNotFoundError) as err:
+            raise RuntimeError("git is required but not installed") from err
+
+        # Initialize git repository
+        subprocess.run([
+            "git", "init"
+        ], cwd=project_path, check=True, capture_output=True, text=True)
+
+    show_spinner(
+        "Initializing git repository...",
+        "Git repository initialized",
+        git_init
+    )
+
+
 def show_success_message(project_name: str) -> None:
     """Show success message with next steps."""
     console.success("Project initialized successfully!")
@@ -172,7 +205,9 @@ def show_success_message(project_name: str) -> None:
     console.plain(f"  cd {project_name}")
     console.plain("  uv run smithery run")
     console.plain("")
-    console.muted("Tip: Try 'Say hello to John' to exercise your tool.")
+    console.muted("Tip: Try 'Say hello to John' to use your tool.")
+    console.plain("")
+    console.muted("Your project is ready with git initialized and dependencies installed!")
 
 
 def create_project(project_name: str | None = None) -> None:
@@ -197,6 +232,9 @@ def create_project(project_name: str | None = None) -> None:
 
         # Install dependencies
         install_dependencies(project_name)
+
+        # Initialize git repository
+        initialize_git(project_name)
 
         # Show success message
         show_success_message(project_name)

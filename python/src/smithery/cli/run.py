@@ -5,13 +5,12 @@ Smithery Python Run System
 Command-line interface for running Smithery Python MCP servers.
 """
 
-import argparse
 import sys
 from typing import Any
 
-from ..utils.console import Colors, console
+from ..utils.console import console
 from .build import import_server_module
-from .helpers import ColoredHelpFormatter, create_base_parser, get_server_ref_from_config
+from .helpers import create_base_parser, get_server_ref_from_config
 
 
 def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:

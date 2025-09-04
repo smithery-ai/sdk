@@ -11,8 +11,8 @@ import sys
 
 from ..utils.console import Colors, console
 from .build import build_server
-from .init import create_project
 from .helpers import ColoredHelpFormatter, resolve_server_ref
+from .init import create_project
 from .run import run_server
 
 
