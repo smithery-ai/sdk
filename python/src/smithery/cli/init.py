@@ -213,10 +213,9 @@ def show_success_message(project_name: str) -> None:
     console.plain("")
     console.info("Next steps:")
     console.rich_console.print(f"  [cyan]1.[/cyan] cd {project_name}")
-    console.rich_console.print("  [cyan]2.[/cyan] uv run playground  # Interactive testing")
-    console.rich_console.print("  [cyan]   or[/cyan] uv run dev        # Just run the server")
-    console.plain("")
-    muted("Tip: Use playground to test your tools interactively!")
+    console.rich_console.print("  [cyan]2.[/cyan] uv run dev          # Run the server")
+    console.rich_console.print("  [cyan]3.[/cyan] uv run playground   # Test interactively")
+    console.rich_console.print("  [cyan]4.[/cyan] Deploy at smithery.ai/new")
     console.plain("")
     muted("Your project is ready with git initialized and dependencies installed!")
 
