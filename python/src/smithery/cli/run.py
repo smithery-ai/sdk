@@ -67,8 +67,21 @@ def import_server_module(server_ref: str) -> SmitheryModule:
         except Exception as e:
             console.warning(f"Could not validate function signature: {e}")
 
-        # Get optional config schema
-        config_schema = getattr(module, 'config_schema', None)
+        # Get config schema - check decorator metadata first, then module-level variable
+        config_schema = None
+
+        # Priority 1: Check for decorator metadata
+        if hasattr(server_function, '_smithery_config_schema'):
+            config_schema = server_function._smithery_config_schema
+            console.info("Using config schema from @smithery decorator", muted=True)
+
+        # Priority 2: Fall back to module-level variable (backward compatibility)
+        if not config_schema:
+            config_schema = getattr(module, 'config_schema', None)
+            if config_schema:
+                console.info("Using config schema from module-level variable", muted=True)
+
+        # Validate config schema if present
         if config_schema and not (inspect.isclass(config_schema) and issubclass(config_schema, BaseModel)):
             console.warning(f"config_schema should be a Pydantic BaseModel class, got {type(config_schema).__name__}")
 
