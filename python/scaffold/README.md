@@ -2,19 +2,19 @@
 
 An MCP server built with Smithery.
 
+## Prerequisites
+
+- **uv**: Install from [uv.dev](https://docs.astral.sh/uv/getting-started/installation/)
+- **Smithery API key**: Get yours at [smithery.ai/account/api-keys](https://smithery.ai/account/api-keys)
+
 ## Getting Started
 
-1. Install dependencies:
+1. Run the server:
    ```bash
-   uv sync
+   uv run dev
    ```
 
-2. Run the server:
-   ```bash
-   uvx smithery run
-   ```
-
-3. Test interactively:
+2. Test interactively:
 
    ```bash
    uv run playground
@@ -25,3 +25,19 @@ Try saying "Say hello to John" to test the example tool.
 ## Development
 
 Your server code is in `src/hello_server/server.py`. Add or update your server capabilities there.
+
+## Deploy
+
+Ready to deploy? Push your code to GitHub and deploy to Smithery:
+
+1. Create a new repository at [github.com/new](https://github.com/new)
+
+2. Initialize git and push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Hello world 👋"
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+   git push -u origin main
+   ```
+
+3. Deploy your server to Smithery at [smithery.ai/new](https://smithery.ai/new)
