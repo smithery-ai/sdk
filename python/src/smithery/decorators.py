@@ -32,18 +32,21 @@ class SmitheryDecorators:
         Adds session-scoped configuration, CORS headers, and deployment patches
         to any FastMCP server you create.
 
+        Session config is parsed from URL parameters and validated against the provided schema.
+        In practice, each session maintains consistent config throughout its lifecycle.
+
         Args:
             config_schema: Optional Pydantic model for session configuration.
-                          If None, the server function will receive an empty dict.
+                          Config parameters are received from URL query params on each request.
 
         Usage:
             # Server with configuration
             @smithery.server(config_schema=ConfigSchema)
-            def create_server(config: ConfigSchema):
+            def create_server():
                 server = FastMCP("My Server")
 
                 @server.tool()
-                def my_tool(ctx, arg: str) -> str:
+                def my_tool(arg: str, ctx: Context) -> str:
                     # Access session-specific config through context
                     session_config = ctx.session_config
                     return f"Hello {arg} with token {session_config.access_token}"
@@ -52,29 +55,26 @@ class SmitheryDecorators:
 
             # Server without configuration
             @smithery.server()
-            def create_server(config):
+            def create_server():
                 server = FastMCP("My Server")
 
                 @server.tool()
-                def my_tool(ctx, arg: str) -> str:
+                def my_tool(arg: str, ctx: Context) -> str:
                     # ctx.session_config will be an empty dict {}
                     return f"Hello {arg}"
 
                 return server
 
-        Your function receives the validated config and should return a FastMCP instance.
-        Tools access session-specific config via ctx.session_config.
+        Your function creates and returns a FastMCP instance.
+        Tools access session-scoped config via ctx.session_config (parsed from URL params).
+        Each session maintains its own config, enabling per-user/per-session customization.
         The decorator automatically enhances it for Smithery deployment.
         """
         def decorator(func: Callable) -> Callable:
             @wraps(func)
             def wrapper(config: Any) -> SmitheryFastMCP:
-                # If no config schema, pass empty dict to keep the interface consistent
-                if config_schema is None:
-                    config = {}
-
-                # Call user function - they create and configure their own FastMCP instance
-                fastmcp_instance = func(config)
+                # Call user function without config - they access it via ctx.session_config in tools
+                fastmcp_instance = func()
 
                 # Apply Smithery enhancements to their FastMCP server
                 return from_fastmcp(fastmcp_instance, config_schema=config_schema)

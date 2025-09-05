@@ -9,7 +9,7 @@ You might find this resources useful:
 https://github.com/modelcontextprotocol/python-sdk
 """
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, Field
 
 from smithery.decorators import smithery
@@ -25,7 +25,7 @@ class ConfigSchema(BaseModel):
 @smithery.server(config_schema=ConfigSchema)
 # For servers without configuration, simply use:
 # @smithery.server()
-def create_server(config):
+def create_server():
     """Create and configure the MCP server."""
 
     # Create your FastMCP server as usual
@@ -33,7 +33,7 @@ def create_server(config):
 
     # Add a tool
     @server.tool()
-    def hello(ctx, name: str) -> str:
+    def hello(name: str, ctx: Context) -> str:
         """Say hello to someone."""
         # Access session-specific config through context
         session_config = ctx.session_config
