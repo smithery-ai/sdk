@@ -9,11 +9,9 @@ You might find this resources useful:
 https://github.com/modelcontextprotocol/python-sdk
 """
 
-from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
-from smithery import from_fastmcp
-from smithery.server.fastmcp_patch import SmitheryFastMCP
+from smithery import smithery
 
 
 # Optional: If you want to receive session-level config from user, define it here
@@ -22,13 +20,9 @@ class ConfigSchema(BaseModel):
     capitalize: bool = Field(True, description="Whether to capitalize the greeting")
 
 
-def create_server(config: ConfigSchema) -> SmitheryFastMCP:
+@smithery(config_schema=ConfigSchema, name="Say Hello")
+def create_server(server, config: ConfigSchema):
     """Create and configure the MCP server."""
-
-    server = from_fastmcp(
-        FastMCP(name="Say Hello"),
-        config_schema=ConfigSchema,
-    )
 
     # Add a tool
     @server.tool()
@@ -69,7 +63,3 @@ def create_server(config: ConfigSchema) -> SmitheryFastMCP:
         ]
 
     return server
-
-
-# Export for Smithery build system
-config_schema = ConfigSchema

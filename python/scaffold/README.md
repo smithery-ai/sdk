@@ -4,7 +4,6 @@ An MCP server built with Smithery.
 
 ## Prerequisites
 
-- **uv**: Install from [uv.dev](https://docs.astral.sh/uv/getting-started/installation/)
 - **Smithery API key**: Get yours at [smithery.ai/account/api-keys](https://smithery.ai/account/api-keys)
 
 ## Getting Started
