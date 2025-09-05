@@ -163,20 +163,20 @@ def run_server(server_ref: str, transport: str = "shttp", port: int = 8081, host
 
 
 def main() -> None:
-    """CLI entry point for run command."""
+    """CLI entry point for dev command."""
 
     import typer
 
     app = typer.Typer()
 
     @app.command()
-    def run_cmd(
+    def dev_cmd(
         server_ref: str | None = typer.Argument(None, help="Server reference (module:function)"),
         transport: str = typer.Option("shttp", help="Transport type (shttp or stdio)"),
         port: int = typer.Option(8081, help="Port to run on (shttp only)"),
         host: str = typer.Option("127.0.0.1", help="Host to bind to (shttp only)")
     ):
-        """Run Smithery MCP servers directly (like uvicorn)."""
+        """Run Smithery MCP servers in development mode (like uvicorn)."""
         # Get server reference from config if not provided explicitly
         server_reference = server_ref or get_server_ref_from_config()
         run_server(server_reference, transport, port, host)

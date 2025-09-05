@@ -11,8 +11,8 @@ import typer
 from .. import __version__
 from ..utils.console import console
 from ..utils.project import get_server_ref_from_config
+from .dev import run_server
 from .init import create_project
-from .run import run_server
 
 # Create the main Typer app
 app = typer.Typer(
@@ -60,7 +60,7 @@ def init(
 
 
 @app.command()
-def run(
+def dev(
     server_function: str | None = typer.Argument(
         None, help="Server function (e.g., src.server:create_server)"
     ),
@@ -70,7 +70,7 @@ def run(
     port: int = typer.Option(8081, "--port", help="Port to run on (shttp only)"),
     host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to (shttp only)"),
 ):
-    """Run [blue]MCP server[/blue]."""
+    """Run [blue]MCP server[/blue] in development mode."""
     try:
         # Get server reference from config if not provided
         server_ref = server_function or get_server_ref_from_config()
@@ -90,7 +90,7 @@ def playground(
     ),
     port: int = typer.Option(8081, "--port", help="Port to run on"),
 ):
-    """Run server and connect [yellow]Smithery CLI client[/yellow] for testing."""
+    """Run server and connect [yellow]Smithery Playground[/yellow] for testing."""
     try:
         # Import here to avoid circular imports
         import sys
