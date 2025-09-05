@@ -13,12 +13,12 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "mcp[cli]>=1.13.1",
-    "smithery>=0.1.20",
+    "smithery>=0.1.21",
 ]
 
 [project.scripts]
 # Run the MCP server in development mode
-dev = "smithery.cli.run:main"
+dev = "smithery.cli.dev:main"
 # Run server with interactive testing playground
 playground = "smithery.cli.playground:main"
 

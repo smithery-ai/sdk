@@ -10,7 +10,7 @@ import threading
 import time
 
 from ..utils.console import console
-from .run import run_server
+from .dev import run_server
 
 
 def main() -> None:
