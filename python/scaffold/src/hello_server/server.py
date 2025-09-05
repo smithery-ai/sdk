@@ -10,6 +10,7 @@ https://github.com/modelcontextprotocol/python-sdk
 """
 
 from pydantic import BaseModel, Field
+from mcp.server.fastmcp import FastMCP
 
 from smithery.decorators import smithery
 
@@ -20,17 +21,17 @@ class ConfigSchema(BaseModel):
     capitalize: bool = Field(True, description="Whether to capitalize the greeting")
 
 
-@smithery(config_schema=ConfigSchema, name="Say Hello")
-def create_server(server, config: ConfigSchema):
+@smithery(config_schema=ConfigSchema)
+def create_server(config: ConfigSchema):
     """Create and configure the MCP server."""
+    
+    # Create your FastMCP server as usual
+    server = FastMCP("Say Hello")
 
     # Add a tool
     @server.tool()
     def hello(name: str) -> str:
         """Say hello to someone."""
-        ctx = server.get_context()
-        config = ctx.session_config  # Returns validated ConfigSchema instance
-
         # Verify access token is provided (it's required, so should always be present)
         if not config.access_token:
             return "Error: Access token required"
