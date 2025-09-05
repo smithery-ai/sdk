@@ -16,11 +16,11 @@ from .server.fastmcp_patch import SmitheryFastMCP, from_fastmcp
 class SmitheryDecorators:
     """
     Smithery decorator namespace for extensible server creation.
-    
+
     Provides decorators like @smithery.server() for different aspects
     of MCP server creation and deployment.
     """
-    
+
     @staticmethod
     def server(
         *,
@@ -41,25 +41,25 @@ class SmitheryDecorators:
             @smithery.server(config_schema=ConfigSchema)
             def create_server(config: ConfigSchema):
                 server = FastMCP("My Server")
-                
+
                 @server.tool()
                 def my_tool(ctx, arg: str) -> str:
                     # Access session-specific config through context
                     session_config = ctx.session_config
                     return f"Hello {arg} with token {session_config.access_token}"
-                
+
                 return server
 
-            # Server without configuration  
+            # Server without configuration
             @smithery.server()
             def create_server(config):
                 server = FastMCP("My Server")
-                
+
                 @server.tool()
                 def my_tool(ctx, arg: str) -> str:
                     # ctx.session_config will be an empty dict {}
                     return f"Hello {arg}"
-                
+
                 return server
 
         Your function receives the validated config and should return a FastMCP instance.
@@ -72,7 +72,7 @@ class SmitheryDecorators:
                 # If no config schema, pass empty dict to keep the interface consistent
                 if config_schema is None:
                     config = {}
-                
+
                 # Call user function - they create and configure their own FastMCP instance
                 fastmcp_instance = func(config)
 

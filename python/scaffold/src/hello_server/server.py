@@ -25,7 +25,7 @@ class ConfigSchema(BaseModel):
 @smithery.server(config_schema=ConfigSchema)
 # For servers without configuration, simply use:
 # @smithery.server()
-def create_server(config: ConfigSchema):
+def create_server(config):
     """Create and configure the MCP server."""
 
     # Create your FastMCP server as usual
@@ -37,8 +37,8 @@ def create_server(config: ConfigSchema):
         """Say hello to someone."""
         # Access session-specific config through context
         session_config = ctx.session_config
-        
-        # In real apps, use token for API requests: 
+
+        # In real apps, use token for API requests:
         # requests.get(url, headers={"Authorization": f"Bearer {session_config.access_token}"})
         # For now, we'll just make sure it exists
         if not session_config.access_token:
