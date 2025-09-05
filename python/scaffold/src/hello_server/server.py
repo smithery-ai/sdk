@@ -11,7 +11,7 @@ https://github.com/modelcontextprotocol/python-sdk
 
 from pydantic import BaseModel, Field
 
-from smithery import smithery
+from smithery.decorators import smithery
 
 
 # Optional: If you want to receive session-level config from user, define it here
