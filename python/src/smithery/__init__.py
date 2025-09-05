@@ -2,10 +2,10 @@
 Smithery Python SDK and CLI
 """
 
+from .decorators import smithery
 from .server.fastmcp_patch import (
     from_fastmcp,
 )
-from .decorators import smithery
 from .utils.url import create_smithery_url
 
 __version__ = "0.1.20"

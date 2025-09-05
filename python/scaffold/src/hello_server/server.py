@@ -9,8 +9,8 @@ You might find this resources useful:
 https://github.com/modelcontextprotocol/python-sdk
 """
 
-from pydantic import BaseModel, Field
 from mcp.server.fastmcp import FastMCP
+from pydantic import BaseModel, Field
 
 from smithery.decorators import smithery
 
@@ -24,7 +24,7 @@ class ConfigSchema(BaseModel):
 @smithery(config_schema=ConfigSchema)
 def create_server(config: ConfigSchema):
     """Create and configure the MCP server."""
-    
+
     # Create your FastMCP server as usual
     server = FastMCP("Say Hello")
 
