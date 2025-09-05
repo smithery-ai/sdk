@@ -12,8 +12,7 @@ https://github.com/modelcontextprotocol/python-sdk
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
-from smithery import from_fastmcp
-from smithery.server.fastmcp_patch import SmitheryFastMCP
+from smithery.decorators import smithery
 
 
 # Optional: If you want to receive session-level config from user, define it here
@@ -22,21 +21,17 @@ class ConfigSchema(BaseModel):
     capitalize: bool = Field(True, description="Whether to capitalize the greeting")
 
 
-def create_server(config: ConfigSchema) -> SmitheryFastMCP:
+@smithery(config_schema=ConfigSchema)
+def create_server(config: ConfigSchema):
     """Create and configure the MCP server."""
 
-    server = from_fastmcp(
-        FastMCP(name="Say Hello"),
-        config_schema=ConfigSchema,
-    )
+    # Create your FastMCP server as usual
+    server = FastMCP("Say Hello")
 
     # Add a tool
     @server.tool()
     def hello(name: str) -> str:
         """Say hello to someone."""
-        ctx = server.get_context()
-        config = ctx.session_config  # Returns validated ConfigSchema instance
-
         # Verify access token is provided (it's required, so should always be present)
         if not config.access_token:
             return "Error: Access token required"
@@ -69,8 +64,3 @@ def create_server(config: ConfigSchema) -> SmitheryFastMCP:
         ]
 
     return server
-
-
-# Export for Smithery build system
-default = create_server
-config_schema = ConfigSchema
