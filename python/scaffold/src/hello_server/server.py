@@ -72,5 +72,4 @@ def create_server(config: ConfigSchema) -> SmitheryFastMCP:
 
 
 # Export for Smithery build system
-default = create_server
 config_schema = ConfigSchema

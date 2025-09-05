@@ -14,16 +14,14 @@ An MCP server built with Smithery.
    uvx smithery run
    ```
 
-3. Build a standalone server:
+3. Test interactively:
+
    ```bash
-   uvx smithery build
+   uv run playground
    ```
-
-## Development
-
-Your server code is in `src/hello_server/server.py`. Add your tools and resources there.
-
-## Testing
 
 Try saying "Say hello to John" to test the example tool.
 
+## Development
+
+Your server code is in `src/hello_server/server.py`. Add or update your server capabilities there.
