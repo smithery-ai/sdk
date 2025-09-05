@@ -9,7 +9,7 @@ You might find this resources useful:
 https://github.com/modelcontextprotocol/python-sdk
 """
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, Field
 
 from smithery.decorators import smithery
@@ -18,11 +18,14 @@ from smithery.decorators import smithery
 # Optional: If you want to receive session-level config from user, define it here
 class ConfigSchema(BaseModel):
     access_token: str = Field(..., description="Your access token for authentication")
-    capitalize: bool = Field(True, description="Whether to capitalize the greeting")
+    pirate_mode: bool = Field(False, description="Speak like a pirate")
 
 
-@smithery(config_schema=ConfigSchema)
-def create_server(config: ConfigSchema):
+# For servers with configuration:
+@smithery.server(config_schema=ConfigSchema)
+# For servers without configuration, simply use:
+# @smithery.server()
+def create_server():
     """Create and configure the MCP server."""
 
     # Create your FastMCP server as usual
@@ -30,17 +33,22 @@ def create_server(config: ConfigSchema):
 
     # Add a tool
     @server.tool()
-    def hello(name: str) -> str:
+    def hello(name: str, ctx: Context) -> str:
         """Say hello to someone."""
-        # Verify access token is provided (it's required, so should always be present)
-        if not config.access_token:
+        # Access session-specific config through context
+        session_config = ctx.session_config
+
+        # In real apps, use token for API requests:
+        # requests.get(url, headers={"Authorization": f"Bearer {session_config.access_token}"})
+        # For now, we'll just make sure it exists
+        if not session_config.access_token:
             return "Error: Access token required"
 
-        # Apply capitalization to the entire greeting based on config
-        base_greeting = f"Hello, {name}!"
-        greeting = base_greeting.upper() if config.capitalize else base_greeting.lower()
-
-        return greeting
+        # Create greeting based on pirate mode
+        if session_config.pirate_mode:
+            return f"Ahoy, {name}!"
+        else:
+            return f"Hello, {name}!"
 
     # Add a resource
     @server.resource("history://hello-world")
