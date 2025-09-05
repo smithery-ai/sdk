@@ -2,7 +2,6 @@
 Smithery Python SDK and CLI
 """
 
-from .decorators import smithery
 from .server.fastmcp_patch import (
     from_fastmcp,
 )
@@ -13,5 +12,4 @@ __version__ = "0.1.21"
 __all__ = [
     "create_smithery_url",
     "from_fastmcp",
-    "smithery",
 ]
