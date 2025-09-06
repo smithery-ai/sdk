@@ -72,7 +72,7 @@ class SmitheryDecorators:
         """
         def decorator(func: Callable) -> Callable:
             @wraps(func)
-            def wrapper(config: Any) -> SmitheryFastMCP:
+            def wrapper(config: Any = None) -> SmitheryFastMCP:
                 # Call user function without config - they access it via ctx.session_config in tools
                 fastmcp_instance = func()
 
