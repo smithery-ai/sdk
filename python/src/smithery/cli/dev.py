@@ -133,7 +133,14 @@ def import_server_module(server_ref: str) -> SmitheryModule:
         sys.exit(1)
 
 
-def create_and_run_server(server_module: SmitheryModule, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:
+def create_and_run_server(
+    server_module: SmitheryModule,
+    transport: str = "shttp",
+    port: int = 8081,
+    host: str = "127.0.0.1",
+    reload: bool = False,
+    server_ref: str | None = None,
+) -> None:
     """Server Creation & Execution
 
     Args: server_module from Stage 2, transport settings
@@ -167,13 +174,38 @@ def create_and_run_server(server_module: SmitheryModule, transport: str = "shttp
 
         # Configure and start server
         if transport == "shttp":
-            server.settings.port = port
-            server.settings.host = host
+            if reload:
+                try:
+                    import uvicorn  # type: ignore
+                except Exception:
+                    console.error("Reload requested but 'uvicorn' is not installed")
+                    console.nested("Install it in your project environment:")
+                    console.indented("uv add uvicorn  # or: pip install uvicorn")
+                    sys.exit(1)
 
-            console.info(f"Starting MCP server on {host}:{port}")
-            console.info("Transport: streamable HTTP", muted=True)
+                # Pass server ref for reloader to reconstruct the app in a fresh interpreter
+                if server_ref:
+                    os.environ["SMITHERY_SERVER_REF"] = server_ref
 
-            server.run(transport="streamable-http")
+                console.info(f"Starting MCP server with reload on {host}:{port}")
+                console.info("Transport: streamable HTTP (uvicorn --reload)", muted=True)
+
+                # Use import string + factory so uvicorn can reload cleanly
+                uvicorn.run(
+                    "smithery.cli.dev:get_reloader_streamable_http_app",
+                    host=host,
+                    port=port,
+                    reload=True,
+                    factory=True,
+                )
+            else:
+                server.settings.port = port
+                server.settings.host = host
+
+                console.info(f"Starting MCP server on {host}:{port}")
+                console.info("Transport: streamable HTTP", muted=True)
+
+                server.run(transport="streamable-http")
 
         elif transport == "stdio":
             console.info("Starting MCP server with stdio transport")
@@ -190,7 +222,7 @@ def create_and_run_server(server_module: SmitheryModule, transport: str = "shttp
         sys.exit(1)
 
 
-def run_server(server_ref: str | None = None, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1") -> None:
+def run_server(server_ref: str | None = None, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1", reload: bool = False) -> None:
     """Run Smithery MCP server using clean 3-stage approach."""
     console.rich_console.print(f"Starting [cyan]Python MCP server[/cyan] with [yellow]{transport}[/yellow] transport...")
 
@@ -205,7 +237,7 @@ def run_server(server_ref: str | None = None, transport: str = "shttp", port: in
         server_module = import_server_module(server_ref)
 
         # Stage 3: Server Creation & Execution
-        create_and_run_server(server_module, transport, port, host)
+        create_and_run_server(server_module, transport, port, host, reload, server_ref)
 
     except KeyboardInterrupt:
         console.info("\nServer stopped by user")
@@ -224,14 +256,38 @@ def main() -> None:
         server_ref: str | None = typer.Argument(None, help="Server reference (module:function)"),
         transport: str = typer.Option("shttp", help="Transport type (shttp or stdio)"),
         port: int = typer.Option(8081, help="Port to run on (shttp only)"),
-        host: str = typer.Option("127.0.0.1", help="Host to bind to (shttp only)")
+        host: str = typer.Option("127.0.0.1", help="Host to bind to (shttp only)"),
+        reload: bool = typer.Option(False, "--reload", help="Enable auto-reload (shttp only, requires uvicorn)")
     ):
         """Run Smithery MCP servers in development mode (like uvicorn)."""
-        # Use provided server reference or let run_server handle validation
-        run_server(server_ref, transport, port, host)
+        if reload and transport != "shttp":
+            console.warning("--reload is only supported with 'shttp' transport; ignoring for stdio")
+        if reload and transport == "shttp":
+            console.warning(
+                "Hot reload resets in-memory server state; stateful clients may need to reinitialize their session after a reload."
+            )
+        run_server(server_ref, transport, port, host, reload)
 
     app()
 
 
 if __name__ == "__main__":
     main()
+
+# Factory used by uvicorn --reload (import-string target)
+def get_reloader_streamable_http_app():
+    """Return a fresh ASGI app for streamable HTTP using env SMITHERY_SERVER_REF.
+
+    This function is imported by Uvicorn in a fresh interpreter on reload.
+    It reconstructs the server from the configured server reference and returns
+    a new ASGI application callable.
+    """
+    server_ref = os.environ.get("SMITHERY_SERVER_REF")
+    if not server_ref:
+        raise RuntimeError("SMITHERY_SERVER_REF not set for reloader")
+
+    # Resolve and import
+    server_module = import_server_module(server_ref)
+    create_server = server_module['create_server']
+    server = create_server()
+    return server.streamable_http_app()
