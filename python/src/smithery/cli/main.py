@@ -43,26 +43,6 @@ def main(
 
 
 @app.command()
-def start(
-    server_function: str | None = typer.Argument(
-        None, help="Server function (e.g., src.server:create_server)"
-    ),
-    transport: str = typer.Option(
-        "shttp", "--transport", help="Transport type (shttp or stdio)"
-    ),
-    port: int = typer.Option(8081, "--port", help="Port to run on (shttp only)"),
-    host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to (shttp only)"),
-):
-    """Start server in production mode (no dev reload)."""
-    try:
-        server_ref = server_function or get_server_ref_from_config()
-        run_server(server_ref, transport, port, host, reload=False)
-    except KeyboardInterrupt:
-        console.info("Server stopped by user")
-        sys.exit(0)
-    except Exception as e:
-        console.error(f"Failed to start server: {e}")
-        sys.exit(1)
 def init(
     project_name: str | None = typer.Argument(
         None, help="Name of the project to initialize"
