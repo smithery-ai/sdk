@@ -17,7 +17,7 @@ from smithery.decorators import smithery
 
 # Optional: If you want to receive session-level config from user, define it here
 class ConfigSchema(BaseModel):
-    access_token: str = Field(..., description="Your access token for authentication")
+    # access_token: str = Field(..., description="Your access token for authentication")
     pirate_mode: bool = Field(False, description="Speak like a pirate")
 
 
@@ -40,9 +40,8 @@ def create_server():
 
         # In real apps, use token for API requests:
         # requests.get(url, headers={"Authorization": f"Bearer {session_config.access_token}"})
-        # For now, we'll just make sure it exists
-        if not session_config.access_token:
-            return "Error: Access token required"
+        # if not session_config.access_token:
+        #     return "Error: Access token required"
 
         # Create greeting based on pirate mode
         if session_config.pirate_mode:
