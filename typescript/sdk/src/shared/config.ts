@@ -79,37 +79,6 @@ export function createSmitheryUrl(
 }
 
 /**
- * General-purpose parser for config from key-value entries (e.g., URLSearchParams.entries()).
- * Reserved keys (api_key, profile, config) are ignored.
- */
-export function parseConfigFromEntries(
-	entries: Iterable<[string, unknown]>,
-): Record<string, unknown> {
-	const parsed: Record<string, unknown> = {}
-	for (const [key, raw] of entries) {
-		if (key === "api_key" || key === "profile" || key === "config") continue
-		const rawValue = Array.isArray(raw) ? raw[0] : raw
-		if (typeof rawValue !== "string") continue
-		let castValue: unknown = rawValue
-		try {
-			castValue = JSON.parse(rawValue)
-		} catch {}
-		_.set(parsed, key.split("."), castValue)
-	}
-	return parsed
-}
-
-/**
- * Parses the config from an Express request using dot-notation parameters.
- * Reserved keys (api_key, profile, config) are ignored.
- */
-export function parseExpressRequestConfig(
-	req: ExpressRequest,
-): Record<string, unknown> {
-	return parseConfigFromEntries(Object.entries(req.query))
-}
-
-/**
  * Parses and validates config from an Express request with optional Zod schema validation
  * Supports dot-notation config parameters (e.g., foo=bar, a.b=c)
  * @param req The express request
@@ -120,32 +89,7 @@ export function parseAndValidateConfig<T = Record<string, unknown>>(
 	req: ExpressRequest,
 	schema?: z.ZodSchema<T>,
 ) {
-	// Parse config from request parameters
-	const config: Record<string, unknown> = {}
-
-	// Process dot-notation config parameters (foo=bar, a.b=c)
-	// This allows URL params like ?server.host=localhost&server.port=8080&debug=true
-	for (const [key, value] of Object.entries(req.query)) {
-		// Skip reserved parameters
-		if (key === "api_key" || key === "profile") continue
-
-		const pathParts = key.split(".")
-
-		// Handle array values from Express query parsing
-		const rawValue = Array.isArray(value) ? value[0] : value
-		if (typeof rawValue !== "string") continue
-
-		// Try to parse value as JSON (for booleans, numbers, objects)
-		let parsedValue: unknown = rawValue
-		try {
-			parsedValue = JSON.parse(rawValue)
-		} catch {
-			// If parsing fails, use the raw string value
-		}
-
-		// Use lodash's set method to handle nested paths
-		_.set(config, pathParts, parsedValue)
-	}
+	const config = parseConfigFromQuery(Object.entries(req.query))
 
 	// Validate config against schema if provided
 	if (schema) {
@@ -186,4 +130,32 @@ export function parseAndValidateConfig<T = Record<string, unknown>>(
 	}
 
 	return ok(config as T)
+}
+
+// Process dot-notation config parameters from query parameters (foo=bar, a.b=c)
+// This allows URL params like ?server.host=localhost&server.port=8080&debug=true
+export function parseConfigFromQuery(query: Iterable<[string, unknown]>) {
+	const config: Record<string, unknown> = {}
+	for (const [key, value] of query) {
+		// Skip reserved parameters
+		if (key === "api_key" || key === "profile") continue
+
+		const pathParts = key.split(".")
+
+		// Handle array values from Express query parsing
+		const rawValue = Array.isArray(value) ? value[0] : value
+		if (typeof rawValue !== "string") continue
+
+		// Try to parse value as JSON (for booleans, numbers, objects)
+		let parsedValue: unknown = rawValue
+		try {
+			parsedValue = JSON.parse(rawValue)
+		} catch {
+			// If parsing fails, use the raw string value
+		}
+
+		// Use lodash's set method to handle nested paths
+		_.set(config, pathParts, parsedValue)
+	}
+	return config
 }
