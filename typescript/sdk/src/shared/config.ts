@@ -13,11 +13,53 @@ export interface SmitheryUrlOptions {
 	config?: object
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+	return value !== null && typeof value === "object" && !Array.isArray(value)
+}
+
+function appendConfigAsDotParams(url: URL, config: unknown) {
+	function add(pathParts: string[], value: unknown) {
+		if (Array.isArray(value)) {
+			for (let index = 0; index < value.length; index++) {
+				add([...pathParts, String(index)], value[index])
+			}
+			return
+		}
+		if (isPlainObject(value)) {
+			for (const [key, nested] of Object.entries(value)) {
+				add([...pathParts, key], nested)
+			}
+			return
+		}
+
+		const key = pathParts.join(".")
+		let stringValue: string
+		switch (typeof value) {
+			case "string":
+				stringValue = value
+				break
+			case "number":
+			case "boolean":
+				stringValue = String(value)
+				break
+			default:
+				stringValue = JSON.stringify(value)
+		}
+		url.searchParams.set(key, stringValue)
+	}
+
+	if (isPlainObject(config)) {
+		for (const [key, value] of Object.entries(config)) {
+			add([key], value)
+		}
+	}
+}
+
 /**
  * Creates a URL to connect to the Smithery MCP server.
  * @param baseUrl The base URL of the Smithery server
  * @param options Optional configuration object
- * @returns A URL object with properly encoded parameters. Example: https://server.smithery.ai/{namespace}/mcp?config=BASE64_ENCODED_CONFIG&api_key=API_KEY
+ * @returns A URL with config encoded using dot-notation query params (e.g. model.name=gpt-4&debug=true)
  */
 export function createSmitheryUrl(
 	baseUrl: string,
@@ -25,11 +67,7 @@ export function createSmitheryUrl(
 ) {
 	const url = new URL(`${baseUrl}/mcp`)
 	if (options?.config) {
-		const param =
-			typeof window !== "undefined"
-				? btoa(JSON.stringify(options.config))
-				: Buffer.from(JSON.stringify(options.config)).toString("base64")
-		url.searchParams.set("config", param)
+		appendConfigAsDotParams(url, options.config)
 	}
 	if (options?.apiKey) {
 		url.searchParams.set("api_key", options.apiKey)
@@ -41,21 +79,39 @@ export function createSmitheryUrl(
 }
 
 /**
- * Parses the config from an express request by checking the query parameter "config".
- * @param req The express request
- * @returns The config
+ * General-purpose parser for config from key-value entries (e.g., URLSearchParams.entries()).
+ * Reserved keys (api_key, profile, config) are ignored.
+ */
+export function parseConfigFromEntries(
+	entries: Iterable<[string, unknown]>,
+): Record<string, unknown> {
+	const parsed: Record<string, unknown> = {}
+	for (const [key, raw] of entries) {
+		if (key === "api_key" || key === "profile" || key === "config") continue
+		const rawValue = Array.isArray(raw) ? raw[0] : raw
+		if (typeof rawValue !== "string") continue
+		let castValue: unknown = rawValue
+		try {
+			castValue = JSON.parse(rawValue)
+		} catch {}
+		_.set(parsed, key.split("."), castValue)
+	}
+	return parsed
+}
+
+/**
+ * Parses the config from an Express request using dot-notation parameters.
+ * Reserved keys (api_key, profile, config) are ignored.
  */
 export function parseExpressRequestConfig(
 	req: ExpressRequest,
 ): Record<string, unknown> {
-	return JSON.parse(
-		Buffer.from(req.query.config as string, "base64").toString(),
-	)
+	return parseConfigFromEntries(Object.entries(req.query))
 }
 
 /**
  * Parses and validates config from an Express request with optional Zod schema validation
- * Supports both base64-encoded config and dot-notation config parameters
+ * Supports dot-notation config parameters (e.g., foo=bar, a.b=c)
  * @param req The express request
  * @param schema Optional Zod schema for validation
  * @returns Result with either parsed data or error response
@@ -65,27 +121,13 @@ export function parseAndValidateConfig<T = Record<string, unknown>>(
 	schema?: z.ZodSchema<T>,
 ) {
 	// Parse config from request parameters
-	let config: Record<string, unknown> = {}
+	const config: Record<string, unknown> = {}
 
-	// 1. Process base64-encoded config parameter if present
-	if (req.query.config) {
-		try {
-			config = parseExpressRequestConfig(req)
-		} catch (configError) {
-			return err({
-				title: "Invalid config parameter",
-				status: 400,
-				detail: "Failed to parse config parameter",
-				instance: req.originalUrl,
-			})
-		}
-	}
-
-	// 2. Process dot-notation config parameters (foo=bar, a.b=c)
+	// Process dot-notation config parameters (foo=bar, a.b=c)
 	// This allows URL params like ?server.host=localhost&server.port=8080&debug=true
 	for (const [key, value] of Object.entries(req.query)) {
 		// Skip reserved parameters
-		if (key === "config" || key === "api_key" || key === "profile") continue
+		if (key === "api_key" || key === "profile") continue
 
 		const pathParts = key.split(".")
 

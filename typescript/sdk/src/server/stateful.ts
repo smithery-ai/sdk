@@ -149,7 +149,6 @@ export function createStatefulServer<T = Record<string, unknown>>(
 			$id: `${req.protocol}://${req.get("host")}/.well-known/mcp-config`,
 			title: "MCP Session Configuration",
 			description: "Schema for the /mcp endpoint configuration",
-			"x-mcp-version": "1.0",
 			"x-query-style": "dot+bracket",
 			...baseSchema,
 		}

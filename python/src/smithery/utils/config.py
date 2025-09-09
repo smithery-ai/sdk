@@ -4,11 +4,9 @@ import json
 from typing import Any
 from urllib.parse import parse_qsl
 
-from .url import decode_config_from_base64
-
 
 def parse_config_from_query_string(query_string: str) -> dict[str, Any]:
-    """Parse config from query string. Supports base64 (?config=...) and dot notation (?key=value)."""
+    """Parse config from query string using dot notation (e.g., a.b=c&flag=true)."""
     if not query_string:
         return {}
 
@@ -16,15 +14,11 @@ def parse_config_from_query_string(query_string: str) -> dict[str, Any]:
     query_params = dict(parse_qsl(query_string))
     config: dict[str, Any] = {}
 
-    # 1. Process base64-encoded config parameter if present
-    if "config" in query_params:
-        config = decode_config_from_base64(query_params["config"])
-
-    # 2. Process dot-notation config parameters (foo=bar, a.b=c)
+    # Process dot-notation config parameters (foo=bar, a.b=c)
     # This allows URL params like ?server.host=localhost&server.port=8080&debug=true
     for key, value in query_params.items():
         # Skip reserved parameters
-        if key in ("config", "api_key", "profile"):
+        if key in ("api_key", "profile"):
             continue
 
         path_parts = key.split(".")

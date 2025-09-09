@@ -1,36 +1,54 @@
-import base64
 import json
 from typing import Any
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 
-def encode_config_to_base64(config: dict[str, Any]) -> str:
-    """Encode config dict to base64 JSON string."""
-    config_json = json.dumps(config)
-    return base64.b64encode(config_json.encode("utf-8")).decode("utf-8")
+def append_config_as_dot_params(
+    query_params: dict[str, list[str]], config: Any
+) -> None:
+    """Flatten config into dot-notation query parameters on query_params.
+
+    Arrays are indexed using numeric segments (e.g., arr.0=value).
+    Non-string primitives are JSON-encoded (true/false/null/numbers),
+    while strings are used as-is.
+    """
+
+    def add(path_parts: list[str], value: Any) -> None:
+        if isinstance(value, list):
+            for index, item in enumerate(value):
+                add([*path_parts, str(index)], item)
+            return
+        if isinstance(value, dict):
+            for key, nested in value.items():
+                add([*path_parts, str(key)], nested)
+            return
+
+        key = ".".join(path_parts)
+        if isinstance(value, str):
+            string_value = value
+        else:
+            # Use JSON to preserve booleans (true/false), null, and numbers
+            string_value = json.dumps(value)
+        query_params.setdefault(key, []).append(string_value)
+
+    if isinstance(config, dict):
+        for key, value in config.items():
+            add([str(key)], value)
 
 
-def decode_config_from_base64(config_b64: str) -> dict[str, Any]:
-    """Decode base64 JSON string to config dict. Raises ValueError on failure."""
-    try:
-        config_json = base64.b64decode(config_b64).decode("utf-8")
-        return json.loads(config_json)
-    except (ValueError, json.JSONDecodeError, UnicodeDecodeError) as e:
-        raise ValueError(f"Failed to decode config parameter: {e}") from e
+def create_smithery_url(base_url: str, config: dict[str, Any] | None = None, api_key: str | None = None) -> str:
+    """Create Smithery URL with config encoded using dot-notation parameters.
 
-
-def create_smithery_url(base_url, config=None, api_key=None):
-    """Create Smithery URL with optional base64 config and API key parameters."""
-    # Parse the URL
+    Example: https://host/namespace/mcp?model.name=gpt-4&debug=true
+    """
     parsed_url = urlparse(base_url)
 
     # Parse existing query parameters
     query_params = parse_qs(parsed_url.query)
 
-    # Add config if provided
+    # Add config if provided (as dot-notation params)
     if config is not None:
-        config_base64 = encode_config_to_base64(config)
-        query_params["config"] = [config_base64]
+        append_config_as_dot_params(query_params, config)
 
     # Add API key if provided
     if api_key:
