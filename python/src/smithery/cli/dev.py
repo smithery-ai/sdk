@@ -51,7 +51,7 @@ def validate_project_setup() -> str:
         console.indented('[cyan]server = "my_server.server:create_server"[/cyan]')
         sys.exit(1)
 
-    # 4. Get server reference
+    # Get server reference
     server_ref = smithery_config.get("server")
     if not server_ref:
         console.error("Missing 'server' in \\[tool.smithery] configuration")
@@ -60,7 +60,7 @@ def validate_project_setup() -> str:
         console.indented('[cyan]server = "my_server.server:create_server"[/cyan]')
         sys.exit(1)
 
-    # 5. Validate server reference format
+    # Validate server reference format
     if ":" not in server_ref:
         console.error(f"Invalid server reference format: '{server_ref}'")
         console.nested("Expected format: 'module.path:function_name'")

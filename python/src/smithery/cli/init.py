@@ -209,13 +209,45 @@ def initialize_git(project_name: str) -> None:
 
 def show_success_message(project_name: str) -> None:
     """Show success message with next steps."""
+    from rich.panel import Panel
+    from rich.text import Text
+    from rich.align import Align
+    
     console.success("Project initialized successfully!")
     console.plain("")
-    console.info("Next steps:")
-    console.rich_console.print(f"  [cyan]1.[/cyan] cd {project_name}")
-    console.rich_console.print("  [cyan]2.[/cyan] uv run dev          # Run the server")
-    console.rich_console.print("  [cyan]3.[/cyan] uv run playground   # Test interactively")
-    console.rich_console.print("  [cyan]4.[/cyan] Deploy at smithery.ai/new")
+    
+    # Create ASCII art title
+    try:
+        from art import text2art
+        ascii_title = text2art("Smithery", font="sub-zero")
+        
+        # Create welcome message content with ASCII art
+        welcome_text = Text()
+        welcome_text.append(ascii_title, style="bold blue")
+        welcome_text.append("\n* Welcome to your MCP server!\n\n", style="bold green")
+        welcome_text.append("To get started, run:\n\n", style="white")
+        welcome_text.append(f"cd {project_name} && uv run playground", style="bold orange3")
+        welcome_text.append("\n\nTry saying something like ", style="white")
+        welcome_text.append("'Say hello to John'", style="bold cyan")
+    except ImportError:
+        # Fallback if art library is not available
+        welcome_text = Text()
+        welcome_text.append("* Welcome to your MCP server!\n\n", style="bold green")
+        welcome_text.append("To get started, run:\n\n", style="white")
+        welcome_text.append(f"cd {project_name} && uv run playground", style="bold orange3")
+        welcome_text.append("\n\nTry saying something like ", style="white")
+        welcome_text.append("'Say hello to John'", style="bold cyan")
+    
+    # Create left-aligned panel
+    welcome_panel = Panel(
+        Align.left(welcome_text),
+        padding=(1, 2),
+        border_style="bright_blue",
+        title="[bold bright_blue]Smithery MCP Server[/bold bright_blue]",
+        title_align="left"
+    )
+    
+    console.rich_console.print(welcome_panel)
     console.plain("")
     muted("Your project is ready with git initialized and dependencies installed!")
 

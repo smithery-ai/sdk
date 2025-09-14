@@ -383,3 +383,9 @@ cat pyproject.toml | grep -A5 "tool.smithery"
 - **Python Quickstart**: [smithery.ai/docs/getting_started/quickstart_build_python.md](https://smithery.ai/docs/getting_started/quickstart_build_python.md)
 - **GitHub**: [github.com/smithery-ai/sdk](https://github.com/smithery-ai/sdk)
 - **Registry**: [smithery.ai](https://smithery.ai) for discovering and deploying MCP servers
+
+## Community & Support
+
+- **Discord**: Join our community for help and discussions: [discord.gg/Afd38S5p9A](https://discord.gg/Afd38S5p9A)
+- **Bug Reports**: Found an issue? Report it on GitHub: [github.com/smithery-ai/sdk/issues](https://github.com/smithery-ai/sdk/issues)
+- **Feature Requests**: Suggest new features on our GitHub discussions: [github.com/smithery-ai/sdk/discussions](https://github.com/smithery-ai/sdk/discussions)

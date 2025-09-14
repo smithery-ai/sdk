@@ -12,6 +12,7 @@ dependencies = [
     "mcp>=1.13.1",
     "toml>=0.10.2",
     "typer>=0.17.3",
+    "art>=6.3",
 ]
 authors = [{ name = "Smithery Team", email = "contact@smithery.ai" }]
 license = "MIT"
