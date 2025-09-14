@@ -34,18 +34,28 @@ def main() -> None:
 def start_playground(server_function: str | None, port: int) -> None:
     """Start the playground with given parameters."""
     from ..utils.project import get_server_ref_from_config
+    from .dev import find_available_port
 
     # Get server reference from config if not provided
     server_ref = server_function or get_server_ref_from_config()
 
-    console.info(f"Starting playground on port {port}...")
+    # Resolve port upfront - this ensures both server and client use the same port
+    try:
+        actual_port = find_available_port(port, "127.0.0.1")
+        if actual_port != port:
+            console.warning(f"Port {port} is in use, using port {actual_port} instead")
+    except RuntimeError as e:
+        console.error(f"Could not find an available port: {e}")
+        return
+
+    console.info(f"Starting playground on port {actual_port}...")
     console.info("This will run your MCP server and connect the Smithery CLI client")
     console.plain("")
 
-    # Start server in background thread
+    # Start server in background thread with the resolved port
     def start_server():
         try:
-            run_server(server_ref, "shttp", port, "127.0.0.1")
+            run_server(server_ref, "shttp", actual_port, "127.0.0.1")
         except Exception as e:
             console.error(f"Server failed: {e}")
 
@@ -56,11 +66,11 @@ def start_playground(server_function: str | None, port: int) -> None:
     console.info("Waiting for server to start...")
     time.sleep(2)
 
-    # Start Smithery CLI client
+    # Start Smithery CLI client with the same resolved port
     try:
-        console.info(f"Starting Smithery CLI client connected to port {port}")
+        console.info(f"Starting Smithery CLI client connected to port {actual_port}")
         subprocess.run([
-            "npx", "-y", "@smithery/cli", "playground", "--port", str(port)
+            "npx", "-y", "@smithery/cli", "playground", "--port", str(actual_port)
         ], check=True)
     except KeyboardInterrupt:
         console.info("Playground stopped by user")
