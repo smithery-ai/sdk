@@ -235,13 +235,13 @@ def create_and_run_server(
         console.error(f"Failed to create or start server: {e}")
         console.nested("Check your server function implementation")
         sys.exit(1)
-    
+
     return port  # Return the resolved port for shttp
 
 
 def run_server(server_ref: str | None = None, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1", reload: bool = False) -> int:
     """Run Smithery MCP server using clean 3-stage approach.
-    
+
     Returns:
         The actual port used by the server (may differ from requested port due to deconfliction)
     """
