@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from ..server.fastmcp_patch import SmitheryFastMCP
 from ..utils.console import console
+from ..utils.network import find_available_port
 
 
 def validate_project_setup() -> str:
@@ -22,14 +23,14 @@ def validate_project_setup() -> str:
     Returns: server_reference string (e.g., "my_server.server:create_server")
     Raises: SystemExit with clear error messages for each failure scenario
     """
-    # 1. Find project root and validate pyproject.toml exists
+    # Find project root and validate pyproject.toml exists
     if not os.path.exists("pyproject.toml"):
         console.error("No pyproject.toml found in current directory")
         console.nested("Make sure you're in a Python project directory")
         console.indented("Expected file: [cyan]pyproject.toml[/cyan]")
         sys.exit(1)
 
-    # 2. Read and parse pyproject.toml
+    # Read and parse pyproject.toml
     try:
         import tomllib
         with open("pyproject.toml", "rb") as f:
@@ -39,7 +40,7 @@ def validate_project_setup() -> str:
         console.nested("Ensure pyproject.toml is valid TOML format")
         sys.exit(1)
 
-    # 3. Extract [tool.smithery] section
+    # Extract [tool.smithery] section
     tool_config = pyproject.get("tool", {})
     smithery_config = tool_config.get("smithery", {})
 
@@ -140,7 +141,7 @@ def create_and_run_server(
     host: str = "127.0.0.1",
     reload: bool = False,
     server_ref: str | None = None,
-) -> None:
+) -> int:
     """Server Creation & Execution
 
     Args: server_module from Stage 2, transport settings
@@ -174,6 +175,19 @@ def create_and_run_server(
 
         # Configure and start server
         if transport == "shttp":
+            # Find an available port, starting with the requested port
+            console.info(f"Checking port availability for {host}:{port}", muted=True)
+            try:
+                actual_port = find_available_port(port, host)
+                if actual_port != port:
+                    console.warning(f"Port {port} is in use, using port {actual_port} instead")
+                    port = actual_port
+                else:
+                    console.info(f"Port {port} is available", muted=True)
+            except RuntimeError as e:
+                console.error(f"Could not find an available port: {e}")
+                sys.exit(1)
+
             if reload:
                 try:
                     import uvicorn  # type: ignore
@@ -210,6 +224,7 @@ def create_and_run_server(
         elif transport == "stdio":
             console.info("Starting MCP server with stdio transport")
             server.run(transport="stdio")
+            return 0  # stdio doesn't use ports
 
         else:
             console.error(f"Unsupported transport: {transport}")
@@ -220,24 +235,31 @@ def create_and_run_server(
         console.error(f"Failed to create or start server: {e}")
         console.nested("Check your server function implementation")
         sys.exit(1)
+    
+    return port  # Return the resolved port for shttp
 
 
-def run_server(server_ref: str | None = None, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1", reload: bool = False) -> None:
-    """Run Smithery MCP server using clean 3-stage approach."""
+def run_server(server_ref: str | None = None, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1", reload: bool = False) -> int:
+    """Run Smithery MCP server using clean 3-stage approach.
+    
+    Returns:
+        The actual port used by the server (may differ from requested port due to deconfliction)
+    """
     console.rich_console.print(f"Starting [cyan]Python MCP server[/cyan] with [yellow]{transport}[/yellow] transport...")
 
     try:
-        # Stage 1: Project Discovery & Validation
+        # Project Discovery & Validation
         if server_ref is None:
             server_ref = validate_project_setup()
         else:
             console.info(f"Using provided server reference: {server_ref}")
 
-        # Stage 2: Module Resolution & Import
+        # Module Resolution & Import
         server_module = import_server_module(server_ref)
 
-        # Stage 3: Server Creation & Execution
-        create_and_run_server(server_module, transport, port, host, reload, server_ref)
+        # Server Creation & Execution
+        actual_port = create_and_run_server(server_module, transport, port, host, reload, server_ref)
+        return actual_port
 
     except KeyboardInterrupt:
         console.info("\nServer stopped by user")
