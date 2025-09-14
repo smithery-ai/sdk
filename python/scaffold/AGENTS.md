@@ -128,13 +128,13 @@ Let's say you're building a weather server. You might want users to customize th
 
 ```python
 class WeatherConfig(BaseModel):
-    api_key: str = Field(..., description="Your OpenWeatherMap API key")
+    weather_api_key: str = Field(..., description="Your OpenWeatherMap API key")  # Note: 'api_key' is reserved
     temperature_unit: str = Field("celsius", description="Temperature unit (celsius/fahrenheit)")
     default_location: str = Field("New York", description="Default city for weather queries")
 
 @smithery.server(config_schema=WeatherConfig)
 def create_weather_server():
-    # Your weather tools use ctx.session_config.api_key, ctx.session_config.temperature_unit, etc.
+    # Your weather tools use ctx.session_config.weather_api_key, ctx.session_config.temperature_unit, etc.
 ```
 
 **Usage scenarios:**
@@ -168,7 +168,7 @@ def my_tool(name: str, ctx: Context) -> str:
 ```python
 class ConfigSchema(BaseModel):
     # Required field - users must provide this
-    api_key: str = Field(..., description="Your API key")
+    user_api_key: str = Field(..., description="Your API key")  # Note: avoid 'api_key' (reserved)
     
     # Optional fields with defaults - users can customize or use defaults
     debug: bool = Field(False, description="Debug mode")
@@ -182,6 +182,8 @@ def create_server():
     # Your server setup
 ```
 
+**Important:** Avoid using reserved parameter names (`api_key`, `profile`, `config`) in your schema fields. These are handled internally by Smithery.
+
 **Field Types:**
 - **Required**: Use `Field(...)` - users must provide a value
 - **Optional with default**: Use `Field(default_value)` - users can customize or use the default
@@ -189,12 +191,20 @@ def create_server():
 
 2. **Pass config via URL parameters**:
 ```
-http://localhost:8000/mcp?api_key=xyz123&debug=true
+http://localhost:8000/mcp?user_api_key=xyz123&debug=true
 ```
 
+**Reserved Parameters:**
+The following parameter names are reserved and cannot be used in your configuration schema:
+- `api_key` - Reserved for API key handling
+- `profile` - Reserved for profile management  
+- `config` - Reserved for internal configuration handling
+
+Use alternative names for your configuration fields (e.g., `user_api_key`, `service_profile`, `app_config`).
+
 3. **Each session gets isolated config**:
-- Session A: `debug=true, api_key=xyz123`
-- Session B: `debug=false, api_key=abc456`
+- Session A: `debug=true, user_api_key=xyz123`
+- Session B: `debug=false, user_api_key=abc456`
 - Sessions don't interfere with each other
 
 ### Why This Matters
