@@ -18,7 +18,7 @@
 	"license": "ISC",
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.3",
-		"@smithery/cli": "^1.2.4",
+		"@smithery/cli": "^1.2.31",
 		"@types/inquirer": "^9.0.8",
 		"@types/node": "^22.15.29",
 		"shx": "^0.4.0",
