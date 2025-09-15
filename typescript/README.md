@@ -1,4 +1,29 @@
-There are two packages available for TypeScript:
+# Smithery TypeScript SDKs
 
-registry - The Registry API as a TypeScript SDK
-sdk - A library with utilities to help developers use and build MCP servers
+This directory contains three TypeScript packages for building and managing MCP servers with Smithery:
+
+## Packages
+
+### [`registry/`](./registry/)
+The **Registry SDK** - A TypeScript client for interacting with the Smithery Registry API.
+
+### [`sdk/`](./sdk/)
+The **Smithery SDK** - A library with utilities to help developers build and use MCP servers.
+
+### [`create/`](./create/)
+**Scaffold** - CLI for bootstrapping new MCP server projects.
+- Published as [`create-smithery`](https://www.npmjs.com/package/create-smithery) on npm
+- Usage: `npm create smithery `
+
+## Quick Start
+
+```bash
+# Create a new MCP server project
+npm create smithery
+
+# Install the SDK in an existing project
+npm install @smithery/sdk
+
+# Install the Registry API client
+npm install @smithery/registry
+```
