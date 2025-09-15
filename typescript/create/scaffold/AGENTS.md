@@ -2,7 +2,7 @@
 
 Welcome to the **Smithery TypeScript MCP Server Scaffold**!
 
-This is the template project that gets cloned when you run `npx create-smithery`. It provides everything you need to build, test, and deploy a Model Context Protocol (MCP) server with Smithery.
+This is the template project that gets cloned when you run `npm create smithery`. It provides everything you need to build, test, and deploy a Model Context Protocol (MCP) server with Smithery.
 
 ## What's Included
 
@@ -12,7 +12,7 @@ This is the template project that gets cloned when you run `npx create-smithery`
 - **Example Prompt** (`greet` prompt for generating greeting messages)
 - **Development Workflow** (`npm run dev` for local testing with hot reload)
 - **Deployment Ready** configuration for the Smithery platform
-- **Session Management** via `createStatefulServer` or `createStatelessServer` with optional config schemas
+- **Session Management** with optional configuration schemas
 
 ## Quick Start Commands
 
@@ -175,7 +175,6 @@ export const configSchema = z.object({
   weatherApiKey: z.string().describe("Your OpenWeatherMap API key"),
   temperatureUnit: z.enum(["celsius", "fahrenheit"]).default("celsius").describe("Temperature unit"),
   defaultLocation: z.string().default("New York").describe("Default city for weather queries"),
-  debug: z.boolean().default(false).describe("Enable debug logging"),
 })
 
 export default function createServer({
@@ -268,35 +267,16 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 - Session B: `debug=false, userApiKey=abc456`
 - Sessions don't interfere with each other
 
-### Stateful vs Stateless Servers
+### Server Configuration
 
-The TypeScript SDK provides two server patterns:
-
-#### Stateless Servers (Recommended for most use cases)
-Each request creates a new server instance - no session state is maintained:
+The server can be configured as stateless or stateful by exporting a `stateless` boolean:
 
 ```typescript
-import { createStatelessServer } from '@smithery/sdk/server/stateless.js'
+// For stateless servers (recommended for most use cases)
+export const stateless = true
 
-// Your server creation function
-function createMcpServer({ config }) {
-  // Create and return a server instance
-  const server = new McpServer({
-    name: "My App",
-    version: "1.0.0"
-  })
-  
-  // Add tools, resources, prompts...
-  
-  return server.server
-}
-
-// Create the stateless server
-createStatelessServer(createMcpServer, {
-  schema: configSchema, // Optional Zod schema for config validation
-})
-  .app
-  .listen(process.env.PORT || 3000)
+// For stateful servers (when you need persistent state between calls)  
+export const stateless = false
 ```
 
 **Use stateless servers for:**
@@ -305,45 +285,10 @@ createStatelessServer(createMcpServer, {
 - File operations
 - Most MCP servers
 
-#### Stateful Servers (For persistent state)
-Maintains state between calls within a session:
-
-```typescript
-import { createStatefulServer } from '@smithery/sdk/server/stateful.js'
-
-// Your server creation function
-function createMcpServer({ sessionId, config }) {
-  // sessionId allows you to maintain state per session
-  const server = new McpServer({
-    name: "My Stateful App",
-    version: "1.0.0"
-  })
-  
-  // You can store session-specific state here
-  const sessionState = new Map()
-  
-  return server.server
-}
-
-// Create the stateful server
-createStatefulServer(createMcpServer, {
-  schema: configSchema, // Optional Zod schema for config validation
-})
-  .app
-  .listen(process.env.PORT || 3000)
-```
-
 **Use stateful servers for:**
 - Chat conversations that need memory
 - Multi-step workflows
-- Game servers
 - Any scenario requiring persistent state
-
-### Why This Matters
-
-- **Multi-user support**: Different users can have different API keys/settings
-- **Environment isolation**: Dev/staging/prod configs per session
-- **Security**: API keys stay session-scoped, not server-global
 
 ### Secure Config Distribution (Production)
 
@@ -383,10 +328,10 @@ npm run dev               # Runs on port 3000 by default
 ```
 
 **Complete MCP Testing Workflow:**
-1. Start server: `npm run dev` (runs on port 3000 by default)
+1. Start server: `npm run dev -- --port 8081` (or use default port 3000)
 2. Initialize with config (always include config params): 
 ```bash
-curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
+curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
@@ -394,14 +339,14 @@ curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
 3. Get session ID from server response or logs (if using stateful server)
 4. Send notifications/initialized:
 ```bash
-curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
+curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
 ```
 5. Test the hello tool with debug mode:
 ```bash
-curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
+curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"hello","arguments":{"name":"World"}}}'
@@ -418,11 +363,11 @@ Expected response: `"Hello, World!"` (with debug=false) or enhanced debug output
     "build": "npx @smithery/cli build"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
-    "zod": "^3.25.46"
+    "@modelcontextprotocol/sdk": "^1.x.x",
+    "zod": "^3.x.x"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.2.4"
+    "@smithery/cli": "^1.x.x"
   }
 }
 ```
@@ -438,8 +383,14 @@ runtime: typescript
 ```bash
 # TypeScript server deployment prep
 npm run build             # Creates build artifacts
+
+# Connect to your GitHub repository (first time only)
+git remote add origin https://github.com/yourusername/your-repo.git
+git branch -M main
+
+# Deploy
 git add . && git commit -m "Deploy ready"
-git push origin main
+git push -u origin main
 ```
 
 ### Production Deployment
