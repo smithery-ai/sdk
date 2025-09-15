@@ -17,7 +17,7 @@ This is the template project that gets cloned when you run `npm create smithery`
 ## Quick Start Commands
 
 ```bash
-# Run development server (streamable HTTP on port 3000)
+# Run development server (streamable HTTP on port 8081)
 npm run dev
 
 # Build for production
@@ -259,7 +259,7 @@ export const configSchema = z.object({
 
 2. **Pass config via URL parameters**:
 ```
-http://localhost:3000/mcp?userApiKey=xyz123&debug=true
+http://localhost:8081/mcp?userApiKey=xyz123&debug=true
 ```
 
 3. **Each session gets isolated config**:
@@ -324,11 +324,11 @@ This starts your server locally with hot reload. Perfect for development and tes
 #### Method 2: Direct MCP Protocol Testing
 ```bash
 # Start server
-npm run dev               # Runs on port 3000 by default
+npm run dev               # Runs on port 8081 by default
 ```
 
 **Complete MCP Testing Workflow:**
-1. Start server: `npm run dev -- --port 8081` (or use default port 3000)
+1. Start server: `npm run dev` (runs on default port 8081)
 2. Initialize with config (always include config params): 
 ```bash
 curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
@@ -419,7 +419,7 @@ Before deploying, ensure your server works locally:
 
 ### 1. Basic Server Test
 ```bash
-# This should start your server on localhost:3000
+# This should start your server on localhost:8081
 npm run dev
 ```
 
@@ -447,9 +447,9 @@ node -e "import('./src/index.ts').then(m => console.log(m.configSchema.parse({ d
 ## Troubleshooting
 
 ### Port Issues
-- Default port is **3000**
-- Change with: `PORT=8000 npm run dev`
-- Kill existing process: `lsof -ti:3000 | xargs kill`
+- Default port is **8081**
+- Change with: `npx @smithery/cli dev --port 8000`
+- Kill existing process: `lsof -ti:8081 | xargs kill`
 
 ### Config Issues
 ```bash
