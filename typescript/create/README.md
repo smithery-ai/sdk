@@ -1,4 +1,4 @@
-# create-smithery
+# create-smithery 
 
 The official CLI to get started with [Smithery](https://www.smithery.ai/).
 
