@@ -1,6 +1,6 @@
 {
 	"name": "create-smithery",
-	"version": "1.0.9",
+	"version": "1.0.10",
 	"description": "The CLI for creating MCP servers with Smithery",
 	"main": "dist/index.js",
 	"bin": {
