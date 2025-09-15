@@ -1,0 +1,11 @@
+node_modules
+dist
+my-app
+scaffold/package-lock.json
+
+# Secure Project - node patterns
+.env*
+.DS_Store
+npm-debug.log*
+build/
+*.log
