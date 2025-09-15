@@ -1,12 +1,7 @@
 name: Publish create-smithery to npm
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'typescript/create/**'
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:  # Allows manual triggering only
 
 permissions:
   contents: write
