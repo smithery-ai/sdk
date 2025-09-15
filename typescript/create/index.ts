@@ -66,27 +66,16 @@ async function load<T>(
 
 	const result = await command()
 	clearInterval(loadingInterval)
-	process.stdout.write(`\r\x1b[K[\u2713] ${endMsg}\n`)
+	process.stdout.write(`\r\x1b[K[${chalk.green("✓")}] ${endMsg}\n`)
 	return result
 }
 
 await load("Cloning scaffold from GitHub...", "Scaffold cloned", async () => {
-	// Clone the scaffold and only keep the scaffold directory
-	await $`git clone https://github.com/smithery-ai/sdk.git ${projectName}`
-	const files = await $`shx ls -al ${projectName}`
-	for (const file of files.stdout.split("\n")) {
-		const fileName = file.split(" ").pop()
-		if (
-			fileName &&
-			fileName !== "typescript" &&
-			fileName !== "." &&
-			fileName !== ".."
-		) {
-			await $`shx rm -rf ${projectName}/${fileName}`
-		}
-	}
-	await $`shx cp -r ${projectName}/typescript/create/scaffold/. ${projectName}/`
-	await $`shx rm -rf ${projectName}/typescript`
+	// Clone the SDK repo with shallow clone (--depth 1) to temp directory
+	await $`git clone --depth 1 https://github.com/smithery-ai/sdk.git ${projectName}_temp`
+	await $`shx mkdir -p ${projectName}`
+	await $`shx cp -r ${projectName}_temp/typescript/create/scaffold/. ${projectName}/`
+	await $`shx rm -rf ${projectName}_temp`
 })
 
 await load("Navigating to project...", "Project navigated", async () => {
@@ -99,6 +88,10 @@ await $`shx rm -rf ${projectName}/node_modules`
 await load("Installing dependencies...", "Dependencies installed", async () => {
 	console.log("\n\n")
 	await $({ cwd: projectName, stdio: "inherit" })`${packageManager} install`
+})
+
+await load("Initializing git repository...", "Git repository initialized", async () => {
+	await $({ cwd: projectName })`git init`
 })
 
 // Generate ASCII art for "Smithery" using figlet
