@@ -90,9 +90,13 @@ await load("Installing dependencies...", "Dependencies installed", async () => {
 	await $({ cwd: projectName, stdio: "inherit" })`${packageManager} install`
 })
 
-await load("Initializing git repository...", "Git repository initialized", async () => {
-	await $({ cwd: projectName })`git init`
-})
+await load(
+	"Initializing git repository...",
+	"Git repository initialized",
+	async () => {
+		await $({ cwd: projectName })`git init`
+	},
+)
 
 // Generate ASCII art for "Smithery" using figlet
 const asciiArt = figlet.textSync("Smithery", { font: "Sub-Zero" })

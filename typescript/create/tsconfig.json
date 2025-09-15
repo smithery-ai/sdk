@@ -12,5 +12,12 @@
 		"preserveSymlinks": true
 	},
 	"include": ["**/*.ts"],
-	"exclude": ["node_modules", "dist", "my-app", "scaffold", "*_temp", "test-project"]
+	"exclude": [
+		"node_modules",
+		"dist",
+		"my-app",
+		"scaffold",
+		"*_temp",
+		"test-project"
+	]
 }
