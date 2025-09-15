@@ -17,7 +17,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 	return value !== null && typeof value === "object" && !Array.isArray(value)
 }
 
-function appendConfigAsDotParams(url: URL, config: unknown) {
+export function appendConfigAsDotParams(url: URL, config: unknown) {
 	function add(pathParts: string[], value: unknown) {
 		if (Array.isArray(value)) {
 			for (let index = 0; index < value.length; index++) {
