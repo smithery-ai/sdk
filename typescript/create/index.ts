@@ -78,9 +78,6 @@ await load("Cloning scaffold from GitHub...", "Scaffold cloned", async () => {
 	await $`shx rm -rf ${projectName}_temp`
 })
 
-await load("Navigating to project...", "Project navigated", async () => {
-	// await $`cd ${projectName}`; Not needed - we use cwd option instead
-})
 await $`shx rm -rf ${projectName}/.git`
 await $`shx rm -rf ${projectName}/package-lock.json`
 await $`shx rm -rf ${projectName}/node_modules`
