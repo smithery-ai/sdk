@@ -151,9 +151,18 @@ class SessionConfigMiddleware:
             base_schema = get_config_schema_dict(self.config_schema)
 
             # Add proper JSON Schema metadata to match TypeScript implementation
+            # Use Host header like TypeScript SDK instead of internal server address
+            host_header = None
+            for header_name, header_value in scope.get("headers", []):
+                if header_name == b"host":
+                    host_header = header_value.decode("utf-8")
+                    break
+
+            host = host_header or f"{scope['server'][0]}:{scope['server'][1]}"
+
             config_schema_dict = {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": f"{scope['scheme']}://{scope['server'][0]}:{scope['server'][1]}/.well-known/mcp-config",
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "$id": f"{scope['scheme']}://{host}/.well-known/mcp-config",
                 "title": "MCP Session Configuration",
                 "description": "Schema for the /mcp endpoint configuration",
                 "x-query-style": "dot+bracket",
