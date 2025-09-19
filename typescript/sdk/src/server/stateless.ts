@@ -5,12 +5,16 @@ import { parseAndValidateConfig } from "../shared/config.js"
 
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import { zodToJsonSchema } from "zod-to-json-schema"
+import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js"
+import type { CallbackOAuthServerProvider } from "./oauth.js"
+import { mountOAuth } from "./oauth.js"
 
 /**
  * Arguments when we create a stateless server instance
  */
 export interface CreateStatelessServerArg<T = Record<string, unknown>> {
 	config: T
+	auth?: AuthInfo
 }
 
 export type CreateStatelessServerFn<T = Record<string, unknown>> = (
@@ -29,6 +33,10 @@ export interface StatelessServerOptions<T = Record<string, unknown>> {
 	 * Express app instance to use (optional)
 	 */
 	app?: express.Application
+	/**
+	 * OAuth provider instance. If provided, OAuth routes and bearer protection are auto-wired.
+	 */
+	oauthProvider?: CallbackOAuthServerProvider
 }
 
 /**
@@ -45,6 +53,12 @@ export function createStatelessServer<T = Record<string, unknown>>(
 	options?: StatelessServerOptions<T>,
 ) {
 	const app = options?.app ?? express()
+
+	// Auto-wire OAuth routes and bearer protection if configured
+	const oauthProvider = options?.oauthProvider
+	if (oauthProvider) {
+		mountOAuth(app, oauthProvider)
+	}
 
 	app.use("/mcp", express.json())
 
@@ -68,6 +82,7 @@ export function createStatelessServer<T = Record<string, unknown>>(
 			// Create a fresh server instance for each request
 			const server = createMcpServer({
 				config,
+				auth: (req as unknown as { auth?: AuthInfo }).auth,
 			})
 
 			// Create a new transport for this request (no session management)
