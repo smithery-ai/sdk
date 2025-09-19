@@ -10,6 +10,7 @@ from typing import Any
 from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
 
 from ..utils.config import parse_config_from_asgi_scope
 from ..utils.responses import create_error_response, get_config_schema_dict
@@ -188,41 +189,37 @@ class SessionConfigMiddleware:
                 host = host_header
 
                 config_schema_dict = {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
                     "$id": f"{scope['scheme']}://{host}/.well-known/mcp-config",
-                    "title": "MCP Session Configuration",
+                    "title": "MCP Session Configuration", 
                     "description": "Schema for the /mcp endpoint configuration",
                     "x-query-style": "dot+bracket",
                     **base_schema,
                 }
-                response_body = json.dumps(config_schema_dict).encode('utf-8')
                 
                 print(f"[INFO] {request_id} - Config schema response generated:")
                 print(f"[INFO] {request_id} - Schema ID: {config_schema_dict['$id']}")
                 print(f"[INFO] {request_id} - Schema properties: {list(config_schema_dict.get('properties', {}).keys())}")
-                print(f"[INFO] {request_id} - Response body size: {len(response_body)} bytes")
+                print(f"[INFO] {request_id} - Response body size: {len(json.dumps(config_schema_dict).encode('utf-8'))} bytes")
                 
+                response_data = config_schema_dict
             else:
-                response_body = json.dumps({"message": "No configuration schema available"}).encode('utf-8')
+                response_data = {"message": "No configuration schema available"}
                 print(f"[INFO] {request_id} - No config schema available, returning default message")
 
-            response = {
-                'type': 'http.response.start',
-                'status': 200,
-                'headers': [
-                    [b'content-type', b'application/json'],
-                    [b'content-length', str(len(response_body)).encode()],
-                    [b'access-control-allow-origin', b'*'],
-                ],
-            }
+            # Use Starlette's JSONResponse for proper HTTP handling
+            response = JSONResponse(
+                content=response_data,
+                status_code=200,
+                headers={
+                    "content-type": "application/schema+json; charset=utf-8",  # Match TypeScript exactly
+                    "cache-control": "no-cache, no-store, must-revalidate",  # Prevent Fly.io caching/transformation
+                    "access-control-allow-origin": "*",
+                }
+            )
             
-            print(f"[INFO] {request_id} - Sending response headers: status=200, content-type=application/json")
-            await send(response)
-
-            await send({
-                'type': 'http.response.body',
-                'body': response_body,
-            })
+            print(f"[INFO] {request_id} - Sending Starlette JSONResponse with proper headers")
+            await response(scope, receive, send)
             
             duration = time.time() - start_time
             print(f"[INFO] {request_id} - Well-known mcp-config request completed successfully in {duration:.3f}s")
@@ -232,22 +229,15 @@ class SessionConfigMiddleware:
             print(f"[ERROR] {request_id} - Error handling well-known mcp-config request: {error}")
             print(f"[ERROR] {request_id} - Duration: {duration:.3f}s")
             
-            # Send error response
-            error_body = json.dumps({"error": "Internal server error"}).encode('utf-8')
-            error_response = {
-                'type': 'http.response.start',
-                'status': 500,
-                'headers': [
-                    [b'content-type', b'application/json'],
-                    [b'content-length', str(len(error_body)).encode()],
-                    [b'access-control-allow-origin', b'*'],
-                ],
-            }
-            await send(error_response)
-            await send({
-                'type': 'http.response.body',
-                'body': error_body,
-            })
+            # Send error response using Starlette
+            error_response = JSONResponse(
+                content={"error": "Internal server error"},
+                status_code=500,
+                headers={
+                    "access-control-allow-origin": "*",
+                }
+            )
+            await error_response(scope, receive, send)
 
 
 def from_fastmcp(
