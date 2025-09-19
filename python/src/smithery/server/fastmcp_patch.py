@@ -4,7 +4,6 @@ Smithery FastMCP Patch - Session Config Support
 This provides a wrapper for FastMCP that adds middleware for smithery session config and CORS.
 """
 
-import json
 from typing import Any
 
 from mcp.server.fastmcp import Context, FastMCP
@@ -78,30 +77,17 @@ class SessionConfigMiddleware:
         self.config_schema = config_schema
 
     async def __call__(self, scope, receive, send):
-        import time
-        import random
-        import string
-        
-        # Generate request ID for tracking
-        request_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=7))
-        path = scope.get('path', 'unknown')
-        method = scope.get('method', 'unknown')
-        
         # Handle well-known config schema endpoint
         if (scope["type"] == "http" and
             scope["method"] == "GET" and
             scope["path"] == "/.well-known/mcp-config"):
-            print(f"[INFO] {request_id} - Routing to well-known mcp-config handler: {method} {path}")
             await self._handle_config_schema_endpoint(scope, receive, send)
             return
 
         # Only process HTTP requests to MCP endpoint
         if scope["type"] != "http" or scope["method"] != "POST" or scope["path"] != "/mcp":
-            print(f"[INFO] {request_id} - Passing through non-MCP request: {method} {path}")
             await self.app(scope, receive, send)
             return
-        
-        print(f"[INFO] {request_id} - Processing MCP endpoint request: {method} {path}")
 
         # Parse config from URL parameters and store in scope
         try:
@@ -161,28 +147,12 @@ class SessionConfigMiddleware:
 
     async def _handle_config_schema_endpoint(self, scope, receive, send):
         """Handle GET /.well-known/mcp-config endpoint."""
-        import time
-        import random
-        import string
-        
-        start_time = time.time()
-        request_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=7))
-        
-        # Extract request details for logging
-        path = scope.get('path', '/.well-known/mcp-config')
-        method = scope.get('method', 'GET')
         headers = {k.decode('utf-8'): v.decode('utf-8') for k, v in scope.get('headers', [])}
         host_header = headers.get('host', f"{scope['server'][0]}:{scope['server'][1]}")
-        user_agent = headers.get('user-agent', 'unknown')
-        
-        print(f"[INFO] {request_id} - Well-known mcp-config request received: method={method}, path={path}, host={host_header}, user_agent={user_agent}")
-        print(f"[INFO] {request_id} - Request headers: {headers}")
-        print(f"[INFO] {request_id} - Has config schema: {self.config_schema is not None}")
-        
+
         try:
             if self.config_schema:
                 base_schema = get_config_schema_dict(self.config_schema)
-                print(f"[INFO] {request_id} - Generated base schema with keys: {list(base_schema.keys())}")
 
                 # Add proper JSON Schema metadata to match TypeScript implementation
                 # Use Host header like TypeScript SDK instead of internal server address
@@ -191,21 +161,15 @@ class SessionConfigMiddleware:
                 config_schema_dict = {
                     "$schema": "https://json-schema.org/draft/2020-12/schema",
                     "$id": f"{scope['scheme']}://{host}/.well-known/mcp-config",
-                    "title": "MCP Session Configuration", 
+                    "title": "MCP Session Configuration",
                     "description": "Schema for the /mcp endpoint configuration",
                     "x-query-style": "dot+bracket",
                     **base_schema,
                 }
-                
-                print(f"[INFO] {request_id} - Config schema response generated:")
-                print(f"[INFO] {request_id} - Schema ID: {config_schema_dict['$id']}")
-                print(f"[INFO] {request_id} - Schema properties: {list(config_schema_dict.get('properties', {}).keys())}")
-                print(f"[INFO] {request_id} - Response body size: {len(json.dumps(config_schema_dict).encode('utf-8'))} bytes")
-                
+
                 response_data = config_schema_dict
             else:
                 response_data = {"message": "No configuration schema available"}
-                print(f"[INFO] {request_id} - No config schema available, returning default message")
 
             # Use Starlette's JSONResponse for proper HTTP handling
             response = JSONResponse(
@@ -217,18 +181,10 @@ class SessionConfigMiddleware:
                     "access-control-allow-origin": "*",
                 }
             )
-            
-            print(f"[INFO] {request_id} - Sending Starlette JSONResponse with proper headers")
+
             await response(scope, receive, send)
-            
-            duration = time.time() - start_time
-            print(f"[INFO] {request_id} - Well-known mcp-config request completed successfully in {duration:.3f}s")
-            
-        except Exception as error:
-            duration = time.time() - start_time
-            print(f"[ERROR] {request_id} - Error handling well-known mcp-config request: {error}")
-            print(f"[ERROR] {request_id} - Duration: {duration:.3f}s")
-            
+
+        except Exception:
             # Send error response using Starlette
             error_response = JSONResponse(
                 content={"error": "Internal server error"},
