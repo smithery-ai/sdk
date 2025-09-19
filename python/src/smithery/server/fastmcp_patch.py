@@ -77,17 +77,30 @@ class SessionConfigMiddleware:
         self.config_schema = config_schema
 
     async def __call__(self, scope, receive, send):
+        import time
+        import random
+        import string
+        
+        # Generate request ID for tracking
+        request_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=7))
+        path = scope.get('path', 'unknown')
+        method = scope.get('method', 'unknown')
+        
         # Handle well-known config schema endpoint
         if (scope["type"] == "http" and
             scope["method"] == "GET" and
             scope["path"] == "/.well-known/mcp-config"):
+            print(f"[INFO] {request_id} - Routing to well-known mcp-config handler: {method} {path}")
             await self._handle_config_schema_endpoint(scope, receive, send)
             return
 
         # Only process HTTP requests to MCP endpoint
         if scope["type"] != "http" or scope["method"] != "POST" or scope["path"] != "/mcp":
+            print(f"[INFO] {request_id} - Passing through non-MCP request: {method} {path}")
             await self.app(scope, receive, send)
             return
+        
+        print(f"[INFO] {request_id} - Processing MCP endpoint request: {method} {path}")
 
         # Parse config from URL parameters and store in scope
         try:
@@ -147,46 +160,94 @@ class SessionConfigMiddleware:
 
     async def _handle_config_schema_endpoint(self, scope, receive, send):
         """Handle GET /.well-known/mcp-config endpoint."""
-        if self.config_schema:
-            base_schema = get_config_schema_dict(self.config_schema)
+        import time
+        import random
+        import string
+        
+        start_time = time.time()
+        request_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=7))
+        
+        # Extract request details for logging
+        path = scope.get('path', '/.well-known/mcp-config')
+        method = scope.get('method', 'GET')
+        headers = {k.decode('utf-8'): v.decode('utf-8') for k, v in scope.get('headers', [])}
+        host_header = headers.get('host', f"{scope['server'][0]}:{scope['server'][1]}")
+        user_agent = headers.get('user-agent', 'unknown')
+        
+        print(f"[INFO] {request_id} - Well-known mcp-config request received: method={method}, path={path}, host={host_header}, user_agent={user_agent}")
+        print(f"[INFO] {request_id} - Request headers: {headers}")
+        print(f"[INFO] {request_id} - Has config schema: {self.config_schema is not None}")
+        
+        try:
+            if self.config_schema:
+                base_schema = get_config_schema_dict(self.config_schema)
+                print(f"[INFO] {request_id} - Generated base schema with keys: {list(base_schema.keys())}")
 
-            # Add proper JSON Schema metadata to match TypeScript implementation
-            # Use Host header like TypeScript SDK instead of internal server address
-            host_header = None
-            for header_name, header_value in scope.get("headers", []):
-                if header_name == b"host":
-                    host_header = header_value.decode("utf-8")
-                    break
+                # Add proper JSON Schema metadata to match TypeScript implementation
+                # Use Host header like TypeScript SDK instead of internal server address
+                host = host_header
 
-            host = host_header or f"{scope['server'][0]}:{scope['server'][1]}"
+                config_schema_dict = {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "$id": f"{scope['scheme']}://{host}/.well-known/mcp-config",
+                    "title": "MCP Session Configuration",
+                    "description": "Schema for the /mcp endpoint configuration",
+                    "x-query-style": "dot+bracket",
+                    **base_schema,
+                }
+                response_body = json.dumps(config_schema_dict).encode('utf-8')
+                
+                print(f"[INFO] {request_id} - Config schema response generated:")
+                print(f"[INFO] {request_id} - Schema ID: {config_schema_dict['$id']}")
+                print(f"[INFO] {request_id} - Schema properties: {list(config_schema_dict.get('properties', {}).keys())}")
+                print(f"[INFO] {request_id} - Response body size: {len(response_body)} bytes")
+                
+            else:
+                response_body = json.dumps({"message": "No configuration schema available"}).encode('utf-8')
+                print(f"[INFO] {request_id} - No config schema available, returning default message")
 
-            config_schema_dict = {
-                "$schema": "http://json-schema.org/draft-07/schema#",
-                "$id": f"{scope['scheme']}://{host}/.well-known/mcp-config",
-                "title": "MCP Session Configuration",
-                "description": "Schema for the /mcp endpoint configuration",
-                "x-query-style": "dot+bracket",
-                **base_schema,
+            response = {
+                'type': 'http.response.start',
+                'status': 200,
+                'headers': [
+                    [b'content-type', b'application/json'],
+                    [b'content-length', str(len(response_body)).encode()],
+                    [b'access-control-allow-origin', b'*'],
+                ],
             }
-            response_body = json.dumps(config_schema_dict).encode('utf-8')
-        else:
-            response_body = json.dumps({"message": "No configuration schema available"}).encode('utf-8')
+            
+            print(f"[INFO] {request_id} - Sending response headers: status=200, content-type=application/json")
+            await send(response)
 
-        response = {
-            'type': 'http.response.start',
-            'status': 200,
-            'headers': [
-                [b'content-type', b'application/json'],
-                [b'content-length', str(len(response_body)).encode()],
-                [b'access-control-allow-origin', b'*'],
-            ],
-        }
-        await send(response)
-
-        await send({
-            'type': 'http.response.body',
-            'body': response_body,
-        })
+            await send({
+                'type': 'http.response.body',
+                'body': response_body,
+            })
+            
+            duration = time.time() - start_time
+            print(f"[INFO] {request_id} - Well-known mcp-config request completed successfully in {duration:.3f}s")
+            
+        except Exception as error:
+            duration = time.time() - start_time
+            print(f"[ERROR] {request_id} - Error handling well-known mcp-config request: {error}")
+            print(f"[ERROR] {request_id} - Duration: {duration:.3f}s")
+            
+            # Send error response
+            error_body = json.dumps({"error": "Internal server error"}).encode('utf-8')
+            error_response = {
+                'type': 'http.response.start',
+                'status': 500,
+                'headers': [
+                    [b'content-type', b'application/json'],
+                    [b'content-length', str(len(error_body)).encode()],
+                    [b'access-control-allow-origin', b'*'],
+                ],
+            }
+            await send(error_response)
+            await send({
+                'type': 'http.response.body',
+                'body': error_body,
+            })
 
 
 def from_fastmcp(
