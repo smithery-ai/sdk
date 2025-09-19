@@ -4,6 +4,7 @@ Smithery FastMCP Patch - Session Config Support
 This provides a wrapper for FastMCP that adds middleware for smithery session config and CORS.
 """
 
+import json
 from typing import Any
 
 from mcp.server.fastmcp import Context, FastMCP
@@ -76,6 +77,13 @@ class SessionConfigMiddleware:
         self.config_schema = config_schema
 
     async def __call__(self, scope, receive, send):
+        # Handle well-known config schema endpoint
+        if (scope["type"] == "http" and
+            scope["method"] == "GET" and
+            scope["path"] == "/.well-known/mcp-config"):
+            await self._handle_config_schema_endpoint(scope, receive, send)
+            return
+
         # Only process HTTP requests to MCP endpoint
         if scope["type"] != "http" or scope["method"] != "POST" or scope["path"] != "/mcp":
             await self.app(scope, receive, send)
@@ -136,6 +144,40 @@ class SessionConfigMiddleware:
             scope["session_config"] = config_instance
 
         await self.app(scope, receive, send)
+
+    async def _handle_config_schema_endpoint(self, scope, receive, send):
+        """Handle GET /.well-known/mcp-config endpoint."""
+        if self.config_schema:
+            base_schema = get_config_schema_dict(self.config_schema)
+
+            # Add proper JSON Schema metadata to match TypeScript implementation
+            config_schema_dict = {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "$id": f"{scope['scheme']}://{scope['server'][0]}:{scope['server'][1]}/.well-known/mcp-config",
+                "title": "MCP Session Configuration",
+                "description": "Schema for the /mcp endpoint configuration",
+                "x-query-style": "dot+bracket",
+                **base_schema,
+            }
+            response_body = json.dumps(config_schema_dict).encode('utf-8')
+        else:
+            response_body = json.dumps({"message": "No configuration schema available"}).encode('utf-8')
+
+        response = {
+            'type': 'http.response.start',
+            'status': 200,
+            'headers': [
+                [b'content-type', b'application/json'],
+                [b'content-length', str(len(response_body)).encode()],
+                [b'access-control-allow-origin', b'*'],
+            ],
+        }
+        await send(response)
+
+        await send({
+            'type': 'http.response.body',
+            'body': response_body,
+        })
 
 
 def from_fastmcp(

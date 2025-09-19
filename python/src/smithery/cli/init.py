@@ -209,18 +209,18 @@ def initialize_git(project_name: str) -> None:
 
 def show_success_message(project_name: str) -> None:
     """Show success message with next steps."""
+    from rich.align import Align
     from rich.panel import Panel
     from rich.text import Text
-    from rich.align import Align
-    
+
     console.success("Project initialized successfully!")
     console.plain("")
-    
+
     # Create ASCII art title
     try:
         from art import text2art
         ascii_title = text2art("Smithery", font="sub-zero")
-        
+
         # Create welcome message content with ASCII art
         welcome_text = Text()
         welcome_text.append(ascii_title, style="bold blue")
@@ -237,7 +237,7 @@ def show_success_message(project_name: str) -> None:
         welcome_text.append(f"cd {project_name} && uv run playground", style="bold orange3")
         welcome_text.append("\n\nTry saying something like ", style="white")
         welcome_text.append("'Say hello to John'", style="bold cyan")
-    
+
     # Create left-aligned panel
     welcome_panel = Panel(
         Align.left(welcome_text),
@@ -246,7 +246,7 @@ def show_success_message(project_name: str) -> None:
         title="[bold bright_blue]Smithery MCP Server[/bold bright_blue]",
         title_align="left"
     )
-    
+
     console.rich_console.print(welcome_panel)
     console.plain("")
     muted("Your project is ready with git initialized and dependencies installed!")
