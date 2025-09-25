@@ -99,22 +99,21 @@ def playground(
         None, help="Server function (e.g., src.server:create_server)"
     ),
     port: int = typer.Option(8081, "--port", help="Port to run on"),
+    reload: bool = typer.Option(False, "--reload/--no-reload", help="Enable auto-reload (requires uvicorn)"),
 ):
     """Run server and connect [yellow]Smithery Playground[/yellow] for testing."""
     try:
         # Import here to avoid circular imports
         import sys
 
-        from .playground import main as playground_main
+        from .playground import start_playground
 
-        # Set up sys.argv for playground main
-        sys.argv = ["smithery playground"]
-        if server_function:
-            sys.argv.append(server_function)
-        if port != 8081:
-            sys.argv.extend(["--port", str(port)])
+        if reload:
+            console.warning(
+                "Note: hot reload resets in-memory server state; stateful clients may need to reinitialize their session after a reload."
+            )
 
-        playground_main()
+        start_playground(server_function, port, reload)
     except KeyboardInterrupt:
         console.info("Playground stopped by user")
         sys.exit(0)
