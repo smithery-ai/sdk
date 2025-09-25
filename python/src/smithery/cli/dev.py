@@ -112,10 +112,10 @@ def main():
     parser.add_argument("--transport", default="shttp", help="Transport type (shttp or stdio)")
     parser.add_argument("--port", type=int, default=8081, help="Port to run on (shttp only)")
     parser.add_argument("--host", default="127.0.0.1", help="Host to bind to (shttp only)")
-    parser.add_argument("--reload/--no-reload", dest="reload", action="store_true", default=True, help="Enable auto-reload (shttp only, requires uvicorn)")
+    parser.add_argument("--reload", dest="reload", action="store_true", default=True, help="Enable auto-reload (shttp only, requires uvicorn)")
     parser.add_argument("--no-reload", dest="reload", action="store_false", help="Disable auto-reload")
     parser.add_argument("--log-level", default="info", help="Log level (critical, error, warning, info, debug, trace)")
-    
+
     args = parser.parse_args()
     run_dev_server(
         server_ref=args.server_function,

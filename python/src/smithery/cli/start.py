@@ -13,6 +13,9 @@ def run_production_server(
 ) -> None:
     """Start server with minimal overhead."""
     try:
+        # Default log level for production
+        log_level = "warning"
+
         if server_ref is None:
             import tomllib
             with open("pyproject.toml", "rb") as f:
@@ -48,7 +51,7 @@ def main():
     parser.add_argument("server_function", nargs="?", help="Server function (e.g., src.server:create_server)")
     parser.add_argument("--port", type=int, default=8081, help="Port to run on")
     parser.add_argument("--host", default="127.0.0.1", help="Host to bind to")
-    
+
     args = parser.parse_args()
     run_production_server(
         server_ref=args.server_function,

@@ -8,7 +8,7 @@ from .console import console
 
 def get_server_ref_from_config() -> str:
     """Get server reference from pyproject.toml config."""
-    import toml
+    import tomllib
 
     pyproject_path = Path("pyproject.toml")
     if not pyproject_path.exists():
@@ -16,7 +16,8 @@ def get_server_ref_from_config() -> str:
         sys.exit(1)
 
     try:
-        pyproject = toml.load(pyproject_path)
+        with open(pyproject_path, "rb") as f:
+            pyproject = tomllib.load(f)
     except Exception as e:
         console.error(f"Failed to parse pyproject.toml: {e}")
         sys.exit(1)
@@ -38,7 +39,7 @@ def get_server_ref_from_config() -> str:
 
 def get_smithery_config() -> dict:
     """Get complete [tool.smithery] configuration from pyproject.toml."""
-    import toml
+    import tomllib
 
     pyproject_path = Path("pyproject.toml")
     if not pyproject_path.exists():
@@ -46,7 +47,8 @@ def get_smithery_config() -> dict:
         sys.exit(1)
 
     try:
-        pyproject = toml.load(pyproject_path)
+        with open(pyproject_path, "rb") as f:
+            pyproject = tomllib.load(f)
     except Exception as e:
         console.error(f"Failed to parse pyproject.toml: {e}")
         sys.exit(1)

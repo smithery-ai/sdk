@@ -16,8 +16,8 @@ from .dev import run_dev_server
 
 def start_playground(server_function: str | None, port: int) -> None:
     """Start the playground with given parameters."""
+    from ..utils.network import find_available_port
     from ..utils.project import get_server_ref_from_config
-    from .dev import find_available_port
 
     # Get server reference from config if not provided
     server_ref = server_function or get_server_ref_from_config()
@@ -67,7 +67,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run server and connect Smithery Playground for testing")
     parser.add_argument("server_function", nargs="?", help="Server function (e.g., src.server:create_server)")
     parser.add_argument("--port", type=int, default=8081, help="Port to run on")
-    
+
     args = parser.parse_args()
     start_playground(args.server_function, args.port)
 
