@@ -1,5 +1,6 @@
 """Production server start for Smithery Python MCP servers."""
 
+import argparse
 import sys
 
 from ..utils.server import check_port_available, create_server_from_ref, run_server
@@ -25,7 +26,7 @@ def run_production_server(
         # Create server instance
         server = create_server_from_ref(server_ref)
 
-        # Check port availability for production (fail fast)
+        # Check port availability for production
         if not check_port_available(host, port):
             print(f"Port {port} unavailable on {host}", file=sys.stderr)
             sys.exit(1)
@@ -41,6 +42,21 @@ def run_production_server(
         sys.exit(1)
 
 
+def main():
+    """Entry point for the start script."""
+    parser = argparse.ArgumentParser(description="Start MCP server for production use")
+    parser.add_argument("server_function", nargs="?", help="Server function (e.g., src.server:create_server)")
+    parser.add_argument("--port", type=int, default=8081, help="Port to run on")
+    parser.add_argument("--host", default="127.0.0.1", help="Host to bind to")
+    
+    args = parser.parse_args()
+    run_production_server(
+        server_ref=args.server_function,
+        port=args.port,
+        host=args.host
+    )
+
+
 if __name__ == "__main__":
     # For direct execution: python -m smithery.cli.start
-    run_production_server()
+    main()

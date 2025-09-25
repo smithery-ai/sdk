@@ -4,6 +4,7 @@ Smithery Python Development Server
 Development server with reload support and flexible port handling.
 """
 
+import argparse
 import os
 import sys
 
@@ -27,15 +28,14 @@ def run_dev_server(
         The actual port used (may differ from requested due to port availability)
     """
     try:
-        # Get server reference (same as production)
+        # Get server reference
         if server_ref is None:
             server_ref = get_server_ref_from_config()
 
-        # Create server (same as production)
+        # Create server
         server = create_server_from_ref(server_ref)
 
         if transport == "shttp":
-            # DEV DIFFERENCE #1: Find available port instead of failing
             try:
                 actual_port = find_available_port(port, host)
                 if actual_port != port:
@@ -45,7 +45,6 @@ def run_dev_server(
                 console.error(f"Could not find an available port: {e}")
                 sys.exit(1)
 
-            # DEV DIFFERENCE #2: Reload support
             if reload:
                 try:
                     import uvicorn  # type: ignore
@@ -106,6 +105,28 @@ def get_reloader_streamable_http_app():
     return server.streamable_http_app()
 
 
+def main():
+    """Entry point for the dev script."""
+    parser = argparse.ArgumentParser(description="Run MCP server in development mode")
+    parser.add_argument("server_function", nargs="?", help="Server function (e.g., src.server:create_server)")
+    parser.add_argument("--transport", default="shttp", help="Transport type (shttp or stdio)")
+    parser.add_argument("--port", type=int, default=8081, help="Port to run on (shttp only)")
+    parser.add_argument("--host", default="127.0.0.1", help="Host to bind to (shttp only)")
+    parser.add_argument("--reload/--no-reload", dest="reload", action="store_true", default=True, help="Enable auto-reload (shttp only, requires uvicorn)")
+    parser.add_argument("--no-reload", dest="reload", action="store_false", help="Disable auto-reload")
+    parser.add_argument("--log-level", default="info", help="Log level (critical, error, warning, info, debug, trace)")
+    
+    args = parser.parse_args()
+    run_dev_server(
+        server_ref=args.server_function,
+        transport=args.transport,
+        port=args.port,
+        host=args.host,
+        reload=args.reload,
+        log_level=args.log_level.lower()
+    )
+
+
 if __name__ == "__main__":
     # For direct execution: python -m smithery.cli.dev
-    run_dev_server()
+    main()
