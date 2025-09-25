@@ -6,6 +6,7 @@ Command-line interface for running Smithery Python MCP servers.
 
 import os
 import sys
+import time
 from collections.abc import Callable
 from importlib import import_module
 from typing import Any, TypedDict
@@ -87,9 +88,6 @@ def import_server_module(server_ref: str) -> SmitheryModule:
     """
     module_path, function_name = server_ref.split(":", 1)
 
-    console.info(f"Importing module: {module_path}", muted=True)
-    console.info(f"Looking for function: {function_name}", muted=True)
-
     try:
         # Import the module (assumes proper Python environment setup)
         module = import_module(module_path)
@@ -112,12 +110,9 @@ def import_server_module(server_ref: str) -> SmitheryModule:
         config_schema = None
         if hasattr(server_function, '_smithery_config_schema'):
             config_schema = server_function._smithery_config_schema
-            console.info("Using config schema from @smithery decorator", muted=True)
         elif hasattr(module, 'config_schema'):
             config_schema = module.config_schema
-            console.info("Using config schema from module-level variable", muted=True)
 
-        console.info("✓ Module imported successfully", muted=True)
         return {
             'create_server': server_function,
             'config_schema': config_schema,
@@ -141,23 +136,26 @@ def create_and_run_server(
     host: str = "127.0.0.1",
     reload: bool = False,
     server_ref: str | None = None,
+    start_time: float | None = None,
+    log_level: str = "info",
 ) -> int:
     """Server Creation & Execution
 
-    Args: server_module from Stage 2, transport settings
+    Args: server_module from Stage 2, transport settings, start_time for timing
     Raises: SystemExit with clear error messages for server creation/startup failures
     """
+    if start_time is None:
+        start_time = time.perf_counter()
+
     create_server = server_module['create_server']
     config_schema = server_module.get('config_schema')
 
-    console.info("Creating server instance...", muted=True)
 
     try:
         # Create config instance
         if config_schema:
             try:
                 config_schema()
-                console.info(f"Using config schema: {config_schema.__name__}", muted=True)
             except Exception as e:
                 console.warning(f"Failed to instantiate config schema: {e}")
                 console.warning("Proceeding with empty config")
@@ -171,19 +169,18 @@ def create_and_run_server(
             console.nested("Expected: return FastMCP(...)")
             sys.exit(1)
 
-        console.rich_console.print("[green]✓ Server created successfully[/green]")
+        # Log startup time
+        startup_time = time.perf_counter() - start_time
+        console.info(f"Server started in {startup_time*1000:.1f}ms", muted=True)
 
         # Configure and start server
         if transport == "shttp":
             # Find an available port, starting with the requested port
-            console.info(f"Checking port availability for {host}:{port}", muted=True)
             try:
                 actual_port = find_available_port(port, host)
                 if actual_port != port:
                     console.warning(f"Port {port} is in use, using port {actual_port} instead")
                     port = actual_port
-                else:
-                    console.info(f"Port {port} is available", muted=True)
             except RuntimeError as e:
                 console.error(f"Could not find an available port: {e}")
                 sys.exit(1)
@@ -201,9 +198,6 @@ def create_and_run_server(
                 if server_ref:
                     os.environ["SMITHERY_SERVER_REF"] = server_ref
 
-                console.info(f"Starting MCP server with reload on {host}:{port}")
-                console.info("Transport: streamable HTTP (uvicorn --reload)", muted=True)
-
                 # Use import string + factory so uvicorn can reload cleanly
                 uvicorn.run(
                     "smithery.cli.dev:get_reloader_streamable_http_app",
@@ -211,18 +205,14 @@ def create_and_run_server(
                     port=port,
                     reload=True,
                     factory=True,
+                    log_level=log_level,
                 )
             else:
                 server.settings.port = port
                 server.settings.host = host
-
-                console.info(f"Starting MCP server on {host}:{port}")
-                console.info("Transport: streamable HTTP", muted=True)
-
                 server.run(transport="streamable-http")
 
         elif transport == "stdio":
-            console.info("Starting MCP server with stdio transport")
             server.run(transport="stdio")
             return 0  # stdio doesn't use ports
 
@@ -239,26 +229,24 @@ def create_and_run_server(
     return port  # Return the resolved port for shttp
 
 
-def run_server(server_ref: str | None = None, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1", reload: bool = False) -> int:
+def run_server(server_ref: str | None = None, transport: str = "shttp", port: int = 8081, host: str = "127.0.0.1", reload: bool = True, log_level: str = "info") -> int:
     """Run Smithery MCP server using clean 3-stage approach.
 
     Returns:
         The actual port used by the server (may differ from requested port due to deconfliction)
     """
-    console.rich_console.print(f"Starting [cyan]Python MCP server[/cyan] with [yellow]{transport}[/yellow] transport...")
+    start_time = time.perf_counter()
 
     try:
         # Project Discovery & Validation
         if server_ref is None:
             server_ref = validate_project_setup()
-        else:
-            console.info(f"Using provided server reference: {server_ref}")
 
         # Module Resolution & Import
         server_module = import_server_module(server_ref)
 
         # Server Creation & Execution
-        actual_port = create_and_run_server(server_module, transport, port, host, reload, server_ref)
+        actual_port = create_and_run_server(server_module, transport, port, host, reload, server_ref, start_time, log_level)
         return actual_port
 
     except KeyboardInterrupt:
@@ -279,14 +267,14 @@ def main() -> None:
         transport: str = typer.Option("shttp", help="Transport type (shttp or stdio)"),
         port: int = typer.Option(8081, help="Port to run on (shttp only)"),
         host: str = typer.Option("127.0.0.1", help="Host to bind to (shttp only)"),
-        reload: bool = typer.Option(False, "--reload", help="Enable auto-reload (shttp only, requires uvicorn)")
+        reload: bool = typer.Option(True, "--reload/--no-reload", help="Enable auto-reload (shttp only, requires uvicorn)")
     ):
         """Run Smithery MCP servers in development mode (like uvicorn)."""
         if reload and transport != "shttp":
             console.warning("--reload is only supported with 'shttp' transport; ignoring for stdio")
         if reload and transport == "shttp":
             console.warning(
-                "Hot reload resets in-memory server state; stateful clients may need to reinitialize their session after a reload."
+                "Note: hot reload resets in-memory server state; stateful clients may need to reinitialize their session after a reload."
             )
         run_server(server_ref, transport, port, host, reload)
 

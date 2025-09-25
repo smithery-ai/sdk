@@ -20,6 +20,9 @@ This is the template project that gets cloned when you run `uvx smithery init`. 
 # Run development server (streamable HTTP on port 8081)
 uv run dev
 
+# Run production server (optimized for deployment)
+uv run start
+
 # Test with interactive playground
 uv run playground
 ```
@@ -270,9 +273,14 @@ This opens the Smithery Playground in your browser with your local server tunnel
 
 #### Method 2: Direct MCP Protocol Testing
 ```bash
-# Start server (with optional reload for development)
+# Start development server (with optional reload)
 uv run dev                # Actually runs: uv run smithery dev
 uv run dev --reload       # Auto-reload on code changes
+uv run dev --log-level debug  # More verbose logging
+
+# Start production server (optimized startup)
+uv run start              # Actually runs: uv run smithery start
+uv run start --log-level warning  # Minimal production logging
 ```
 
 **Complete MCP Testing Workflow:**
@@ -372,14 +380,22 @@ Before deploying, ensure your server works locally:
 
 ### 1. Basic Server Test
 ```bash
-# This should start your server on localhost:8081
+# Development server with timing info and reload support
 uv run dev
+
+# Production server with optimized startup (recommended for deployment testing)
+uv run start
 ```
+
+**What you'll see:**
+- **Development mode**: `Server started in 45.2ms` (shows startup timing)
+- **Production mode**: Minimal output, faster startup (no dev overhead)
 
 **Common issues:**
 - **"Module not found"**: Run `uv sync` first
 - **"Server function not callable"**: Check your `[tool.smithery]` server reference in `pyproject.toml`
 - **"Config schema errors"**: Verify your Pydantic model can be instantiated
+- **Port unavailable**: In production mode, server fails fast instead of switching ports
 
 ### 2. Validate Server Creation
 ```bash
@@ -401,8 +417,14 @@ uv run playground
 
 ### Port Issues
 - Default port is **8081** (not 8000)
-- Change with: `uv run dev --port 8000`
+- **Development**: `uv run dev --port 8000` (auto-switches if port busy)
+- **Production**: `uv run start --port 8000` (fails fast if port unavailable)
 - Kill existing process: `lsof -ti:8081 | xargs kill`
+
+### Log Level Control
+- **Development**: `uv run dev --log-level debug` (default: info)
+- **Production**: `uv run start --log-level error` (default: warning)
+- Available levels: critical, error, warning, info, debug, trace
 
 ### Config Issues
 ```bash

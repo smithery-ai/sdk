@@ -13,6 +13,7 @@ from ..utils.console import console
 from ..utils.project import get_server_ref_from_config
 from .dev import run_server
 from .init import create_project
+from .start import run_production_server
 
 # Create the main Typer app
 app = typer.Typer(
@@ -69,7 +70,8 @@ def dev(
     ),
     port: int = typer.Option(8081, "--port", help="Port to run on (shttp only)"),
     host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to (shttp only)"),
-    reload: bool = typer.Option(False, "--reload", help="Enable auto-reload (shttp only, requires uvicorn)"),
+    reload: bool = typer.Option(True, "--reload/--no-reload", help="Enable auto-reload (shttp only, requires uvicorn)"),
+    log_level: str = typer.Option("info", "--log-level", help="Log level (critical, error, warning, info, debug, trace)"),
 ):
     """Run [blue]MCP server[/blue] in development mode."""
     try:
@@ -80,9 +82,9 @@ def dev(
             console.warning("--reload is only supported with 'shttp' transport; ignoring for stdio")
         if reload and transport == "shttp":
             console.warning(
-                "Hot reload resets in-memory server state; stateful clients may need to reinitialize their session after a reload."
+                "Note: hot reload resets in-memory server state; stateful clients may need to reinitialize their session after a reload."
             )
-        run_server(server_ref, transport, port, host, reload)
+        run_server(server_ref, transport, port, host, reload, log_level.lower())
     except KeyboardInterrupt:
         console.info("Server stopped by user")
         sys.exit(0)
@@ -118,6 +120,30 @@ def playground(
         sys.exit(0)
     except Exception as e:
         console.error(f"Failed to start playground: {e}")
+        sys.exit(1)
+
+
+@app.command()
+def start(
+    server_function: str | None = typer.Argument(
+        None, help="Server function (e.g., src.server:create_server)"
+    ),
+    transport: str = typer.Option(
+        "shttp", "--transport", help="Transport type (shttp or stdio)"
+    ),
+    port: int = typer.Option(8081, "--port", help="Port to run on (shttp only)"),
+    host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to (shttp only)"),
+    log_level: str = typer.Option("warning", "--log-level", help="Log level (critical, error, warning, info, debug, trace)"),
+):
+    """Start [blue]MCP server[/blue] for production use."""
+    try:
+        # Use optimized production runner
+        run_production_server(server_function, transport, port, host, log_level.lower())
+    except KeyboardInterrupt:
+        console.info("Server stopped by user")
+        sys.exit(0)
+    except Exception as e:
+        console.error(f"Failed to start server: {e}")
         sys.exit(1)
 
 

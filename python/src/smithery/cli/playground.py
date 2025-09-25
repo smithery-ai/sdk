@@ -48,10 +48,6 @@ def start_playground(server_function: str | None, port: int) -> None:
         console.error(f"Could not find an available port: {e}")
         return
 
-    console.info(f"Starting playground on port {actual_port}...")
-    console.info("This will run your MCP server and connect the Smithery CLI client")
-    console.plain("")
-
     # Start server in background thread with the resolved port
     def start_server():
         try:
@@ -63,7 +59,6 @@ def start_playground(server_function: str | None, port: int) -> None:
     server_thread.start()
 
     # Wait a moment for server to start
-    console.info("Waiting for server to start...")
     time.sleep(2)
 
     # Start Smithery CLI client with the same resolved port

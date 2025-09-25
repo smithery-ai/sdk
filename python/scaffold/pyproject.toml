@@ -17,11 +17,9 @@ dependencies = [
 ]
 
 [project.scripts]
-# Run the MCP server in development mode
-dev = "smithery.cli.dev:main"
-# Run server with interactive testing playground
-playground = "smithery.cli.playground:main"
+dev = "smithery.cli.dev:main" # Run the MCP server in development mode
+start = "smithery.cli.start:main" # Run the MCP server in production mode
+playground = "smithery.cli.playground:main" # Run server with interactive testing playground
 
 [tool.smithery]
-# Function that returns a patched FastMCP server
-server = "hello_server.server:create_server"
+server = "hello_server.server:create_server" # Function that returns a patched FastMCP server
