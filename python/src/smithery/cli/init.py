@@ -308,22 +308,6 @@ def create_project(project_name: str | None = None) -> None:
         sys.exit(1)
 
 
-def main() -> None:
-    """CLI entry point for Smithery Python init command."""
-
-    import typer
-
-    app = typer.Typer()
-
-    @app.command()
-    def init_cmd(
-        project_name: str | None = typer.Argument(None, help="Name of the project to initialize")
-    ):
-        """Initialize a new Smithery Python MCP project."""
-        create_project(project_name)
-
-    app()
-
-
 if __name__ == "__main__":
-    main()
+    # For direct execution: python -m smithery.cli.init
+    create_project()

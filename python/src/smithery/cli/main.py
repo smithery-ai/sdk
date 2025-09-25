@@ -11,7 +11,7 @@ import typer
 from .. import __version__
 from ..utils.console import console
 from ..utils.project import get_server_ref_from_config
-from .dev import run_server
+from .dev import run_dev_server
 from .init import create_project
 from .start import run_production_server
 
@@ -84,7 +84,7 @@ def dev(
             console.warning(
                 "Note: hot reload resets in-memory server state; stateful clients may need to reinitialize their session after a reload."
             )
-        run_server(server_ref, transport, port, host, reload, log_level.lower())
+        run_dev_server(server_ref, transport, port, host, reload, log_level.lower())
     except KeyboardInterrupt:
         console.info("Server stopped by user")
         sys.exit(0)
@@ -128,17 +128,13 @@ def start(
     server_function: str | None = typer.Argument(
         None, help="Server function (e.g., src.server:create_server)"
     ),
-    transport: str = typer.Option(
-        "shttp", "--transport", help="Transport type (shttp or stdio)"
-    ),
-    port: int = typer.Option(8081, "--port", help="Port to run on (shttp only)"),
-    host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to (shttp only)"),
-    log_level: str = typer.Option("warning", "--log-level", help="Log level (critical, error, warning, info, debug, trace)"),
+    port: int = typer.Option(8081, "--port", help="Port to run on"),
+    host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to"),
 ):
     """Start [blue]MCP server[/blue] for production use."""
     try:
         # Use optimized production runner
-        run_production_server(server_function, transport, port, host, log_level.lower())
+        run_production_server(server_function, port, host)
     except KeyboardInterrupt:
         console.info("Server stopped by user")
         sys.exit(0)

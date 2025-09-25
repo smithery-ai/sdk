@@ -10,25 +10,7 @@ import threading
 import time
 
 from ..utils.console import console
-from .dev import run_server
-
-
-def main() -> None:
-    """CLI entry point for playground command."""
-
-    import typer
-
-    app = typer.Typer()
-
-    @app.command()
-    def playground_cmd(
-        server_function: str | None = typer.Argument(None, help="Server function (e.g., src.server:create_server)"),
-        port: int = typer.Option(8081, help="Port to run on")
-    ):
-        """Start your MCP server and automatically connect the Smithery CLI client for interactive testing."""
-        start_playground(server_function, port)
-
-    app()
+from .dev import run_dev_server
 
 
 def start_playground(server_function: str | None, port: int) -> None:
@@ -51,7 +33,7 @@ def start_playground(server_function: str | None, port: int) -> None:
     # Start server in background thread with the resolved port
     def start_server():
         try:
-            run_server(server_ref, "shttp", actual_port, "127.0.0.1")
+            run_dev_server(server_ref, "shttp", actual_port, "127.0.0.1", reload=False, log_level="warning")
         except Exception as e:
             console.error(f"Server failed: {e}")
 
@@ -80,4 +62,5 @@ def start_playground(server_function: str | None, port: int) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    # For direct execution: python -m smithery.cli.playground
+    start_playground(None, 8081)

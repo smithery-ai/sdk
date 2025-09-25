@@ -1,43 +1,37 @@
-"""Ultra-fast production server start for Smithery Python MCP servers."""
+"""Production server start for Smithery Python MCP servers."""
 
 import sys
+
+from ..utils.server import check_port_available, create_server_from_ref, run_server
 
 
 def run_production_server(
     server_ref: str | None = None,
-    transport: str = "shttp",
     port: int = 8081,
-    host: str = "127.0.0.1",
-    log_level: str = "warning"
+    host: str = "127.0.0.1"
 ) -> None:
     """Start server with minimal overhead."""
     try:
         if server_ref is None:
             import tomllib
             with open("pyproject.toml", "rb") as f:
-                server_ref = tomllib.load(f)["tool"]["smithery"]["server"]
+                config = tomllib.load(f)
+                smithery_config = config["tool"]["smithery"]
+                server_ref = smithery_config["server"]
 
-        from importlib import import_module
-        module_path, function_name = server_ref.split(":", 1)
-        server = getattr(import_module(module_path), function_name)()
+                # Get log_level from config (production is config-driven)
+                log_level = smithery_config.get("log_level", "warning")
 
-        if transport == "shttp":
-            import socket
-            try:
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                    sock.bind((host, port))
-            except OSError:
-                print(f"Port {port} unavailable on {host}", file=sys.stderr)
-                sys.exit(1)
+        # Create server instance
+        server = create_server_from_ref(server_ref)
 
-            server.settings.port = port
-            server.settings.host = host
-            server.run(transport="streamable-http")
-        elif transport == "stdio":
-            server.run(transport="stdio")
-        else:
-            print(f"Unsupported transport: {transport}", file=sys.stderr)
+        # Check port availability for production (fail fast)
+        if not check_port_available(host, port):
+            print(f"Port {port} unavailable on {host}", file=sys.stderr)
             sys.exit(1)
+
+        # Run server with shttp transport
+        run_server(server, "shttp", port=port, host=host, log_level=log_level)
 
     except KeyboardInterrupt:
         print("\nServer stopped")
@@ -47,24 +41,6 @@ def run_production_server(
         sys.exit(1)
 
 
-def main() -> None:
-    """CLI entry point."""
-    import typer
-
-    app = typer.Typer()
-
-    @app.command()
-    def start_cmd(
-        server_ref: str | None = typer.Argument(None, help="Server reference (module:function)"),
-        transport: str = typer.Option("shttp", help="Transport type (shttp or stdio)"),
-        port: int = typer.Option(8081, help="Port to run on (shttp only)"),
-        host: str = typer.Option("127.0.0.1", help="Host to bind to (shttp only)")
-    ):
-        """Start MCP server for production."""
-        run_production_server(server_ref, transport, port, host)
-
-    app()
-
-
 if __name__ == "__main__":
-    main()
+    # For direct execution: python -m smithery.cli.start
+    run_production_server()
