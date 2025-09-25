@@ -1,4 +1,5 @@
 export * from "./stateful.js"
 export * from "./stateless.js"
 export * from "./session.js"
-export * from "./oauth.js"
+export * from "./auth/oauth.js"
+export * from "./auth/identity.js"

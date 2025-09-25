@@ -12,3 +12,5 @@ export {
 	type StatefulServerOptions,
 } from "./server/stateful.js"
 export * from "./server/session.js"
+export * from "./server/auth/identity.js"
+export * from "./server/auth/oauth.js"

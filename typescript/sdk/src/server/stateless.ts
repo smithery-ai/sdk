@@ -6,8 +6,7 @@ import { parseAndValidateConfig } from "../shared/config.js"
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import { zodToJsonSchema } from "zod-to-json-schema"
 import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js"
-import type { CallbackOAuthServerProvider } from "./oauth.js"
-import { mountOAuth } from "./oauth.js"
+import type { OAuthMountOptions } from "./auth/oauth.js"
 
 /**
  * Arguments when we create a stateless server instance
@@ -33,10 +32,7 @@ export interface StatelessServerOptions<T = Record<string, unknown>> {
 	 * Express app instance to use (optional)
 	 */
 	app?: express.Application
-	/**
-	 * OAuth provider instance. If provided, OAuth routes and bearer protection are auto-wired.
-	 */
-	oauthProvider?: CallbackOAuthServerProvider
+	oauth?: OAuthMountOptions
 }
 
 /**
@@ -53,12 +49,6 @@ export function createStatelessServer<T = Record<string, unknown>>(
 	options?: StatelessServerOptions<T>,
 ) {
 	const app = options?.app ?? express()
-
-	// Auto-wire OAuth routes and bearer protection if configured
-	const oauthProvider = options?.oauthProvider
-	if (oauthProvider) {
-		mountOAuth(app, oauthProvider)
-	}
 
 	app.use("/mcp", express.json())
 

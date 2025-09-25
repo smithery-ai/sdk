@@ -1,6 +1,6 @@
 {
 	"name": "@smithery/sdk",
-	"version": "1.6.2",
+	"version": "1.6.4",
 	"description": "SDK to develop with Smithery",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -18,10 +18,12 @@
 		"watch": "tsc --watch",
 		"check": "npx @biomejs/biome check --write --unsafe"
 	},
+	"packageManager": "npm@11.4.1",
 	"license": "MIT",
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.18.0",
 		"express": "^5.1.0",
+		"jose": "^6.1.0",
 		"json-schema": "^0.4.0",
 		"lodash": "^4.17.21",
 		"okay-error": "^1.0.3",
