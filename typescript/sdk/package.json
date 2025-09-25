@@ -18,10 +18,12 @@
 		"watch": "tsc --watch",
 		"check": "npx @biomejs/biome check --write --unsafe"
 	},
+	"packageManager": "npm@11.4.1",
 	"license": "MIT",
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.18.0",
 		"express": "^5.1.0",
+		"jose": "^6.1.0",
 		"json-schema": "^0.4.0",
 		"lodash": "^4.17.21",
 		"okay-error": "^1.0.3",
