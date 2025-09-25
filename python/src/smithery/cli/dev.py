@@ -68,8 +68,14 @@ def run_dev_server(
                     log_level=log_level,
                 )
             else:
-                # No reload - same as production
-                run_server(server, "shttp", port=port, host=host, log_level=log_level)
+                # No reload - use uvicorn with patched app to ensure middleware is applied
+                # This ensures .well-known/mcp-config endpoint is available
+                uvicorn.run(
+                    server.streamable_http_app(),
+                    host=host,
+                    port=port,
+                    log_level=log_level,
+                )
 
             return port
 
