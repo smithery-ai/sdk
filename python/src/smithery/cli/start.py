@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from ..utils.server import check_port_available, create_server_from_ref, run_server
+from ..utils.server import check_port_available, create_server_from_ref
 
 
 def run_production_server(
@@ -34,8 +34,15 @@ def run_production_server(
             print(f"Port {port} unavailable on {host}", file=sys.stderr)
             sys.exit(1)
 
-        # Run server with shttp transport
-        run_server(server, "shttp", port=port, host=host, log_level=log_level)
+        # Run server with shttp transport using patched app to ensure middleware is applied
+        # This ensures .well-known/mcp-config endpoint is available in production
+        import uvicorn  # type: ignore
+        uvicorn.run(
+            server.streamable_http_app(),
+            host=host,
+            port=port,
+            log_level=log_level,
+        )
 
     except KeyboardInterrupt:
         print("\nServer stopped")
