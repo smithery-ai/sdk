@@ -574,7 +574,7 @@ wheels = [
 
 [[package]]
 name = "smithery"
-version = "0.1.25"
+version = "0.2.5"
 source = { editable = "." }
 dependencies = [
     { name = "art" },
