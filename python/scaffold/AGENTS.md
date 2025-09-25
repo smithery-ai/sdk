@@ -184,10 +184,32 @@ def create_server():
 
 **Important:** Avoid using reserved parameter names (`api_key`, `profile`, `config`) in your schema fields. These are handled internally by Smithery.
 
-**Field Types:**
-- **Required**: Use `Field(...)` - users must provide a value
-- **Optional with default**: Use `Field(default_value)` - users can customize or use the default
-- **Optional without default**: Use `Field(None)` with nullable type - completely optional
+**Field Types and Validation Behavior:**
+
+- **Required Fields**: Use `Field(...)` - Server returns 422 error if missing
+  ```python
+  api_key: str = Field(..., description="Your API key")
+  # Missing this field → 422 error with config schema
+  ```
+
+- **Optional with Default**: Use `Field(default_value)` - Uses default if not provided
+  ```python
+  debug: bool = Field(False, description="Debug mode")
+  max_results: int = Field(10, description="Maximum results")
+  # Missing these fields → Uses defaults (debug=False, max_results=10)
+  ```
+
+- **Optional without Default**: Use `Field(None)` with nullable type - Can be None
+  ```python
+  custom_endpoint: str | None = Field(None, description="Custom API endpoint")
+  # Missing this field → Sets to None, no validation error
+  ```
+
+**Validation Logic:**
+- **No config provided** → Uses defaults for optional fields, 422 only if required fields exist
+- **Partial config** → Uses provided values + defaults for missing optional fields
+- **Missing required fields** → 422 error with validation details and config schema
+- **Invalid values** → 422 error (wrong types, constraint violations, etc.)
 
 2. **Pass config via URL parameters**:
 ```
@@ -254,32 +276,53 @@ uv run dev --reload       # Auto-reload on code changes
 ```
 
 **Complete MCP Testing Workflow:**
+
 1. Start server: `uv run dev` (runs on port 8081 by default)
-2. Initialize with config (always include config params): 
-```bash
-curl -X POST "http://127.0.0.1:8081/mcp?pirate_mode=true" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
-```
+
+2. **Test scenarios based on your config schema:**
+
+   **Scenario A: Required fields (like `pirate_mode: bool = Field(...)`)** 
+   ```bash
+   # Must include required config - will get 422 error without it
+   curl -X POST "http://127.0.0.1:8081/mcp?pirate_mode=true" \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json, text/event-stream" \
+     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
+   ```
+
+   **Scenario B: Optional fields with defaults (like `debug: bool = Field(False)`)** 
+   ```bash
+   # Can omit config - will use defaults
+   curl -X POST "http://127.0.0.1:8081/mcp" \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json, text/event-stream" \
+     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
+   ```
+
 3. Get session ID from server logs: "Created new transport with session ID: [uuid]"
+
 4. Send notifications/initialized with session header:
-```bash
-curl -X POST "http://127.0.0.1:8081/mcp?pirate_mode=true" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -H "mcp-session-id: [session-id]" \
-  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
-```
-5. Test the hello tool with pirate mode:
-```bash
-curl -X POST "http://127.0.0.1:8081/mcp?pirate_mode=true" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -H "mcp-session-id: [session-id]" \
-  -d '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"hello","arguments":{"name":"World"}}}'
-```
-Expected response: `"Ahoy, World!"` (with pirate_mode=true) or `"Hello, World!"` (with pirate_mode=false)
+   ```bash
+   curl -X POST "http://127.0.0.1:8081/mcp" \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json, text/event-stream" \
+     -H "mcp-session-id: [session-id]" \
+     -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+   ```
+
+5. Test your tools:
+   ```bash
+   curl -X POST "http://127.0.0.1:8081/mcp" \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json, text/event-stream" \
+     -H "mcp-session-id: [session-id]" \
+     -d '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"hello","arguments":{"name":"World"}}}'
+   ```
+
+**Expected Responses:**
+- With `pirate_mode=true`: `"Ahoy, World!"`
+- With `pirate_mode=false` or default: `"Hello, World!"`
+- Missing required fields: `422 error` with config schema
 
 
 ### Deployment Configuration

@@ -223,12 +223,12 @@ def show_success_message(project_name: str) -> None:
 
         # Create welcome message content with ASCII art
         welcome_text = Text()
-        welcome_text.append(ascii_title, style="bold blue")
-        welcome_text.append("\n* Welcome to your MCP server!\n\n", style="bold green")
+        welcome_text.append(ascii_title, style="bold #cc5500")
+        welcome_text.append("\n* Welcome to your MCP server!\n\n", style="bold #7fb069")
         welcome_text.append("To get started, run:\n\n", style="white")
         welcome_text.append(f"cd {project_name} && uv run playground", style="bold orange3")
         welcome_text.append("\n\nTry saying something like ", style="white")
-        welcome_text.append("'Say hello to John'", style="bold cyan")
+        welcome_text.append("'Say hello to John'", style="bold orange3")
     except ImportError:
         # Fallback if art library is not available
         welcome_text = Text()
@@ -236,14 +236,14 @@ def show_success_message(project_name: str) -> None:
         welcome_text.append("To get started, run:\n\n", style="white")
         welcome_text.append(f"cd {project_name} && uv run playground", style="bold orange3")
         welcome_text.append("\n\nTry saying something like ", style="white")
-        welcome_text.append("'Say hello to John'", style="bold cyan")
+        welcome_text.append("'Say hello to John'", style="bold orange3")
 
     # Create left-aligned panel
     welcome_panel = Panel(
         Align.left(welcome_text),
         padding=(1, 2),
-        border_style="bright_blue",
-        title="[bold bright_blue]Smithery MCP Server[/bold bright_blue]",
+        border_style="#cc5500",
+        title="[bold #cc5500]Smithery MCP Server[/bold #cc5500]",
         title_align="left"
     )
 

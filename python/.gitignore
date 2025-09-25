@@ -180,3 +180,6 @@ cython_debug/
 scaffold/uv.lock
 
 scratch/
+
+# Other
+todos.md

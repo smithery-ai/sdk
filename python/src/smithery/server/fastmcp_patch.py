@@ -95,24 +95,11 @@ class SessionConfigMiddleware:
 
             # Validate and create ConfigSchema instance
             if self.config_schema:
-                # If no config provided but schema exists, return 422 with schema
-                if not raw_config:
-                    config_schema_dict = get_config_schema_dict(self.config_schema)
-                    error_response = create_error_response(
-                        422,
-                        "Invalid configuration parameters",
-                        "One or more config parameters are invalid.",
-                        None,
-                        config_schema_dict,
-                        instance="/mcp"
-                    )
-                    await error_response(scope, receive, send)
-                    return
-
                 try:
                     config_instance = self.config_schema(**raw_config)
                 except ValidationError as e:
-                    # Return 422 validation error with config schema for frontend
+                    # Return 422 for any validation issues
+                    # (missing required fields or invalid values)
                     config_schema_dict = get_config_schema_dict(self.config_schema)
                     error_response = create_error_response(
                         422,
