@@ -1,6 +1,6 @@
 # Hello Server
 
-An MCP server built with Smithery.
+An MCP server built with [Smithery CLI](https://smithery.ai/docs/getting_started/quickstart_build_python)
 
 ## Prerequisites
 
