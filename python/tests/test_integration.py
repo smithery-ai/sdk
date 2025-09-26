@@ -3,12 +3,12 @@ Tests for Smithery FastMCP Integration
 
 Tests the integration, CORS, and wrapper functionality.
 """
-import pytest
-from mcp.server.fastmcp import FastMCP
-from pydantic import BaseModel, Field
-from starlette.testclient import TestClient
+import pytest # type: ignore
+from mcp.server.fastmcp import FastMCP # type: ignore
+from pydantic import BaseModel, Field # type: ignore
+from starlette.testclient import TestClient # type: ignore
 
-from smithery.server.fastmcp_patch import from_fastmcp
+from smithery.server.fastmcp_patch import from_fastmcp # type: ignore
 
 from .utils.version_utils import requires_fastmcp_feature
 

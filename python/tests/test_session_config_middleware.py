@@ -3,12 +3,12 @@ Tests for Session Config Middleware
 
 Tests config validation, reserved parameter detection, and error handling.
 """
-import pytest
-from mcp.server.fastmcp import FastMCP
-from pydantic import BaseModel, Field
-from starlette.testclient import TestClient
+import pytest # type: ignore
+from mcp.server.fastmcp import FastMCP # type: ignore
+from pydantic import BaseModel, Field # type: ignore
+from starlette.testclient import TestClient # type: ignore
 
-from smithery.server.fastmcp_patch import from_fastmcp
+from smithery.server.fastmcp_patch import from_fastmcp # type: ignore
 
 
 class ConfigSchema(BaseModel):
