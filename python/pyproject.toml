@@ -1,4 +1,4 @@
- [build-system]
+[build-system]
 requires = ["uv_build>=0.8.15,<0.9.0"]
 build-backend = "uv_build"
 
@@ -27,7 +27,6 @@ fastmcp = [
     "mcp>=1.6.0",
     "fastmcp>=2.0.0",
 ]
-
 
 [project.urls]
 "Homepage" = "https://github.com/smithery-ai/python-sdk"
@@ -81,3 +80,13 @@ test = [
     "fastmcp>=2.12.3",
 ]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = ["-v", "--tb=short"]
+filterwarnings = [
+    "ignore::DeprecationWarning:fastmcp.*",
+    "ignore::PendingDeprecationWarning",
+]

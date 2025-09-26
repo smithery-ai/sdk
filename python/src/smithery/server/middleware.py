@@ -13,6 +13,9 @@ from starlette.responses import JSONResponse  # type: ignore
 from ..utils.config import parse_config_from_asgi_scope
 from ..utils.responses import create_error_response, get_config_schema_dict
 
+# Reserved query parameters that cannot be used in session config
+RESERVED_QUERY_PARAMS = {"api_key", "profile"}
+
 
 class SessionConfigMiddleware:
     """Extract config from URL parameters and validate with schema."""
@@ -23,14 +26,13 @@ class SessionConfigMiddleware:
 
     def _get_reserved_params_in_query(self, scope) -> list[str]:
         """Check for reserved parameters in query string that are not config keys."""
-        reserved = {"api_key", "profile"}
         query = scope.get("query_string", b"").decode("utf-8")
         pairs = parse_qsl(query, keep_blank_values=True)
 
         def is_config_key(k: str) -> bool:
             return k.startswith("config.") or k.startswith("config[")
 
-        return [k for (k, _v) in pairs if k in reserved and not is_config_key(k)]
+        return [k for (k, _v) in pairs if k in RESERVED_QUERY_PARAMS and not is_config_key(k)]
 
     async def __call__(self, scope, receive, send):
         # Handle well-known config schema endpoint

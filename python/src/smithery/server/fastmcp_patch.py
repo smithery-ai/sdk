@@ -6,6 +6,7 @@ This provides a wrapper for FastMCP that adds middleware for smithery session co
 
 import functools
 import importlib.util
+import logging
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel  # type: ignore
@@ -24,8 +25,6 @@ if importlib.util.find_spec("mcp.server.fastmcp"):
     from mcp.server.fastmcp import Context as MCPSDKContext  # type: ignore
     from mcp.server.fastmcp import FastMCP as MCPSDKFastMCP  # type: ignore
     _CONTEXT_CLASSES.append(("mcp_sdk", MCPSDKContext))
-    MCPSDKContext = MCPSDKContext
-    MCPSDKFastMCP = MCPSDKFastMCP
 else:
     MCPSDKContext = None
     MCPSDKFastMCP = None
@@ -35,8 +34,6 @@ if importlib.util.find_spec("fastmcp"):
     from fastmcp import Context as FastMCPContext  # type: ignore
     from fastmcp import FastMCP as FastMCPServer  # type: ignore
     _CONTEXT_CLASSES.append(("standalone", FastMCPContext))
-    FastMCPContext = FastMCPContext
-    FastMCPServer = FastMCPServer
 else:
     FastMCPContext = None
     FastMCPServer = None
@@ -49,13 +46,24 @@ if not FastMCP:
         "Neither MCP SDK FastMCP nor standalone FastMCP is available. "
     )
 
+# Log which FastMCP flavor is being used
+logger = logging.getLogger(__name__)
+if MCPSDKFastMCP:
+    logger.debug("Using MCP SDK FastMCP implementation")
+elif FastMCPServer:
+    logger.debug("Using standalone FastMCP implementation")
+
 
 def ensure_context_patched() -> None:
     """Add session_config property to all available FastMCP Context classes (idempotent)."""
 
+    # Module-level flag for one-time warning
+    _session_config_warned = False
+
     @property
     def session_config(self) -> dict[str, Any]:
         """Get session config from request scope."""
+        nonlocal _session_config_warned
         try:
             if hasattr(self, 'request_context') and hasattr(self.request_context, "request") and hasattr(self.request_context.request, "scope"):
                 scope = self.request_context.request.scope
@@ -64,6 +72,12 @@ def ensure_context_patched() -> None:
                     return config
         except (AttributeError, KeyError):
             pass
+        
+        # Log warning once when falling back to empty dict
+        if not _session_config_warned:
+            logger.debug("session_config falling back to empty dict - context path may have changed")
+            _session_config_warned = True
+        
         return {}
 
     # Patch all available Context classes
