@@ -6,12 +6,17 @@ to avoid duplication between dev.py and start.py.
 
 import sys
 from importlib import import_module
+from typing import TYPE_CHECKING
 
-from ..server.fastmcp_patch import SmitheryFastMCP
+# Import SmitheryFastMCP only for type checking to avoid circular/heavy imports
+# This allows the CLI to load without requiring FastMCP dependencies (mcp/fastmcp packages)
+# The actual import happens at runtime inside functions when FastMCP is actually needed
+if TYPE_CHECKING:
+    from ..server.fastmcp_patch import SmitheryFastMCP
 
 
 def configure_server_settings(
-    server: SmitheryFastMCP,
+    server: "SmitheryFastMCP",
     *,
     port: int,
     host: str,
@@ -30,7 +35,7 @@ def configure_server_settings(
     server.settings.log_level = log_level
 
 
-def create_server_from_ref(server_ref: str) -> SmitheryFastMCP:
+def create_server_from_ref(server_ref: str) -> "SmitheryFastMCP":
     """Create server instance from module:function reference.
 
     Args:
@@ -60,7 +65,7 @@ def create_server_from_ref(server_ref: str) -> SmitheryFastMCP:
 
 
 def run_server(
-    server: SmitheryFastMCP,
+    server: "SmitheryFastMCP",
     transport: str,
     *,
     port: int,

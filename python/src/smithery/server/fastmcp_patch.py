@@ -21,20 +21,28 @@ if TYPE_CHECKING:
 _CONTEXT_CLASSES = []
 
 # Check for MCP SDK FastMCP Context
-if importlib.util.find_spec("mcp.server.fastmcp"):
-    from mcp.server.fastmcp import Context as MCPSDKContext  # type: ignore
-    from mcp.server.fastmcp import FastMCP as MCPSDKFastMCP  # type: ignore
-    _CONTEXT_CLASSES.append(("mcp_sdk", MCPSDKContext))
-else:
+try:
+    if importlib.util.find_spec("mcp.server.fastmcp"):
+        from mcp.server.fastmcp import Context as MCPSDKContext  # type: ignore
+        from mcp.server.fastmcp import FastMCP as MCPSDKFastMCP  # type: ignore
+        _CONTEXT_CLASSES.append(("mcp_sdk", MCPSDKContext))
+    else:
+        MCPSDKContext = None
+        MCPSDKFastMCP = None
+except (ImportError, ModuleNotFoundError):
     MCPSDKContext = None
     MCPSDKFastMCP = None
 
 # Check for standalone FastMCP Context
-if importlib.util.find_spec("fastmcp"):
-    from fastmcp import Context as FastMCPContext  # type: ignore
-    from fastmcp import FastMCP as FastMCPServer  # type: ignore
-    _CONTEXT_CLASSES.append(("standalone", FastMCPContext))
-else:
+try:
+    if importlib.util.find_spec("fastmcp"):
+        from fastmcp import Context as FastMCPContext  # type: ignore
+        from fastmcp import FastMCP as FastMCPServer  # type: ignore
+        _CONTEXT_CLASSES.append(("standalone", FastMCPContext))
+    else:
+        FastMCPContext = None
+        FastMCPServer = None
+except (ImportError, ModuleNotFoundError):
     FastMCPContext = None
     FastMCPServer = None
 
