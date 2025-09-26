@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-09-26
+
+### Added
+- Test suite for important components
+- Support for both MCP SDK and standalone FastMCP packages
+- Reserved parameter validation with helpful error messages
+- GitHub Actions CI workflow
+
+### Changed
+- Improved FastMCP wrapping design
+- Enhanced CORS configuration and error handling
+
+### Fixed
+- FastMCP package compatibility issues
+- Session config access patterns
+
 ## [0.3.1] - 2025-09-25
 
 ### Fixed
