@@ -8,6 +8,8 @@ import argparse
 import os
 import sys
 
+import uvicorn  # type: ignore
+
 from ..utils.console import console
 from ..utils.network import find_available_port
 from ..utils.project import get_server_ref_from_config
@@ -46,13 +48,6 @@ def run_dev_server(
                 sys.exit(1)
 
             if reload:
-                try:
-                    import uvicorn  # type: ignore
-                except ImportError:
-                    console.error("Reload requested but 'uvicorn' is not installed")
-                    console.nested("Install it in your project environment:")
-                    console.indented("uv add uvicorn  # or: pip install uvicorn")
-                    sys.exit(1)
 
                 # Pass server ref for reloader
                 if server_ref:
