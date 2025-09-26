@@ -3,12 +3,12 @@ Tests for Well-Known Configuration Endpoint
 
 Tests the /.well-known/mcp-config endpoint functionality including schema generation and CORS.
 """
-import pytest # type: ignore
-from mcp.server.fastmcp import FastMCP # type: ignore
-from pydantic import BaseModel, Field # type: ignore
-from starlette.testclient import TestClient # type: ignore
+import pytest  # type: ignore
+from mcp.server.fastmcp import FastMCP  # type: ignore
+from pydantic import BaseModel, Field  # type: ignore
+from starlette.testclient import TestClient  # type: ignore
 
-from smithery.server.fastmcp_patch import from_fastmcp # type: ignore
+from smithery.server.fastmcp_patch import from_fastmcp  # type: ignore
 
 
 class ConfigSchema(BaseModel):

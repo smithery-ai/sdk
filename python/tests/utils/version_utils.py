@@ -54,14 +54,14 @@ def get_fastmcp_version() -> str | None:
 
         # Try submodules
         try:
-            import mcp.server # type: ignore
+            import mcp.server  # type: ignore
             if hasattr(mcp.server, '__version__'):
                 return mcp.server.__version__
         except (ImportError, AttributeError):
             pass
 
         try:
-            import mcp.server.fastmcp # type: ignore
+            import mcp.server.fastmcp  # type: ignore
             if hasattr(mcp.server.fastmcp, '__version__'):
                 return mcp.server.fastmcp.__version__
         except (ImportError, AttributeError):

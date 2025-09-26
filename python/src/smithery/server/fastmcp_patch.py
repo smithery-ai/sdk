@@ -22,7 +22,7 @@ _CONTEXT_CLASSES = []
 # Check for MCP SDK FastMCP Context
 if importlib.util.find_spec("mcp.server.fastmcp"):
     from mcp.server.fastmcp import Context as MCPSDKContext  # type: ignore
-    from mcp.server.fastmcp import FastMCP as MCPSDKFastMCP # type: ignore
+    from mcp.server.fastmcp import FastMCP as MCPSDKFastMCP  # type: ignore
     _CONTEXT_CLASSES.append(("mcp_sdk", MCPSDKContext))
     MCPSDKContext = MCPSDKContext
     MCPSDKFastMCP = MCPSDKFastMCP
@@ -33,7 +33,7 @@ else:
 # Check for standalone FastMCP Context
 if importlib.util.find_spec("fastmcp"):
     from fastmcp import Context as FastMCPContext  # type: ignore
-    from fastmcp import FastMCP as FastMCPServer # type: ignore
+    from fastmcp import FastMCP as FastMCPServer  # type: ignore
     _CONTEXT_CLASSES.append(("standalone", FastMCPContext))
     FastMCPContext = FastMCPContext
     FastMCPServer = FastMCPServer
