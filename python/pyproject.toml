@@ -13,6 +13,7 @@ dependencies = [
     "toml>=0.10.2",
     "typer>=0.17.3",
     "art>=6.3",
+    "uvicorn>=0.30.0",
 ]
 authors = [{ name = "Smithery Team", email = "contact@smithery.ai" }]
 license = "MIT"
