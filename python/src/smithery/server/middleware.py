@@ -66,11 +66,12 @@ class SessionConfigMiddleware:
             raw_config = parse_config_from_asgi_scope(scope)
 
             # Validate and create ConfigSchema instance
+            # Schema is always expected in Smithery - this ensures consistent attribute access
             if self.config_schema:
                 try:
                     config_instance = self.config_schema(**raw_config)
-                    # Normalize to dict for consistent access
-                    scope["session_config"] = config_instance.model_dump()
+                    # Store the Pydantic instance for attribute access
+                    scope["session_config"] = config_instance
                 except ValidationError as e:
                     # Normal validation error
                     config_schema_dict = get_config_schema_dict(self.config_schema)
@@ -85,8 +86,10 @@ class SessionConfigMiddleware:
                     await error_response(scope, receive, send)
                     return
             else:
-                # No schema, store raw dict
-                scope["session_config"] = raw_config
+                # Create empty Pydantic-like object for consistent attribute access
+                class EmptyConfig:
+                    pass
+                scope["session_config"] = EmptyConfig()
 
         except ValueError as e:
             # Config parsing failed - return 400 error
