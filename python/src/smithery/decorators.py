@@ -60,7 +60,7 @@ class SmitheryDecorators:
 
                 @server.tool()
                 def my_tool(arg: str, ctx: Context) -> str:
-                    # ctx.session_config will be an empty dict {}
+                    # ctx.session_config will be an empty object with no attributes
                     return f"Hello {arg}"
 
                 return server

@@ -69,8 +69,8 @@ def ensure_context_patched() -> None:
     _session_config_warned = False
 
     @property
-    def session_config(self) -> dict[str, Any]:
-        """Get session config from request scope."""
+    def session_config(self) -> Any:
+        """Get session config from request scope. Returns Pydantic model instance."""
         nonlocal _session_config_warned
         try:
             if hasattr(self, 'request_context') and hasattr(self.request_context, "request") and hasattr(self.request_context.request, "scope"):
@@ -81,12 +81,15 @@ def ensure_context_patched() -> None:
         except (AttributeError, KeyError):
             pass
 
-        # Log warning once when falling back to empty dict
+        # Log warning once when falling back - this should not happen in normal Smithery usage
         if not _session_config_warned:
-            logger.debug("session_config falling back to empty dict - context path may have changed")
+            logger.warning("session_config not found in request scope - ensure middleware is properly configured")
             _session_config_warned = True
 
-        return {}
+        # Return a simple object that behaves like an empty Pydantic model for attribute access
+        class EmptyConfig:
+            pass
+        return EmptyConfig()
 
     # Patch all available Context classes
     for _, context_class in _CONTEXT_CLASSES:
