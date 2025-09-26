@@ -1,186 +1,146 @@
 """
 Smithery FastMCP Patch - Session Config Support
 
-This provides a wrapper for FastMCP that adds middleware for smithery session config and CORS.
+This provides a wrapper for FastMCP that adds middleware for smithery session config and CORS
 """
 
-from typing import Any
+import functools
+import importlib.util
+import logging
+from typing import TYPE_CHECKING, Any
 
-from mcp.server.fastmcp import Context, FastMCP
-from pydantic import BaseModel, ValidationError
-from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+from pydantic import BaseModel  # type: ignore
+from starlette.middleware.cors import CORSMiddleware  # type: ignore
 
-from ..utils.config import parse_config_from_asgi_scope
-from ..utils.responses import create_error_response, get_config_schema_dict
+from .middleware import SessionConfigMiddleware
+
+if TYPE_CHECKING:
+    pass
+
+# Import both Context classes using proper spec checking
+_CONTEXT_CLASSES = []
+
+# Check for MCP SDK FastMCP Context
+if importlib.util.find_spec("mcp.server.fastmcp"):
+    from mcp.server.fastmcp import Context as MCPSDKContext  # type: ignore
+    from mcp.server.fastmcp import FastMCP as MCPSDKFastMCP  # type: ignore
+    _CONTEXT_CLASSES.append(("mcp_sdk", MCPSDKContext))
+else:
+    MCPSDKContext = None
+    MCPSDKFastMCP = None
+
+# Check for standalone FastMCP Context
+if importlib.util.find_spec("fastmcp"):
+    from fastmcp import Context as FastMCPContext  # type: ignore
+    from fastmcp import FastMCP as FastMCPServer  # type: ignore
+    _CONTEXT_CLASSES.append(("standalone", FastMCPContext))
+else:
+    FastMCPContext = None
+    FastMCPServer = None
+
+# Determine which FastMCP to use for the function signature
+FastMCP = MCPSDKFastMCP or FastMCPServer
+
+if not FastMCP:
+    raise ImportError(
+        "Neither MCP SDK FastMCP nor standalone FastMCP is available. "
+    )
+
+# Log which FastMCP flavor is being used
+logger = logging.getLogger(__name__)
+if MCPSDKFastMCP:
+    logger.debug("Using MCP SDK FastMCP implementation")
+elif FastMCPServer:
+    logger.debug("Using standalone FastMCP implementation")
+
+
+def ensure_context_patched() -> None:
+    """Add session_config property to all available FastMCP Context classes (idempotent)."""
+
+    # Module-level flag for one-time warning
+    _session_config_warned = False
+
+    @property
+    def session_config(self) -> dict[str, Any]:
+        """Get session config from request scope."""
+        nonlocal _session_config_warned
+        try:
+            if hasattr(self, 'request_context') and hasattr(self.request_context, "request") and hasattr(self.request_context.request, "scope"):
+                scope = self.request_context.request.scope
+                config = scope.get("session_config")
+                if config is not None:
+                    return config
+        except (AttributeError, KeyError):
+            pass
+
+        # Log warning once when falling back to empty dict
+        if not _session_config_warned:
+            logger.debug("session_config falling back to empty dict - context path may have changed")
+            _session_config_warned = True
+
+        return {}
+
+    # Patch all available Context classes
+    for _, context_class in _CONTEXT_CLASSES:
+        if getattr(context_class, "_smithery_session_config_patched", False):
+            continue  # Already patched
+
+        # Add the property to this Context class
+        context_class.session_config = session_config
+        context_class._smithery_session_config_patched = True
 
 
 class SmitheryFastMCP:
-    """Wrapper that adds session config and CORS to FastMCP."""
+    """Wrapper that adds session config and CORS to FastMCP using global app wrapping."""
 
     def __init__(self, fastmcp_instance: FastMCP, config_schema: type[BaseModel] | None = None):
         self._fastmcp = fastmcp_instance
         self._config_schema = config_schema
 
-        # Patch the instance methods
-        self._patch_streamable_http_app()
+        # Ensure Context class is patched for ctx.session_config access
+        ensure_context_patched()
 
     def __getattr__(self, name: str):
         """Forward attribute access to wrapped FastMCP instance."""
-        # First check if the attribute exists on the wrapped instance
         if hasattr(self._fastmcp, name):
             attr = getattr(self._fastmcp, name)
 
-            # If it's a callable (method), return it directly
-            # Python will handle the binding automatically
+            # Intercept app creation methods to apply global wrapping
+            if name in ('http_app', 'streamable_http_app') and callable(attr):
+                return self._wrap_app_method(attr)
+
             return attr
 
-        # If attribute doesn't exist on wrapped instance, raise AttributeError
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
-    def _patch_streamable_http_app(self):
-        """Add CORS and session config middleware to StreamableHTTP app."""
-        original_method = self._fastmcp.streamable_http_app
+    def _wrap_app_method(self, original_method):
+        """Wrap app creation methods to apply global middleware wrapping."""
+        @functools.wraps(original_method)
+        def wrapped_method(*args, **kwargs):
+            # Create the base app (whatever FastMCP returns)
+            app = original_method(*args, **kwargs)
 
-        def patched_streamable_http_app():
-            app = original_method()
+            # Global SessionConfig wrapping - most robust approach
+            app = SessionConfigMiddleware(app, config_schema=self._config_schema)
 
-            # Add CORS middleware - minimal configuration for MCP compatibility
-            # Key finding: mcp-protocol-version header is ESSENTIAL for tunnel/browser requests
-            # OPTIONS method is handled automatically by Starlette CORS middleware
-            app.add_middleware(
-                CORSMiddleware,
+            # Global CORS wrapping - guarantees CORS headers on ALL responses (including errors)
+            # Order: session-config → CORS, so CORS headers are present on schema/errors
+            app = CORSMiddleware(
+                app=app,
                 allow_origins=["*"],
-                allow_credentials=True,
+                allow_credentials=False,  # As per CORS analysis
                 allow_methods=["GET", "POST"],
-                allow_headers=["Content-Type", "Accept", "mcp-session-id", "mcp-protocol-version"],
+                allow_headers=["Content-Type", "Accept", "Authorization", "mcp-session-id", "mcp-protocol-version"],
                 expose_headers=["mcp-session-id", "mcp-protocol-version"],
                 max_age=86400,
             )
 
-            # Add session config middleware to extract config from URL
-            app.add_middleware(SessionConfigMiddleware, config_schema=self._config_schema)
-
             return app
 
-        # Replace the method on the actual FastMCP instance
-        self._fastmcp.streamable_http_app = patched_streamable_http_app
+        return wrapped_method
 
 
 
-
-class SessionConfigMiddleware:
-    """Extract config from URL parameters and validate with schema."""
-
-    def __init__(self, app, config_schema=None):
-        self.app = app
-        self.config_schema = config_schema
-
-    async def __call__(self, scope, receive, send):
-        # Handle well-known config schema endpoint
-        if (scope["type"] == "http" and
-            scope["method"] == "GET" and
-            scope["path"] == "/.well-known/mcp-config"):
-            await self._handle_config_schema_endpoint(scope, receive, send)
-            return
-
-        # Only process HTTP requests to MCP endpoint
-        if scope["type"] != "http" or scope["method"] != "POST" or scope["path"] != "/mcp":
-            await self.app(scope, receive, send)
-            return
-
-        # Parse config from URL parameters and store in scope
-        try:
-            raw_config = parse_config_from_asgi_scope(scope)
-
-            # Validate and create ConfigSchema instance
-            if self.config_schema:
-                try:
-                    config_instance = self.config_schema(**raw_config)
-                except ValidationError as e:
-                    # Return 422 for any validation issues
-                    # (missing required fields or invalid values)
-                    config_schema_dict = get_config_schema_dict(self.config_schema)
-                    error_response = create_error_response(
-                        422,
-                        "Invalid configuration parameters",
-                        "One or more config parameters are invalid.",
-                        e,
-                        config_schema_dict,
-                        instance="/mcp"
-                    )
-                    await error_response(scope, receive, send)
-                    return
-            else:
-                # No schema, store raw dict
-                config_instance = raw_config
-
-            # Store validated config instance in scope
-            scope["session_config"] = config_instance
-
-        except ValueError as e:
-            # Config parsing failed - return 400 error
-            if "config" in str(e).lower():
-                error_response = create_error_response(400, "Invalid config", str(e))
-                await error_response(scope, receive, send)
-                return
-            raise
-        except Exception:
-            # Other unexpected errors - use default config for backward compatibility
-            config_instance = self.config_schema() if self.config_schema else {}
-            scope["session_config"] = config_instance
-
-        await self.app(scope, receive, send)
-
-    async def _handle_config_schema_endpoint(self, scope, receive, send):
-        """Handle GET /.well-known/mcp-config endpoint."""
-        headers = {k.decode('utf-8'): v.decode('utf-8') for k, v in scope.get('headers', [])}
-        host_header = headers.get('host', f"{scope['server'][0]}:{scope['server'][1]}")
-
-        try:
-            if self.config_schema:
-                base_schema = get_config_schema_dict(self.config_schema)
-
-                # Add proper JSON Schema metadata to match TypeScript implementation
-                # Use Host header like TypeScript SDK instead of internal server address
-                host = host_header
-
-                config_schema_dict = {
-                    "$schema": "https://json-schema.org/draft/2020-12/schema",
-                    "$id": f"{scope['scheme']}://{host}/.well-known/mcp-config",
-                    "title": "MCP Session Configuration",
-                    "description": "Schema for the /mcp endpoint configuration",
-                    "x-query-style": "dot+bracket",
-                    **base_schema,
-                }
-
-                response_data = config_schema_dict
-            else:
-                response_data = {"message": "No configuration schema available"}
-
-            # Use Starlette's JSONResponse for proper HTTP handling
-            response = JSONResponse(
-                content=response_data,
-                status_code=200,
-                headers={
-                    "content-type": "application/schema+json; charset=utf-8",  # Match TypeScript exactly
-                    "cache-control": "no-cache, no-store, must-revalidate",  # Prevent Fly.io caching/transformation
-                    "access-control-allow-origin": "*",
-                }
-            )
-
-            await response(scope, receive, send)
-
-        except Exception:
-            # Send error response using Starlette
-            error_response = JSONResponse(
-                content={"error": "Internal server error"},
-                status_code=500,
-                headers={
-                    "access-control-allow-origin": "*",
-                }
-            )
-            await error_response(scope, receive, send)
 
 
 def from_fastmcp(
@@ -194,30 +154,3 @@ def from_fastmcp(
 
 
 
-# Patch the Context class to include session config
-def patch_context_with_session_config():
-    """Add session_config property to FastMCP Context class."""
-
-    @property
-    def session_config(self) -> Any:
-        """Get session config from request scope."""
-        try:
-            # Get config from request scope (set by middleware)
-            if hasattr(self.request_context, 'request') and hasattr(self.request_context.request, 'scope'):
-                scope = self.request_context.request.scope
-                config = scope.get('session_config')
-
-                if config is not None:
-                    return config
-
-        except (AttributeError, KeyError):
-            pass
-
-        return {}
-
-    # Add the property to Context class
-    Context.session_config = session_config
-
-
-# Apply the context patch
-patch_context_with_session_config()

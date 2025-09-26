@@ -37,7 +37,7 @@ def start_playground(server_function: str | None, port: int, reload: bool = Fals
         try:
             console.info(f"Starting Smithery CLI client connected to port {actual_port}")
             subprocess.run([
-                "npx", "-y", "@smithery/cli", "playground", "--port", str(actual_port)
+                "npx", "-y", "@smithery/cli@latest", "playground", "--port", str(actual_port)
             ], check=True)
         except subprocess.CalledProcessError as e:
             console.error(f"Failed to start Smithery CLI: {e}")

@@ -364,9 +364,16 @@ git push origin main
 ## Architecture Notes
 
 ### Key Dependencies
-- **mcp>=1.13.1**: Model Context Protocol SDK with CLI tools
-- **smithery>=0.1.24**: Smithery enhancements for session config and deployment
+- **mcp>=1.6.0**: Model Context Protocol SDK
 - **Python >=3.10**: Required Python version
+
+### FastMCP Compatibility
+The scaffold works with both:
+- **MCP SDK FastMCP** (bundled with official mcp package)
+- **FastMCP 2.0** (fastmcp package)
+
+When using with existing FastMCP servers, ensure you have compatible versions:
+- `mcp>=1.6.0` OR `fastmcp>=2.0.0`
 
 ### Security Considerations
 - Session-scoped API keys and configuration
