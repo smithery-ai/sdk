@@ -72,12 +72,12 @@ def ensure_context_patched() -> None:
                     return config
         except (AttributeError, KeyError):
             pass
-        
+
         # Log warning once when falling back to empty dict
         if not _session_config_warned:
             logger.debug("session_config falling back to empty dict - context path may have changed")
             _session_config_warned = True
-        
+
         return {}
 
     # Patch all available Context classes
