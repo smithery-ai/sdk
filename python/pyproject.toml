@@ -9,11 +9,12 @@ description = "SDK for using Smithery with Python"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "mcp>=1.13.1",
     "toml>=0.10.2",
-    "typer>=0.17.3",
+    "typer>=0.17.3", 
     "art>=6.3",
     "uvicorn>=0.30.0",
+    "pydantic>=2.0.0",
+    "starlette>=0.37.0",
 ]
 authors = [{ name = "Smithery Team", email = "contact@smithery.ai" }]
 license = "MIT"
@@ -22,9 +23,11 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "ruff==0.12.11",
+fastmcp = [
+    "mcp>=1.6.0",
+    "fastmcp>=2.0.0",
 ]
+
 
 [project.urls]
 "Homepage" = "https://github.com/smithery-ai/python-sdk"
@@ -59,3 +62,22 @@ ignore = [
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[dependency-groups]
+dev = [
+    {include-group = "lint"},
+    {include-group = "test"},
+]
+lint = [
+    "ruff==0.12.11",
+]
+test = [
+    "httpx>=0.28.1",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=4.0.0",
+    "packaging>=25.0",
+    "mcp>=1.12.4",
+    "fastmcp>=2.12.3",
+]
+

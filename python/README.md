@@ -12,6 +12,11 @@ uv add smithery
 pip install smithery
 ```
 
+### FastMCP Compatibility
+
+When using with existing FastMCP servers, ensure you have compatible versions:
+- `mcp>=1.6.0` OR `fastmcp>=2.0.0`
+
 ## Usage
 
 ```python
