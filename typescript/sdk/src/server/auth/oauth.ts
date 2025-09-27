@@ -38,12 +38,12 @@ export interface OAuthProvider extends ProviderVerifier {
 }
 
 export interface OAuthMountOptions {
-	provider?: OAuthProvider | ProviderVerifier
+	provider?: OAuthProvider | TokenVerifier
 	identity?: IdentityHandler
 }
 
 function isOAuthProvider(
-	provider: OAuthProvider | ProviderVerifier | undefined,
+	provider: OAuthProvider | TokenVerifier | undefined,
 ): provider is OAuthProvider {
 	return !!provider && "authorize" in provider
 }
