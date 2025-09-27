@@ -1,6 +1,6 @@
 {
 	"name": "@smithery/sdk",
-	"version": "1.6.4",
+	"version": "1.6.5",
 	"description": "SDK to develop with Smithery",
 	"type": "module",
 	"main": "./dist/index.js",
