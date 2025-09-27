@@ -1,25 +1,33 @@
+import { authorizationHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/authorize.js"
+import { metadataHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/metadata.js"
+import { clientRegistrationHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/register.js"
+import { revocationHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/revoke.js"
+import { tokenHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/token.js"
+import { requireBearerAuth } from "@modelcontextprotocol/sdk/server/auth/middleware/bearerAuth.js"
 import type {
 	OAuthServerProvider,
 	OAuthTokenVerifier,
 } from "@modelcontextprotocol/sdk/server/auth/provider.js"
-import type { Application, Response } from "express"
-import { requireBearerAuth } from "@modelcontextprotocol/sdk/server/auth/middleware/bearerAuth.js"
 import {
-	mcpAuthMetadataRouter,
 	createOAuthMetadata,
+	mcpAuthMetadataRouter,
 } from "@modelcontextprotocol/sdk/server/auth/router.js"
-import { authorizationHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/authorize.js"
-import { tokenHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/token.js"
-import { clientRegistrationHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/register.js"
-import { revocationHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/revoke.js"
-import { metadataHandler } from "@modelcontextprotocol/sdk/server/auth/handlers/metadata.js"
+import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js"
 import type {
 	OAuthMetadata,
 	OAuthProtectedResourceMetadata,
 } from "@modelcontextprotocol/sdk/shared/auth.js"
-import { mountIdentity, type IdentityHandler } from "./identity.js"
+import type { Application, Response } from "express"
+import { type IdentityHandler, mountIdentity } from "./identity.js"
 
-export interface CallbackOAuthServerProvider extends OAuthServerProvider {
+export interface TokenVerifier extends OAuthTokenVerifier {
+	verifyAccessToken: (token: string) => Promise<AuthInfo>
+	requiredScopes?: string[]
+	resourceMetadataUrl?: string
+}
+
+type ProviderVerifier = OAuthServerProvider & TokenVerifier
+export interface OAuthProvider extends ProviderVerifier {
 	basePath?: string
 	callbackPath?: string
 	handleOAuthCallback?: (
@@ -30,13 +38,13 @@ export interface CallbackOAuthServerProvider extends OAuthServerProvider {
 }
 
 export interface OAuthMountOptions {
-	provider?: CallbackOAuthServerProvider | OAuthTokenVerifier
+	provider?: OAuthProvider | ProviderVerifier
 	identity?: IdentityHandler
 }
 
 function isOAuthProvider(
-	provider: CallbackOAuthServerProvider | OAuthTokenVerifier | undefined,
-): provider is CallbackOAuthServerProvider {
+	provider: OAuthProvider | ProviderVerifier | undefined,
+): provider is OAuthProvider {
 	return !!provider && "authorize" in provider
 }
 
@@ -196,6 +204,8 @@ export function mountOAuth(app: Application, opts: OAuthMountOptions) {
 		app.use("/mcp", (req, res, next) => {
 			return requireBearerAuth({
 				verifier: provider,
+				requiredScopes: provider.requiredScopes,
+				resourceMetadataUrl: provider.resourceMetadataUrl,
 			})(req, res, next)
 		})
 	}
