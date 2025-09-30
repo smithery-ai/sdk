@@ -67,10 +67,7 @@ bun add @smithery/registry
 ### Yarn
 
 ```bash
-yarn add @smithery/registry zod
-
-# Note that Yarn does not install peer dependencies automatically. You will need
-# to install zod as shown above.
+yarn add @smithery/registry
 ```
 
 > [!NOTE]
@@ -438,7 +435,7 @@ httpClient.addHook("requestError", (error, request) => {
   console.groupEnd();
 });
 
-const sdk = new SmitheryRegistry({ httpClient });
+const sdk = new SmitheryRegistry({ httpClient: httpClient });
 ```
 <!-- End Custom HTTP Client [http-client] -->
 

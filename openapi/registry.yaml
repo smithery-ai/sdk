@@ -240,6 +240,15 @@ components:
           type: string
           description: A lambda Javascript function that takes in the config object and returns a StdioConnection object (for stdio type).
           example: "run_server"
+        bundleUrl:
+          type: string
+          description: URL to download the MCPB bundle
+          example: "https://backend.smithery.ai/storage/v1/object/public/bundles/server.mcpb"
+        runtime:
+          type: string
+          description: Runtime environment for the bundle
+          enum: ["node"]
+          example: "node"
 
     Tool:
       type: object
