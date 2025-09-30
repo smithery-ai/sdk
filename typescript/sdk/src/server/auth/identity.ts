@@ -64,7 +64,7 @@ export function createIdentityTokenRouter(options: IdentityHandler): Router {
 			}
 
 			const host = req.get("host") ?? "localhost"
-			const audience = `${req.protocol}://${host}${tokenPath}`
+			const audience = `https://${host}${tokenPath}`
 
 			const { payload } = await jwtVerify(assertion, JWKS, {
 				issuer,

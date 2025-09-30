@@ -119,7 +119,7 @@ export function mountOAuth(app: Application, opts: OAuthMountOptions) {
 		// Identity-only: explicitly mount protected resource metadata endpoint
 		app.use("/.well-known/oauth-protected-resource", (req, res, next) => {
 			const host = req.get("host") ?? "localhost"
-			const issuerUrl = new URL(`${req.protocol}://${host}`)
+			const issuerUrl = new URL(`https://${host}`)
 			const protectedResourceMetadata: OAuthProtectedResourceMetadata = {
 				resource: new URL("/mcp", issuerUrl).href,
 				authorization_servers: [issuerUrl.href],
@@ -130,7 +130,7 @@ export function mountOAuth(app: Application, opts: OAuthMountOptions) {
 		// Identity-only: also advertise minimal AS metadata for discovery per RFC 8414
 		app.use("/.well-known/oauth-authorization-server", (req, res, next) => {
 			const host = req.get("host") ?? "localhost"
-			const issuerUrl = new URL(`${req.protocol}://${host}`)
+			const issuerUrl = new URL(`https://${host}`)
 			const oauthMetadata: Omit<OAuthMetadata, "authorization_endpoint"> = {
 				issuer: issuerUrl.href,
 				token_endpoint: new URL(`${basePath}token`, issuerUrl).href,
