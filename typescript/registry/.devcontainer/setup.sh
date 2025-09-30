@@ -7,8 +7,8 @@ curl -fsSL https://raw.githubusercontent.com/speakeasy-api/speakeasy/main/instal
 rmdir samples || true
 mkdir samples
 
-npm install
-npm install -g ts-node
+npm install --ignore-scripts
+npm install -g ts-node --ignore-scripts
 npm link
 npm link @smithery/registry
 TS_CONFIG_CONTENT=$(cat <<EOL

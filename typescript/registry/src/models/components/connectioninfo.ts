@@ -20,6 +20,17 @@ export const ConnectionInfoType = {
  */
 export type ConnectionInfoType = ClosedEnum<typeof ConnectionInfoType>;
 
+/**
+ * Runtime environment for the bundle
+ */
+export const Runtime = {
+  Node: "node",
+} as const;
+/**
+ * Runtime environment for the bundle
+ */
+export type Runtime = ClosedEnum<typeof Runtime>;
+
 export type ConnectionInfo = {
   /**
    * Connection type
@@ -41,6 +52,14 @@ export type ConnectionInfo = {
    * A lambda Javascript function that takes in the config object and returns a StdioConnection object (for stdio type).
    */
   stdioFunction?: string | undefined;
+  /**
+   * URL to download the MCPB bundle
+   */
+  bundleUrl?: string | undefined;
+  /**
+   * Runtime environment for the bundle
+   */
+  runtime?: Runtime | undefined;
 };
 
 /** @internal */
@@ -65,6 +84,25 @@ export namespace ConnectionInfoType$ {
 }
 
 /** @internal */
+export const Runtime$inboundSchema: z.ZodNativeEnum<typeof Runtime> = z
+  .nativeEnum(Runtime);
+
+/** @internal */
+export const Runtime$outboundSchema: z.ZodNativeEnum<typeof Runtime> =
+  Runtime$inboundSchema;
+
+/**
+ * @internal
+ * @deprecated This namespace will be removed in future versions. Use schemas and types that are exported directly from this module.
+ */
+export namespace Runtime$ {
+  /** @deprecated use `Runtime$inboundSchema` instead. */
+  export const inboundSchema = Runtime$inboundSchema;
+  /** @deprecated use `Runtime$outboundSchema` instead. */
+  export const outboundSchema = Runtime$outboundSchema;
+}
+
+/** @internal */
 export const ConnectionInfo$inboundSchema: z.ZodType<
   ConnectionInfo,
   z.ZodTypeDef,
@@ -75,6 +113,8 @@ export const ConnectionInfo$inboundSchema: z.ZodType<
   configSchema: z.record(z.any()),
   published: z.boolean().optional(),
   stdioFunction: z.string().optional(),
+  bundleUrl: z.string().optional(),
+  runtime: Runtime$inboundSchema.optional(),
 });
 
 /** @internal */
@@ -84,6 +124,8 @@ export type ConnectionInfo$Outbound = {
   configSchema: { [k: string]: any };
   published?: boolean | undefined;
   stdioFunction?: string | undefined;
+  bundleUrl?: string | undefined;
+  runtime?: string | undefined;
 };
 
 /** @internal */
@@ -97,6 +139,8 @@ export const ConnectionInfo$outboundSchema: z.ZodType<
   configSchema: z.record(z.any()),
   published: z.boolean().optional(),
   stdioFunction: z.string().optional(),
+  bundleUrl: z.string().optional(),
+  runtime: Runtime$outboundSchema.optional(),
 });
 
 /**

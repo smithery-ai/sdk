@@ -8,7 +8,7 @@ dotenv.config();
  * Example usage of the @smithery/registry SDK
  *
  * To run this example from the examples directory:
- * npm run build && npx tsx serversList.ts
+ * npm run build && npx tsx serversList.example.ts
  */
 
 import { SmitheryRegistry } from "@smithery/registry";
@@ -18,7 +18,7 @@ const smitheryRegistry = new SmitheryRegistry({
 });
 
 async function main() {
-  const result = await smitheryRegistry.list({
+  const result = await smitheryRegistry.servers.list({
     q: "owner:mem0ai is:verified memory",
   });
 

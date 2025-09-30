@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: 139424e40f5ce4e3e5ba8905d4762d0c
+  docChecksum: e3f2a337c5e89fc506f9192b3bfe9e26
   docVersion: 1.0.0
-  speakeasyVersion: 1.599.0
-  generationVersion: 2.675.0
-  releaseVersion: 0.4.1
-  configChecksum: fbc2cfd1b1408129f33d370fcb09c7b1
+  speakeasyVersion: 1.631.5
+  generationVersion: 2.716.16
+  releaseVersion: 0.4.2
+  configChecksum: a820c11549066d69a8a386333b4a778f
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -16,12 +16,12 @@ features:
     additionalDependencies: 0.1.0
     additionalProperties: 0.1.1
     constsAndDefaults: 0.1.12
-    core: 3.21.20
+    core: 3.21.25
     defaultEnabledRetries: 0.1.0
-    devContainers: 2.90.0
+    devContainers: 2.90.1
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.1.2
-    globalSecurity: 2.82.13
+    globalSecurity: 2.82.14
     globalSecurityCallbacks: 0.1.0
     globalSecurityFlattening: 0.1.0
     globalServerURLs: 2.82.5
@@ -46,6 +46,7 @@ generatedFiles:
   - docs/models/components/connectioninfotype.md
   - docs/models/components/inputschema.md
   - docs/models/components/pagination.md
+  - docs/models/components/runtime.md
   - docs/models/components/security.md
   - docs/models/components/serverdetailresponse.md
   - docs/models/components/serverdetailresponsesecurity.md
