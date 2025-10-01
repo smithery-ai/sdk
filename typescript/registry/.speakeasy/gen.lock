@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: e3f2a337c5e89fc506f9192b3bfe9e26
+  docChecksum: 442c3f62184a48c00f10428d9efa0440
   docVersion: 1.0.0
   speakeasyVersion: 1.631.5
   generationVersion: 2.716.16
-  releaseVersion: 0.4.2
-  configChecksum: a820c11549066d69a8a386333b4a778f
+  releaseVersion: 0.4.3
+  configChecksum: 956dee9a3fa0211a5f407fe357204dcc
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
