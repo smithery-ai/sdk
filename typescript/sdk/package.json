@@ -27,6 +27,8 @@
 		"json-schema": "^0.4.0",
 		"lodash": "^4.17.21",
 		"okay-error": "^1.0.3",
+		"pino": "^9.13.0",
+		"pino-pretty": "^13.1.1",
 		"uuid": "^11.0.3",
 		"zod": "^3.23.8",
 		"zod-to-json-schema": "^3.24.1"
