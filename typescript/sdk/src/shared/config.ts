@@ -124,6 +124,7 @@ export function parseAndValidateConfig<T = Record<string, unknown>>(
 				instance: req.originalUrl,
 				configSchema: jsonSchema,
 				errors,
+				help: "Pass config as URL query params. Example: /mcp?param1=value1&param2=value2",
 			} as const)
 		}
 		return ok(result.data)

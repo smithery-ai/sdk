@@ -87,6 +87,33 @@ your-server/
 └── README.md
 ```
 
+**Important:** Your project MUST use the [src layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/) for Smithery builds to work correctly. The `src/` directory is **not optional** - it's required for proper packaging and deployment. Here's why:
+
+1. **Prevents import conflicts** - Keeps your package isolated from project config files
+2. **Ensures clean builds** - Only distributes intended code, not development files
+3. **Required by Smithery** - Our build system expects the src layout structure
+
+**Correct structure (src layout):**
+```
+your-server/
+├── pyproject.toml
+├── smithery.yaml
+├── src/                    # ← REQUIRED directory
+│   └── your_package/       # ← Your importable package goes here
+│       ├── __init__.py
+│       └── server.py
+```
+
+**WRONG - Flat layout (will break builds):**
+```
+your-server/
+├── pyproject.toml
+├── smithery.yaml
+├── your_package/           # ← DON'T put package at root level!
+│   ├── __init__.py
+│   └── server.py
+```
+
 ### Customizing Your Project
 
 **Important:** You'll want to rename `hello_server` to match your actual project:
@@ -112,6 +139,15 @@ your-server/
    ```
 
 **Note:** The function name `create_server` can be anything you want - just make sure the `[tool.smithery]` server path matches your actual function name (e.g., `"module:my_function_name"`).
+
+**Common mistake:** When renaming `hello_server`, always keep your package **inside** the `src/` directory:
+```bash
+# Correct: Rename within src/
+mv src/hello_server src/your_package
+
+# Wrong: Don't move to root
+mv src/hello_server your_package  # This breaks builds!
+```
 
 ## Session Configuration
 

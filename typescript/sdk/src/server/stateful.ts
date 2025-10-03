@@ -9,6 +9,8 @@ import { parseAndValidateConfig } from "../shared/config.js"
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
 import { zodToJsonSchema } from "zod-to-json-schema"
 import { type SessionStore, createLRUStore } from "./session.js"
+import { createLogger } from "./logger.js"
+import type { Logger } from "./logger.js"
 
 /**
  * Arguments when we create a new instance of your server
@@ -17,6 +19,7 @@ export interface CreateServerArg<T = Record<string, unknown>> {
 	sessionId: string
 	config: T
 	auth?: AuthInfo
+	logger: Logger
 }
 
 export type CreateServerFn<T = Record<string, unknown>> = (
@@ -39,6 +42,10 @@ export interface StatefulServerOptions<T = Record<string, unknown>> {
 	 * Express app instance to use (optional)
 	 */
 	app?: express.Application
+	/**
+	 * Log level for the server (default: 'info')
+	 */
+	logLevel?: "debug" | "info" | "warn" | "error"
 }
 
 /**
@@ -58,8 +65,20 @@ export function createStatefulServer<T = Record<string, unknown>>(
 
 	const sessionStore = options?.sessionStore ?? createLRUStore()
 
+	const logger = createLogger(options?.logLevel ?? "info")
+
 	// Handle POST requests for client-to-server communication
 	app.post("/mcp", async (req, res) => {
+		// Log incoming MCP request
+		logger.debug(
+			{
+				method: req.body.method,
+				id: req.body.id,
+				sessionId: req.headers["mcp-session-id"],
+			},
+			"MCP Request",
+		)
+
 		// Check for existing session ID
 		const sessionId = req.headers["mcp-session-id"] as string | undefined
 		let transport: StreamableHTTPServerTransport
@@ -90,6 +109,10 @@ export function createStatefulServer<T = Record<string, unknown>>(
 			const configResult = parseAndValidateConfig(req, options?.schema)
 			if (!configResult.ok) {
 				const status = (configResult.error.status as number) || 400
+				logger.error(
+					{ error: configResult.error, sessionId: newSessionId },
+					"Config validation failed",
+				)
 				res.status(status).json(configResult.error)
 				return
 			}
@@ -97,16 +120,21 @@ export function createStatefulServer<T = Record<string, unknown>>(
 			const config = configResult.value
 
 			try {
+				logger.info({ sessionId: newSessionId }, "Creating new session")
 				const server = createMcpServer({
 					sessionId: newSessionId,
 					config: config as T,
 					auth: (req as unknown as { auth?: AuthInfo }).auth,
+					logger,
 				})
 
 				// Connect to the MCP server
 				await server.connect(transport)
 			} catch (error) {
-				console.error("Error initializing server:", error)
+				logger.error(
+					{ error, sessionId: newSessionId },
+					"Error initializing server",
+				)
 				res.status(500).json({
 					jsonrpc: "2.0",
 					error: {
@@ -119,6 +147,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 			}
 		} else {
 			// Invalid request
+			logger.warn({ sessionId }, "Session not found or expired")
 			res.status(400).json({
 				jsonrpc: "2.0",
 				error: {
@@ -132,6 +161,16 @@ export function createStatefulServer<T = Record<string, unknown>>(
 
 		// Handle the request
 		await transport.handleRequest(req, res, req.body)
+
+		// Log successful response
+		logger.debug(
+			{
+				method: req.body.method,
+				id: req.body.id,
+				sessionId: req.headers["mcp-session-id"],
+			},
+			"MCP Response sent",
+		)
 	})
 
 	// Add .well-known/mcp-config endpoint for configuration discovery
@@ -179,6 +218,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 		const sessionId = req.headers["mcp-session-id"] as string | undefined
 
 		if (!sessionId) {
+			logger.warn("Session termination request missing session ID")
 			res.status(400).json({
 				jsonrpc: "2.0",
 				error: {
@@ -192,6 +232,7 @@ export function createStatefulServer<T = Record<string, unknown>>(
 
 		const transport = sessionStore.get(sessionId)
 		if (!transport) {
+			logger.warn({ sessionId }, "Session termination failed - not found")
 			res.status(404).json({
 				jsonrpc: "2.0",
 				error: {
@@ -205,6 +246,8 @@ export function createStatefulServer<T = Record<string, unknown>>(
 
 		// Close the transport
 		transport.close?.()
+
+		logger.info({ sessionId }, "Session terminated")
 
 		// Acknowledge session termination with 204 No Content
 		res.status(204).end()
