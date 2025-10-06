@@ -133,6 +133,7 @@ components:
         - homepage
         - useCount
         - createdAt
+        - verified
       properties:
         qualifiedName:
           type: string
@@ -150,6 +151,15 @@ components:
           type: string
           description: Link to Smithery server page
           example: "https://smithery.ai/server/smithery-ai/fetch"
+        iconUrl:
+          type: string
+          nullable: true
+          description: URL to the server's icon image
+          example: "https://example.com/icon.png"
+        verified:
+          type: boolean
+          description: Whether the server has been verified by Smithery
+          example: true
         useCount:
           type: integer
           description: Number of times the server has been used via tool calling
