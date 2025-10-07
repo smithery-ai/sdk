@@ -12,6 +12,8 @@ let value: ServerListResponse = {
       displayName: "Fetch",
       description: "A server for fetching web content",
       homepage: "https://smithery.ai/server/smithery-ai/fetch",
+      iconUrl: "https://example.com/icon.png",
+      verified: true,
       useCount: 12345,
       createdAt: new Date("2023-01-01T12:00:00Z"),
     },

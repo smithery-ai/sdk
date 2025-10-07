@@ -25,6 +25,14 @@ export type ServerListItem = {
    */
   homepage: string;
   /**
+   * URL to the server's icon image
+   */
+  iconUrl?: string | null | undefined;
+  /**
+   * Whether the server has been verified by Smithery
+   */
+  verified: boolean;
+  /**
    * Number of times the server has been used via tool calling
    */
   useCount: number;
@@ -44,6 +52,8 @@ export const ServerListItem$inboundSchema: z.ZodType<
   displayName: z.string(),
   description: z.string(),
   homepage: z.string(),
+  iconUrl: z.nullable(z.string()).optional(),
+  verified: z.boolean(),
   useCount: z.number().int(),
   createdAt: z.string().datetime({ offset: true }).transform(v => new Date(v)),
 });
@@ -54,6 +64,8 @@ export type ServerListItem$Outbound = {
   displayName: string;
   description: string;
   homepage: string;
+  iconUrl?: string | null | undefined;
+  verified: boolean;
   useCount: number;
   createdAt: string;
 };
@@ -68,6 +80,8 @@ export const ServerListItem$outboundSchema: z.ZodType<
   displayName: z.string(),
   description: z.string(),
   homepage: z.string(),
+  iconUrl: z.nullable(z.string()).optional(),
+  verified: z.boolean(),
   useCount: z.number().int(),
   createdAt: z.date().transform(v => v.toISOString()),
 });

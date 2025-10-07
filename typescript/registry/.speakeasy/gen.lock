@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: 442c3f62184a48c00f10428d9efa0440
+  docChecksum: ee057120bff5d9dbf85e22a3a1ea1991
   docVersion: 1.0.0
-  speakeasyVersion: 1.631.5
-  generationVersion: 2.716.16
-  releaseVersion: 0.4.3
-  configChecksum: 956dee9a3fa0211a5f407fe357204dcc
+  speakeasyVersion: 1.635.1
+  generationVersion: 2.722.2
+  releaseVersion: 0.4.4
+  configChecksum: 24be9ac9956ac4a95ac3ef68bcdc1e81
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -16,7 +16,7 @@ features:
     additionalDependencies: 0.1.0
     additionalProperties: 0.1.1
     constsAndDefaults: 0.1.12
-    core: 3.21.25
+    core: 3.21.26
     defaultEnabledRetries: 0.1.0
     devContainers: 2.90.1
     enumUnions: 0.1.0
@@ -135,7 +135,7 @@ examples:
           pageSize: 10
       responses:
         "200":
-          application/json: {"servers": [{"qualifiedName": "smithery-ai/fetch", "displayName": "Fetch", "description": "A server for fetching web content", "homepage": "https://smithery.ai/server/smithery-ai/fetch", "useCount": 12345, "createdAt": "2023-01-01T12:00:00Z"}, {"qualifiedName": "smithery-ai/fetch", "displayName": "Fetch", "description": "A server for fetching web content", "homepage": "https://smithery.ai/server/smithery-ai/fetch", "useCount": 12345, "createdAt": "2023-01-01T12:00:00Z"}], "pagination": {"currentPage": 1, "pageSize": 10, "totalPages": 5, "totalCount": 47}}
+          application/json: {"servers": [{"qualifiedName": "smithery-ai/fetch", "displayName": "Fetch", "description": "A server for fetching web content", "homepage": "https://smithery.ai/server/smithery-ai/fetch", "verified": true, "useCount": 12345, "createdAt": "2023-01-01T12:00:00Z"}, {"qualifiedName": "smithery-ai/fetch", "displayName": "Fetch", "description": "A server for fetching web content", "homepage": "https://smithery.ai/server/smithery-ai/fetch", "verified": true, "useCount": 12345, "createdAt": "2023-01-01T12:00:00Z"}], "pagination": {"currentPage": 1, "pageSize": 10, "totalPages": 5, "totalCount": 47}}
         "401":
           application/json: {"error": "Unauthorized: Invalid API key"}
         "500":
@@ -156,3 +156,6 @@ examples:
           application/json: {"error": "An unexpected error occurred"}
 examplesVersion: 1.0.2
 generatedTests: {}
+releaseNotes: |
+  ## Typescript SDK Changes Detected:
+  * `smitheryregistry.servers.list()`:  `response.servers.[]` **Changed**
