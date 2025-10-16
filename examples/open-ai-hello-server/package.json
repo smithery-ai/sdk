@@ -10,16 +10,11 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "@smithery/sdk": "file:../../typescript/sdk",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "@smithery/sdk": "^1.0.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.5.2",
-    "@types/react": "^18.3.1",
-    "@types/react-dom": "^18.3.0",
-    "typescript": "^5.6.0"
+    "@smithery/cli": "^1.5.2"
   }
 }
 
