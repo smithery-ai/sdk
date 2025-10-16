@@ -11,17 +11,13 @@ export interface WidgetResourceOptions {
   name: string
   description: string
   bundle: string
-  prefersBorder?: boolean
-  csp?: {
-    connect?: string[]
-    resources?: string[]
-  }
 }
 
 export interface WidgetToolOptions {
   template: string
   invoking?: string
   invoked?: string
+  widgetAccessible?: boolean
 }
 
 export function response(options: WidgetResponseOptions) {
@@ -53,7 +49,7 @@ export function error(message: string, details?: unknown) {
 }
 
 export function resource(options: WidgetResourceOptions) {
-  const { name, description, bundle, prefersBorder, csp } = options
+  const { name, description, bundle } = options
 
   const uri = `ui://widget/${name}.html`
 
@@ -65,39 +61,38 @@ export function resource(options: WidgetResourceOptions) {
 <script type="module">${js}</script>
     `.trim()
 
-    const resourceMeta: Record<string, unknown> = {
-      "openai/widgetDescription": description,
-    }
-
-    if (prefersBorder !== undefined) {
-      resourceMeta["openai/widgetPrefersBorder"] = prefersBorder
-    }
-
-    if (csp) {
-      resourceMeta["openai/widgetCSP"] = {
-        connect_domains: csp.connect ?? [],
-        resource_domains: csp.resources ?? [],
-      }
-    }
-
     return {
       contents: [
         {
           uri,
           text: html,
           mimeType: "text/html+skybridge" as const,
-          _meta: resourceMeta,
         },
       ],
     }
   }
 
-  return { uri, metadata: { title: `${name} Widget`, description }, handler }
+  const toolConfig = (options?: Omit<WidgetToolOptions, "template">) => {
+    return {
+      "openai/outputTemplate": uri,
+      "openai/widgetAccessible": options?.widgetAccessible ?? true,
+      ...(options?.invoking && { "openai/toolInvocation/invoking": options.invoking }),
+      ...(options?.invoked && { "openai/toolInvocation/invoked": options.invoked }),
+    }
+  }
+
+  return { 
+    uri, 
+    metadata: { title: `${name} Widget`, description }, 
+    handler,
+    toolConfig,
+  }
 }
 
 export function toolConfig(options: WidgetToolOptions): Record<string, unknown> {
   const meta: Record<string, unknown> = {
     "openai/outputTemplate": `ui://widget/${options.template}.html`,
+    "openai/widgetAccessible": options.widgetAccessible ?? true,
   }
 
   if (options.invoking) {
