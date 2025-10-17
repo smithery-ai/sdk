@@ -3,4 +3,5 @@ dist/
 .smithery/
 .DS_Store
 *.log
+.env
 
