@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, Component, type ReactNode } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { MemoryRouter, Routes, Route, useNavigate, useLocation, Outlet } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -9,6 +9,7 @@ import {
   useToolResponseMetadata,
   useWidgetState,
   useRequestDisplayMode,
+  ErrorBoundary,
 } from "@smithery/sdk/react";
 import type { CoffeeShop } from "../../shared/types";
 
@@ -331,54 +332,6 @@ function ShopInspector({ shop, isFavorite, onToggleFavorite, onClose, isDark, di
       </div>
     </div>
   );
-}
-
-interface ErrorBoundaryProps {
-  children: ReactNode;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          padding: "40px 20px",
-          textAlign: "center",
-          color: "#ef4444",
-          backgroundColor: "#fef2f2",
-          borderRadius: "8px",
-          margin: "20px",
-        }}>
-          <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
-            Something went wrong
-          </h2>
-          <p style={{ fontSize: "14px", color: "#7f1d1d" }}>
-            {this.state.error?.message || "An unexpected error occurred"}
-          </p>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
 }
 
 export default function CoffeeMap() {
