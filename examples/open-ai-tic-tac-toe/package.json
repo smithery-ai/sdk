@@ -17,7 +17,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.6.1",
+    "@smithery/cli": "^1.6.2",
     "@types/canvas-confetti": "^1.6.4",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
