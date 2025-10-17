@@ -39,7 +39,8 @@
 		"build": "tsc",
 		"build:all": "npm run build -ws --include-workspace-root",
 		"watch": "tsc --watch",
-		"check": "npx @biomejs/biome check --write --unsafe"
+		"check": "npx @biomejs/biome check --write --unsafe",
+		"prepare": "npm run build"
 	},
 	"packageManager": "npm@11.4.1",
 	"license": "MIT",
