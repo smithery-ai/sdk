@@ -9,11 +9,17 @@ export default function createServer() {
     version: "1.0.0",
   })
 
-  const greeterWidget = widget.resource({
-    name: "greeter",
-    description: "A simple greeting widget",
-    bundle: ".smithery/greeter.js", // should be optional with default
+  const greeterWidget = widget.resource<GreeterState>({
+    name: "greeter", // Used as resource ID, in URI (ui://widget/greeter.html), bundle path (.smithery/greeter.js), and HTML root ID
+    description: "A simple greeting widget", // Becomes openai/widgetDescription in resource _meta
   })
+
+  server.registerResource(
+    greeterWidget.name,
+    greeterWidget.uri,
+    {},
+    greeterWidget.handler
+  )
 
   server.registerTool(
     "say-hello",
@@ -31,24 +37,17 @@ export default function createServer() {
     async (args) => {
       const { name } = args
 
-      const state: GreeterState = {
+      const structuredData: GreeterState = {
         name,
         greeting: `Hello, ${name}!`,
         timestamp: new Date().toISOString(),
       }
 
-      return widget.response({
-        state,
+      return greeterWidget.response({
+        structuredData,
         message: `Said hello to ${name}`,
       })
     }
-  )
-
-  server.registerResource(
-    "greeter-widget",
-    greeterWidget.uri,
-    greeterWidget.metadata,
-    greeterWidget.handler
   )
 
   return server.server

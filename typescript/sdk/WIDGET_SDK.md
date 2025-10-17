@@ -135,11 +135,11 @@ const gameState = useWidgetState<GameState>()
 - Type-safe with generics
 - Auto-updates when server responds
 
-**`useWidgetAction<TArgs, TResult>()`** - Call tools
+**`useCallTool<TArgs, TResult>()`** - Call tools
 ```typescript
-const makeMove = useWidgetAction<{ position: number }>("make-move")
+const makeMove = useCallTool<{ position: number }>("make-move")
 
-makeMove.mutate({ position: 5 })
+makeMove.call({ position: 5 })
 makeMove.isPending  // boolean
 makeMove.error      // Error | null
 makeMove.data       // TResult | null
@@ -148,9 +148,21 @@ makeMove.data       // TResult | null
 - Type-safe arguments and results
 - Automatic error handling
 
-**`usePersistentState<T>()`** - Client-side state
+**`useSendFollowUp()`** - Send conversational follow-ups
 ```typescript
-const [uiState, setUiState] = usePersistentState({
+const followUp = useSendFollowUp()
+
+followUp.send("Draft an itinerary for my favorites")
+followUp.isPending  // boolean
+followUp.error      // Error | null
+```
+- Inserts message into conversation as if user typed it
+- Built-in loading/error states
+- Cleaner than direct `window.openai.sendFollowUpMessage` calls
+
+**`useWidgetState<T>()`** - Client-side state
+```typescript
+const [uiState, setUiState] = useWidgetState({
   soundEnabled: true,
   gamesPlayed: 0,
 })
@@ -238,31 +250,31 @@ export default function createServer({ config }) {
 
 ```typescript
 import {
+  useToolOutput,
   useWidgetState,
-  useWidgetAction,
+  useCallTool,
   useTheme,
-  usePersistentState,
 } from "@smithery/sdk/react"
 import type { MyState } from "./types"
 
 export function MyWidget() {
-  const state = useWidgetState<MyState>()
-  const action = useWidgetAction<{ name: string }>("my-tool")
+  const output = useToolOutput<MyState>()
+  const tool = useCallTool<{ name: string }>("my-tool")
   const theme = useTheme()
-  const [uiState, setUiState] = usePersistentState({ count: 0 })
+  const [uiState, setUiState] = useWidgetState({ count: 0 })
 
-  if (!state) return <div>Loading...</div>
+  if (!output?.structuredContent) return <div>Loading...</div>
 
   return (
     <div className={theme}>
-      <h1>{state.title}</h1>
+      <h1>{output.structuredContent?.title}</h1>
       <button
-        onClick={() => action.mutate({ name: "Alice" })}
-        disabled={action.isPending}
+        onClick={() => tool.call({ name: "Alice" })}
+        disabled={tool.isPending}
       >
-        {action.isPending ? "Loading..." : "Click me"}
+        {tool.isPending ? "Loading..." : "Click me"}
       </button>
-      {action.error && <div>{action.error.message}</div>}
+      {tool.error && <div>{tool.error.message}</div>}
       <div>UI State: {uiState.count}</div>
     </div>
   )

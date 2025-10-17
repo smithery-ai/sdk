@@ -37,6 +37,14 @@
 		"./react": {
 			"types": "./dist/react/index.d.ts",
 			"default": "./dist/react/index.js"
+		},
+		"./shared/config": {
+			"types": "./dist/shared/config.d.ts",
+			"default": "./dist/shared/config.js"
+		},
+		"./shared/config.js": {
+			"types": "./dist/shared/config.d.ts",
+			"default": "./dist/shared/config.js"
 		}
 	},
 	"files": [

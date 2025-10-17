@@ -72,12 +72,7 @@ export function useToolResponseMetadata<T = Record<string, unknown>>() {
   return useOpenAiGlobal("toolResponseMetadata") as T | undefined
 }
 
-export function useWidgetState<T = unknown>(): T | null {
-	const output = useOpenAiGlobal("toolOutput")
-	return (output ?? null) as T | null
-}
-
-export function useWidgetAction<
+export function useCallTool<
   TArgs = Record<string, unknown>,
   TResult = unknown
 >(toolName: string) {
@@ -87,7 +82,7 @@ export function useWidgetAction<
 
   const callTool = useOpenAiGlobal("callTool")
 
-  const mutate = useCallback(
+  const call = useCallback(
     async (args: TArgs) => {
       if (!callTool) {
         setError(new Error("callTool not available"))
@@ -116,16 +111,46 @@ export function useWidgetAction<
     [callTool, toolName]
   )
 
-  return { mutate, isPending, error, data }
+  return { call, isPending, error, data }
 }
 
-export function usePersistentState<T extends Record<string, unknown>>(
+export function useSendFollowUp() {
+  const [isPending, setIsPending] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  const sendFollowUpMessage = useOpenAiGlobal("sendFollowUpMessage")
+
+  const send = useCallback(
+    async (prompt: string) => {
+      if (!sendFollowUpMessage) {
+        setError(new Error("sendFollowUpMessage not available"))
+        return
+      }
+
+      setIsPending(true)
+      setError(null)
+
+      try {
+        await sendFollowUpMessage({ prompt })
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error(String(err)))
+      } finally {
+        setIsPending(false)
+      }
+    },
+    [sendFollowUpMessage]
+  )
+
+  return { send, isPending, error }
+}
+
+export function useWidgetState<T extends Record<string, unknown>>(
   defaultState: T | (() => T)
 ): readonly [T, (state: SetStateAction<T>) => void]
-export function usePersistentState<T extends Record<string, unknown>>(
+export function useWidgetState<T extends Record<string, unknown>>(
   defaultState?: T | (() => T | null) | null
 ): readonly [T | null, (state: SetStateAction<T | null>) => void]
-export function usePersistentState<T extends Record<string, unknown>>(
+export function useWidgetState<T extends Record<string, unknown>>(
   defaultState?: T | (() => T | null) | null
 ): readonly [T | null, (state: SetStateAction<T | null>) => void] {
   const widgetStateFromWindow = useOpenAiGlobal("widgetState") as T | null

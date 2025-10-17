@@ -1,16 +1,22 @@
 import { readFile } from "node:fs/promises"
 import { resolve } from "node:path"
 
-export interface WidgetResponseOptions {
-  state: Record<string, unknown>
+export interface WidgetResponseOptions<TState = Record<string, unknown>> {
+  structuredData: TState
   message: string
   meta?: Record<string, unknown>
 }
 
 export interface WidgetResourceOptions {
   name: string
-  description: string
-  bundle: string
+  description?: string
+  prefersBorder?: boolean
+  csp?: {
+    connect_domains?: string[]
+    resource_domains?: string[]
+  }
+  bundle?: string
+  bundleCSS?: string | string[]
 }
 
 export interface WidgetToolOptions {
@@ -20,11 +26,13 @@ export interface WidgetToolOptions {
   widgetAccessible?: boolean
 }
 
-export function response(options: WidgetResponseOptions) {
-  const { state, message, meta = {} } = options
+export function response<TState = Record<string, unknown>>(
+  options: WidgetResponseOptions<TState>
+) {
+  const { structuredData, message, meta = {} } = options
 
   return {
-    structuredContent: state as Record<string, unknown>,
+    structuredContent: structuredData as Record<string, unknown>,
     content: [
       {
         type: "text" as const,
@@ -48,18 +56,41 @@ export function error(message: string, details?: unknown) {
   }
 }
 
-export function resource(options: WidgetResourceOptions) {
-  const { name, description, bundle } = options
+export function resource<TState = Record<string, unknown>>(options: WidgetResourceOptions): {
+  name: string
+  uri: string
+  handler: () => Promise<{
+    contents: Array<{
+      uri: string
+      text: string
+      mimeType: "text/html+skybridge"
+      _meta?: Record<string, unknown>
+    }>
+  }>
+  toolConfig: (options?: Omit<WidgetToolOptions, "template">) => Record<string, unknown>
+  response: (options: WidgetResponseOptions<TState>) => ReturnType<typeof response<TState>>
+  register: (server: { registerResource: (name: string, uri: string, metadata: Record<string, unknown>, handler: () => Promise<{ contents: Array<{ uri: string; text: string; mimeType: string; _meta?: Record<string, unknown> }> }>) => void }) => void
+} {
+  const { name, description, prefersBorder, csp, bundle = `.smithery/${name}.js` } = options
 
   const uri = `ui://widget/${name}.html`
 
   const handler = async () => {
     const js = await readFile(resolve(process.cwd(), bundle), "utf-8")
 
+    const cssUrls = Array.isArray(options.bundleCSS) ? options.bundleCSS : (options.bundleCSS ? [options.bundleCSS] : [])
+    const cssLinks = cssUrls.map(url => `<link rel="stylesheet" href="${url}">`).join('\n')
+
     const html = `
 <div id="${name}-root"></div>
+${cssLinks}
 <script type="module">${js}</script>
     `.trim()
+
+    const _meta: Record<string, unknown> = {}
+    if (description) _meta["openai/widgetDescription"] = description
+    if (prefersBorder !== undefined) _meta["openai/widgetPrefersBorder"] = prefersBorder
+    if (csp) _meta["openai/widgetCSP"] = csp
 
     return {
       contents: [
@@ -67,6 +98,7 @@ export function resource(options: WidgetResourceOptions) {
           uri,
           text: html,
           mimeType: "text/html+skybridge" as const,
+          ...(Object.keys(_meta).length > 0 && { _meta }),
         },
       ],
     }
@@ -81,11 +113,21 @@ export function resource(options: WidgetResourceOptions) {
     }
   }
 
+  const typedResponse = (options: WidgetResponseOptions<TState>) => {
+    return response<TState>(options)
+  }
+
+  const register = (server: { registerResource: (name: string, uri: string, metadata: Record<string, unknown>, handler: () => Promise<{ contents: Array<{ uri: string; text: string; mimeType: string; _meta?: Record<string, unknown> }> }>) => void }) => {
+    server.registerResource(name, uri, {}, handler)
+  }
+
   return { 
+    name,
     uri, 
-    metadata: { title: `${name} Widget`, description }, 
     handler,
     toolConfig,
+    response: typedResponse,
+    register,
   }
 }
 

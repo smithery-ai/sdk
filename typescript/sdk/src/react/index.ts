@@ -10,8 +10,8 @@ export {
   useToolOutput,
   useToolResponseMetadata,
   useWidgetState,
-  useWidgetAction,
-  usePersistentState,
+  useCallTool,
+  useSendFollowUp,
 } from "./hooks.js"
 
 export type {
