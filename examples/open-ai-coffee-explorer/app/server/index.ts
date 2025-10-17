@@ -26,7 +26,7 @@ export default function createServer() {
         "https://unpkg.com"
       ]
     },
-    bundleCSS: "https://unpkg.com/mapbox-gl@3.1.0/dist/mapbox-gl.css",
+    cssURLs: "https://unpkg.com/mapbox-gl@3.1.0/dist/mapbox-gl.css",
   });
 
   coffeeMap.register(server);
