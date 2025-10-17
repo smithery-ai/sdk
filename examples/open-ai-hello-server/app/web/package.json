@@ -1,0 +1,18 @@
+{
+  "name": "greeter-widget",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@smithery/sdk": "^1.0.0",
+    "canvas-confetti": "^1.9.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.6.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.7.2"
+  }
+}
+

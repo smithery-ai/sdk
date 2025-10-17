@@ -1,0 +1,20 @@
+{
+  "name": "open-ai-hello-server",
+  "version": "1.0.0",
+  "description": "A simple greeting widget",
+  "type": "module",
+  "module": "./app/server/index.ts",
+  "scripts": {
+    "dev": "npx @smithery/cli dev",
+    "build": "npx @smithery/cli build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@smithery/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@smithery/cli": "^1.5.2"
+  }
+}
+
