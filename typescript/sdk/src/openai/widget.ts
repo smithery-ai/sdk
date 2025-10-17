@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises"
 import { resolve } from "node:path"
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
 export interface WidgetResponseOptions<TState = Record<string, unknown>> {
   structuredData: TState
@@ -15,9 +16,9 @@ export interface WidgetResourceOptions {
     connect_domains?: string[]
     resource_domains?: string[]
   }
-  bundle?: string
+  bundlePath?: string
   bundleURL?: string
-  bundleCSS?: string | string[]
+  cssURLs?: string | string[]
 }
 
 export interface WidgetToolOptions {
@@ -25,6 +26,12 @@ export interface WidgetToolOptions {
   invoking?: string
   invoked?: string
   widgetAccessible?: boolean
+}
+
+export interface WidgetErrorOptions {
+  message: string
+  details?: unknown
+  meta?: Record<string, unknown>
 }
 
 export function response<TState = Record<string, unknown>>(
@@ -44,7 +51,20 @@ export function response<TState = Record<string, unknown>>(
   }
 }
 
-export function error(message: string, details?: unknown) {
+export function error(options: string | WidgetErrorOptions) {
+  const isString = typeof options === 'string'
+  const message = isString ? options : options.message
+  const details = isString ? undefined : options.details
+  const meta = isString ? undefined : options.meta
+
+  const finalMeta: Record<string, unknown> = {
+    ...(meta || {}),
+  }
+
+  if (details) {
+    finalMeta.errorDetails = details
+  }
+
   return {
     content: [
       {
@@ -53,7 +73,7 @@ export function error(message: string, details?: unknown) {
       },
     ],
     isError: true,
-    _meta: details ? { errorDetails: details } : undefined,
+    ...(Object.keys(finalMeta).length > 0 && { _meta: finalMeta }),
   }
 }
 
@@ -70,9 +90,9 @@ export function resource<TState = Record<string, unknown>>(options: WidgetResour
   }>
   toolConfig: (options?: Omit<WidgetToolOptions, "template">) => Record<string, unknown>
   response: (options: WidgetResponseOptions<TState>) => ReturnType<typeof response<TState>>
-  register: (server: { registerResource: (name: string, uri: string, metadata: Record<string, unknown>, handler: () => Promise<{ contents: Array<{ uri: string; text: string; mimeType: string; _meta?: Record<string, unknown> }> }>) => void }) => void
+  register: (server: Pick<McpServer, 'registerResource'>) => void
 } {
-  const { name, description, prefersBorder, csp, bundle = `.smithery/${name}.js`, bundleURL } = options
+  const { name, description, prefersBorder, csp, bundlePath = `.smithery/${name}.js`, bundleURL } = options
 
   const uri = `ui://widget/${name}.html`
 
@@ -82,11 +102,11 @@ export function resource<TState = Record<string, unknown>>(options: WidgetResour
     if (bundleURL) {
       scriptTag = `<script type="module" src="${bundleURL}"></script>`
     } else {
-      const js = await readFile(resolve(process.cwd(), bundle), "utf-8")
+      const js = await readFile(resolve(process.cwd(), bundlePath), "utf-8")
       scriptTag = `<script type="module">${js}</script>`
     }
 
-    const cssUrls = Array.isArray(options.bundleCSS) ? options.bundleCSS : (options.bundleCSS ? [options.bundleCSS] : [])
+    const cssUrls = Array.isArray(options.cssURLs) ? options.cssURLs : (options.cssURLs ? [options.cssURLs] : [])
     const cssLinks = cssUrls.map(url => `<link rel="stylesheet" href="${url}">`).join('\n')
 
     const html = `
@@ -125,7 +145,7 @@ ${scriptTag}
     return response<TState>(options)
   }
 
-  const register = (server: { registerResource: (name: string, uri: string, metadata: Record<string, unknown>, handler: () => Promise<{ contents: Array<{ uri: string; text: string; mimeType: string; _meta?: Record<string, unknown> }> }>) => void }) => {
+  const register = (server: Pick<McpServer, 'registerResource'>) => {
     server.registerResource(name, uri, {}, handler)
   }
 

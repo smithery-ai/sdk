@@ -21,13 +21,11 @@ export { createWidgetServer } from "./server/widget.js"
 export type { WidgetServerOptions } from "./server/widget.js"
 
 // === Widget SDK - Helpers ===
-// tool() - Clean API for tool metadata
 // widget.response() - Standard success response
 // widget.error() - Standard error response  
 // widget.resource() - Auto-generate widget HTML
-export { tool, widget } from "./helpers/index.js"
+export { widget } from "./helpers/index.js"
 export type {
-	ToolConfig,
 	WidgetToolOptions,
 	WidgetResponseOptions,
 	WidgetResourceOptions,
