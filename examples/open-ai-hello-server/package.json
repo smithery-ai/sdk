@@ -5,16 +5,23 @@
   "type": "module",
   "module": "./app/server/index.ts",
   "scripts": {
-    "dev": "npx @smithery/cli dev",
-    "build": "npx @smithery/cli build"
+    "build": "node build.mjs",
+    "dev": "node build.mjs && node app/server/index.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "@smithery/sdk": "file:../../typescript/sdk",
-    "zod": "^3.23.0"
+    "@smithery/sdk": "^1.7.2",
+    "zod": "^3.23.0",
+    "canvas-confetti": "^1.9.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.5.3"
+    "@types/canvas-confetti": "^1.6.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.7.2"
   }
 }
 

@@ -9,11 +9,18 @@ export default function createServer() {
     version: "1.0.0",
   })
 
+  // Using SDK helper to create widget resource
+  // This automatically:
+  // - Loads .smithery/greeter.js
+  // - Constructs HTML with <div id="greeter-root">
+  // - Sets uri to ui://widget/greeter.html
+  // - Adds widget description to _meta
   const greeterWidget = widget.resource<GreeterState>({
-    name: "greeter", // Used as resource ID, in URI (ui://widget/greeter.html), bundle path (.smithery/greeter.js), and HTML root ID
-    description: "A simple greeting widget", // Becomes openai/widgetDescription in resource _meta
+    name: "greeter",
+    description: "A simple greeting widget displaying personalized greetings",
   })
 
+  // Register the resource using the SDK-generated handler
   server.registerResource(
     greeterWidget.name,
     greeterWidget.uri,
@@ -29,6 +36,7 @@ export default function createServer() {
       inputSchema: {
         name: z.string().min(1).describe("Name of person to greet"),
       },
+      // Using widget-specific toolConfig (knows template URI automatically)
       _meta: greeterWidget.toolConfig({
         invoking: "Preparing greeting...",
         invoked: "Greeting ready!",
@@ -43,6 +51,7 @@ export default function createServer() {
         timestamp: new Date().toISOString(),
       }
 
+      // Using widget-specific response helper (type-safe with GreeterState)
       return greeterWidget.response({
         structuredData,
         message: `Said hello to ${name}`,
