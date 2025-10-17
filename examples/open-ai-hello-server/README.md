@@ -1,79 +1,61 @@
 # Hello Widget Example
 
-A minimal example of a ChatGPT widget using the Smithery SDK.
+A minimal ChatGPT app with interactive greeting widget, confetti animation, and theme support.
 
-## What It Does
+Built with [Smithery CLI](https://smithery.ai/docs)
 
-Greets someone by name with a beautiful widget displaying:
-- Personalized greeting message
-- Timestamp of when greeted
-- Theme-aware styling (light/dark)
+## Prerequisites
 
-## Running Locally
+- **Smithery API key**: Get yours at [smithery.ai/account/api-keys](https://smithery.ai/account/api-keys)
+
+## Getting Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start smithery playground:
+   ```bash
+   npm run dev
+   ```
+
+Try asking: "Say hello to Alice"
+
+## Development
+
+Your code is organized as:
+- `app/server/` - MCP server with widget resource
+- `app/shared/` - Shared TypeScript types
+- `app/web/src/` - React widget component
+
+Edit `app/web/src/greeter.tsx` to customize the widget UI.
+
+## Build
 
 ```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Visit http://localhost:3000/mcp in MCP Inspector
+npm run build
 ```
 
-## Project Structure
+Creates bundled server and widget JS in `.smithery/`
 
-```
-app/
-├── server/
-│   ├── types.ts       # Shared types
-│   └── index.ts       # MCP server with SDK helpers
-└── web/
-    └── src/
-        ├── greeter.tsx        # Widget component (default export)
-        └── types.ts           # Re-export server types
-smithery.yaml          # Must include "type: widget"
-```
+## Deploy
 
-**Note:** No `index.tsx` needed - the CLI auto-generates the entry point!
+Ready to deploy? Push your code to GitHub and deploy to Smithery:
 
-## Key Features
+1. Create a new repository at [github.com/new](https://github.com/new)
 
-### Server Side (`app/server/index.ts`)
+2. Initialize git and push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Hello widget"
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+   git push -u origin main
+   ```
 
-- Uses `createWidgetServer()` from SDK
-- Clean `tool()` helper for metadata
-- `widget.response()` for standard responses
-- `widget.resource()` auto-generates widget HTML
+3. Deploy your app to Smithery at [smithery.ai/new](https://smithery.ai/new)
 
-### Client Side (`app/web/src/greeter.tsx`)
+## Learn More
 
-- `useWidgetState<GreeterState>()` for type-safe state
-- `useTheme()` for theme-aware styling
-- Zero boilerplate - just React
-
-## Configuration
-
-`smithery.yaml`:
-```yaml
-runtime: typescript
-type: widget
-```
-
-The `type: widget` tells the CLI to:
-- Bundle the server code
-- Bundle the client widget(s) from `app/web/src/`
-- Auto-generate the React entry point
-- Watch both server and client files in dev mode
-
-## Total Code
-
-- **Server:** ~40 lines (types + logic)
-- **Client:** ~60 lines (just the component)
-- **Config:** 2 lines (smithery.yaml)
-- **Total:** ~102 lines for complete working widget
-
-Compare to vanilla MCP: ~300+ lines (66% reduction!)
-
-**No boilerplate:** CLI auto-generates the entry point from your component!
-
+- [Smithery Docs](https://smithery.ai/docs)
+- [MCP Protocol](https://modelcontextprotocol.io)
