@@ -1,0 +1,20 @@
+{
+  "name": "open-ai-solar-system",
+  "version": "1.0.0",
+  "description": "Interactive solar system visualization with CDN-based widget",
+  "type": "module",
+  "module": "./app/server/index.ts",
+  "scripts": {
+    "dev": "npx @smithery/cli dev",
+    "build": "npx @smithery/cli build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@smithery/sdk": "file:../../typescript/sdk",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@smithery/cli": "^1.5.3"
+  }
+}
+
