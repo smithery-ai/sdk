@@ -20,16 +20,16 @@ export * from "./server/auth/oauth.js"
 export { createWidgetServer } from "./server/widget.js"
 export type { WidgetServerOptions } from "./server/widget.js"
 
-// === Widget SDK - Helpers ===
+// === Widget SDK - OpenAI ===
 // widget.response() - Standard success response
 // widget.error() - Standard error response  
 // widget.resource() - Auto-generate widget HTML
-export { widget } from "./helpers/index.js"
+export { widget } from "./openai/index.js"
 export type {
 	WidgetToolOptions,
 	WidgetResponseOptions,
 	WidgetResourceOptions,
-} from "./helpers/index.js"
+} from "./openai/index.js"
 
 // === Widget SDK - React Types ===
 // Common types re-exported for convenience (full hooks in @smithery/sdk/react)
