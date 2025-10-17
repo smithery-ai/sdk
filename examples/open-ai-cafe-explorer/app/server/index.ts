@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { widget } from "@smithery/sdk";
+import { widget } from "@smithery/sdk/openai";
 import type { MapState, SearchParams } from "../shared/types.js";
 import { coffeeShops } from "./data.js";
 
@@ -29,7 +29,12 @@ export default function createServer() {
     cssURLs: "https://unpkg.com/mapbox-gl@3.1.0/dist/mapbox-gl.css",
   });
 
-  coffeeMap.register(server);
+  server.registerResource(
+    coffeeMap.name,
+    coffeeMap.uri,
+    {},
+    coffeeMap.handler
+  );
 
   server.registerTool(
     "search-coffee-shops",

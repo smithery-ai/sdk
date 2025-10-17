@@ -12,6 +12,7 @@ export {
 	useWidgetState,
 	useCallTool,
 	useSendFollowUp,
+	useRequestDisplayMode,
 } from "./hooks.js"
 
 export type {

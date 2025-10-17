@@ -145,6 +145,22 @@ export function useSendFollowUp() {
 	return { send, isPending, error }
 }
 
+export function useRequestDisplayMode() {
+	const requestDisplayMode = useOpenAiGlobal("requestDisplayMode")
+
+	const request = useCallback(
+		async (mode: "inline" | "pip" | "fullscreen") => {
+			if (!requestDisplayMode) {
+				return
+			}
+			await requestDisplayMode({ mode })
+		},
+		[requestDisplayMode],
+	)
+
+	return request
+}
+
 export function useWidgetState<T extends Record<string, unknown>>(
 	defaultState: T | (() => T),
 ): readonly [T, (state: SetStateAction<T>) => void]

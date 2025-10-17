@@ -6,14 +6,12 @@
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
-		},
-		"./*": {
-			"types": "./dist/*.d.ts",
-			"default": "./dist/*.js"
-		}
+		".": "./dist/index.js",
+		"./react": "./dist/react/index.js",
+		"./openai": "./dist/openai/index.js",
+		"./server": "./dist/server/index.js",
+		"./helpers": "./dist/helpers/index.js",
+		"./*": "./dist/*"
 	},
 	"files": [
 		"dist"

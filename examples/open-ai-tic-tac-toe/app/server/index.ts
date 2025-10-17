@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
-import { widget } from "@smithery/sdk"
-import type { GameState } from "./types.js"
+import { widget } from "@smithery/sdk/openai"
+import type { GameState } from "../shared/types.js"
 
 let gameState: GameState = {
   board: Array(9).fill(null),

@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
-import { widget } from "@smithery/sdk"
+import { widget } from "@smithery/sdk/openai"
 import type { GreeterState } from "./types.js"
 
 export default function createServer() {

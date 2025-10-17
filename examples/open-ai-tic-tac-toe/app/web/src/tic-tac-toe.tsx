@@ -1,17 +1,27 @@
 import { useTheme, useToolResponseMetadata, useDisplayMode, useMaxHeight, useCallTool } from "@smithery/sdk/react"
 import { useEffect, useRef } from "react"
 import confetti from "canvas-confetti"
-import type { GameState } from "../../server/types.js"
+import type { GameState } from "../../shared/types.js"
+import "./tic-tac-toe.css"
+
+function useRequestDisplayMode() {
+  return (mode: 'fullscreen' | 'inline' | 'pip') => {
+    return window.openai?.requestDisplayMode?.({ mode })
+  }
+}
+
+function ExpandButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button className="expand-button" onClick={onClick}>
+      Expand
+    </button>
+  )
+}
 
 export default function TicTacToe() {
   if (!window.openai) {
     return (
-      <div style={{
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        padding: "40px 20px",
-        textAlign: "center",
-        color: "#6b7280"
-      }}>
+      <div className="ttt-error">
         <p>Please open this widget in ChatGPT</p>
       </div>
     )
@@ -21,6 +31,7 @@ export default function TicTacToe() {
   const displayMode = useDisplayMode()
   const maxHeight = useMaxHeight()
   const metadata = useToolResponseMetadata<{ gameState?: GameState }>()
+  const requestDisplayMode = useRequestDisplayMode()
   
   const { call: makeMove } = useCallTool<{ position: number }>("make-move")
   const { call: startGame } = useCallTool("start-game")
@@ -33,6 +44,7 @@ export default function TicTacToe() {
   }
 
   const isFullscreen = displayMode === "fullscreen"
+  const isDark = theme === "dark"
   const previousWinnerRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -86,113 +98,71 @@ export default function TicTacToe() {
     return `${gameState.currentPlayer}'s Turn`
   }
 
+  const containerClasses = [
+    'ttt-container',
+    isFullscreen ? 'fullscreen' : 'inline',
+    isDark ? 'dark' : 'light'
+  ].join(' ')
+
+  const titleClasses = [
+    'ttt-title',
+    isFullscreen ? 'fullscreen' : 'inline'
+  ].join(' ')
+
+  const statusClasses = [
+    'ttt-status',
+    isFullscreen ? 'fullscreen' : ''
+  ].filter(Boolean).join(' ')
+
+  const boardClasses = [
+    'ttt-board',
+    isFullscreen ? 'fullscreen' : ''
+  ].filter(Boolean).join(' ')
+
   return (
-    <div style={{
-      ...styles.container,
-      backgroundColor: theme === "dark" ? "#0d0d0d" : "#fafafa",
-      color: theme === "dark" ? "#e5e5e5" : "#1f2937",
-      minHeight: isFullscreen ? (maxHeight ?? "100vh") : "100vh",
-      maxHeight: maxHeight ?? "100vh",
-      padding: isFullscreen ? "40px 20px" : "20px",
-    }}>
-      <h1 style={{
-        ...styles.title,
-        fontSize: isFullscreen ? "28px" : "24px",
-      }}>Tic-Tac-Toe</h1>
-      <div style={{
-        ...styles.status,
-        color: theme === "dark" ? "#e5e5e5" : "#1f2937"
-      }}>
+    <div 
+      className={containerClasses}
+      style={{ 
+        height: isFullscreen ? (maxHeight ?? "100vh") : undefined,
+        maxHeight: maxHeight ?? "100vh" 
+      }}
+    >
+      {!isFullscreen && (
+        <ExpandButton onClick={() => requestDisplayMode('fullscreen')} />
+      )}
+
+      <h1 className={titleClasses}>Tic-Tac-Toe</h1>
+      
+      <div className={statusClasses}>
         {getStatusText()}
       </div>
-      <div style={{
-        ...styles.board,
-        gridTemplateColumns: isFullscreen ? "repeat(3, 120px)" : "repeat(3, 100px)",
-        gap: isFullscreen ? "12px" : "10px",
-      }}>
-        {gameState.board.map((cell, index) => (
-          <button
-            key={index}
-            style={{
-              ...styles.cell,
-              width: isFullscreen ? "120px" : "100px",
-              height: isFullscreen ? "120px" : "100px",
-              fontSize: isFullscreen ? "40px" : "32px",
-              backgroundColor: theme === "dark" ? "#1c1c1c" : "#ffffff",
-              border: `2px solid ${theme === "dark" ? "#2d2d2d" : "#e5e7eb"}`,
-              color: theme === "dark" ? "#e5e5e5" : "#1f2937",
-              cursor: !gameState.gameOver && cell === null ? "pointer" : "not-allowed",
-              opacity: !gameState.gameOver && cell === null ? 1 : 0.6,
-            }}
-            onClick={() => handleCellClick(index)}
-            disabled={gameState.gameOver || cell !== null}
-          >
-            {cell}
-          </button>
-        ))}
+      
+      <div className={boardClasses}>
+        {gameState.board.map((cell, index) => {
+          const isClickable = !gameState.gameOver && cell === null
+          const cellClasses = [
+            'ttt-cell',
+            isFullscreen ? 'fullscreen' : '',
+            isDark ? 'dark' : 'light',
+            isClickable ? 'clickable' : 'disabled'
+          ].filter(Boolean).join(' ')
+
+          return (
+            <button
+              key={index}
+              className={cellClasses}
+              onClick={() => handleCellClick(index)}
+              disabled={!isClickable}
+            >
+              {cell}
+            </button>
+          )
+        })}
       </div>
-      <button 
-        style={{
-          ...styles.button,
-          backgroundColor: theme === "dark" ? "#007AFF" : "#007AFF",
-        }}
-        onClick={handleNewGame}
-      >
+      
+      <button className="ttt-button" onClick={handleNewGame}>
         {gameState.gameOver ? "New Game" : "Reset"}
       </button>
     </div>
   )
 }
-
-const styles = {
-  container: {
-    padding: "20px",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', sans-serif",
-    display: "flex" as const,
-    flexDirection: "column" as const,
-    alignItems: "center" as const,
-    minHeight: "100vh",
-  } as const,
-  title: {
-    textAlign: "center" as const,
-    marginBottom: "10px",
-    fontSize: "24px",
-    fontWeight: 600 as const,
-    letterSpacing: "-0.02em",
-  },
-  status: {
-    textAlign: "center" as const,
-    fontSize: "18px",
-    marginBottom: "20px",
-    fontWeight: "bold" as const,
-  },
-  board: {
-    display: "grid" as const,
-    gridTemplateColumns: "repeat(3, 100px)",
-    gap: "10px",
-    marginBottom: "20px",
-  },
-  cell: {
-    width: "100px",
-    height: "100px",
-    fontSize: "32px",
-    fontWeight: "bold" as const,
-    borderRadius: "6px",
-    transition: "all 0.2s",
-    display: "flex" as const,
-    alignItems: "center" as const,
-    justifyContent: "center" as const,
-  },
-  button: {
-    width: "320px",
-    padding: "12px",
-    fontSize: "16px",
-    fontWeight: 600 as const,
-    color: "#fff",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer" as const,
-    transition: "all 0.2s",
-  } as const,
-}
-
