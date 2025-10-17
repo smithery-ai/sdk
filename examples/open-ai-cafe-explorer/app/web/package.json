@@ -6,7 +6,7 @@
     "build": "tsx build.ts"
   },
   "dependencies": {
-    "@smithery/sdk": "file:../../../../typescript/sdk",
+    "@smithery/sdk": "^1.7.2",
     "mapbox-gl": "^3.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
