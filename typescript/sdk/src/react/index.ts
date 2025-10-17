@@ -24,3 +24,5 @@ export type {
 	CallToolResponse,
 	OpenAiGlobals,
 } from "./types.js"
+
+export { ErrorBoundary } from "./ErrorBoundary.js"
