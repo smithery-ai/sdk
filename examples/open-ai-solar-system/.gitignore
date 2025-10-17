@@ -1,6 +1,6 @@
 node_modules/
-dist/
 .smithery/
-.DS_Store
+dist/
 *.log
+.DS_Store
 

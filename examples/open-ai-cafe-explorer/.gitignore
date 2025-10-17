@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.smithery/
+.DS_Store
+*.log
+.env
+

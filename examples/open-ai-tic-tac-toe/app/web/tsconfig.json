@@ -14,7 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
   },
-  "include": ["src/**/*", "../server/types.ts"],
+  "include": ["src/**/*", "../shared/types.ts"],
   "exclude": ["node_modules"]
 }
 

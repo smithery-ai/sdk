@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, Component, type ReactNode } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { MemoryRouter, Routes, Route, useNavigate, useLocation, Outlet } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -8,11 +8,12 @@ import {
   useMaxHeight,
   useToolResponseMetadata,
   useWidgetState,
+  useRequestDisplayMode,
+  ErrorBoundary,
 } from "@smithery/sdk/react";
 import type { CoffeeShop } from "../../shared/types";
-import { MAPBOX_TOKEN } from "./config";
 
-mapboxgl.accessToken = MAPBOX_TOKEN;
+mapboxgl.accessToken = "pk.eyJ1IjoiZXJpY25pbmciLCJhIjoiY21icXlubWM1MDRiczJvb2xwM2p0amNyayJ9.n-3O6JI5nOp_Lw96ZO5vJQ";
 
 function fitMapToMarkers(map: mapboxgl.Map, coords: [number, number][]) {
   if (!map || !coords.length) return;
@@ -37,6 +38,7 @@ function MapContainer() {
   const maxHeight = useMaxHeight();
   const metadata = useToolResponseMetadata<{ shops?: CoffeeShop[], selectedShopId?: string }>();
   const [widgetState, setWidgetState] = useWidgetState<{ favorites: string[] }>({ favorites: [] });
+  const requestDisplayMode = useRequestDisplayMode();
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -137,10 +139,6 @@ function MapContainer() {
     }));
   };
 
-  const requestFullscreen = () => {
-    window.openai?.requestDisplayMode?.({ mode: "fullscreen" });
-  };
-
   return (
     <div
       style={{
@@ -159,7 +157,7 @@ function MapContainer() {
       
       {!isFullscreen && (
         <button
-          onClick={requestFullscreen}
+          onClick={() => requestDisplayMode("fullscreen")}
           style={{
             position: "absolute",
             top: "12px",
@@ -209,89 +207,6 @@ function MapContainer() {
   );
 }
 
-interface ShopsSidebarProps {
-  shops: CoffeeShop[];
-  selectedId: string | null;
-  favorites: string[];
-  onSelectShop: (shop: CoffeeShop) => void;
-  onToggleFavorite: (shopId: string) => void;
-  isDark: boolean;
-}
-
-function ShopsSidebar({ shops, selectedId, favorites, onSelectShop, onToggleFavorite, isDark }: ShopsSidebarProps) {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: "340px",
-        zIndex: 20,
-        background: isDark ? "#0a0a0a" : "#ffffff",
-        overflowY: "auto",
-        padding: "16px",
-      }}
-    >
-      <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "16px" }}>
-        {shops.length} Coffee Shops
-      </h2>
-      
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-        {shops.map(shop => (
-          <div
-            key={shop.id}
-            onClick={() => onSelectShop(shop)}
-            style={{
-              padding: "12px",
-              borderRadius: "12px",
-              background: selectedId === shop.id
-                ? isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"
-                : "transparent",
-              cursor: "pointer",
-              display: "flex",
-              gap: "12px",
-              alignItems: "start",
-              border: `1px solid ${selectedId === shop.id ? (isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)") : "transparent"}`,
-            }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 600, fontSize: "14px", marginBottom: "4px" }}>
-                {shop.name}
-              </div>
-              <div style={{
-                fontSize: "12px",
-                color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
-                marginBottom: "4px",
-              }}>
-                {shop.neighborhood} • {shop.priceRange}
-              </div>
-              <div style={{ fontSize: "12px", color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)" }}>
-                ⭐ {shop.rating}
-              </div>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFavorite(shop.id);
-              }}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "20px",
-                padding: "4px",
-              }}
-            >
-              {favorites.includes(shop.id) ? "❤️" : "🤍"}
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 interface ShopInspectorProps {
   shop: CoffeeShop;
   isFavorite: boolean;
@@ -302,7 +217,6 @@ interface ShopInspectorProps {
 }
 
 function ShopInspector({ shop, isFavorite, onToggleFavorite, onClose, isDark, displayMode = "inline" }: ShopInspectorProps) {
-  const isFullscreen = displayMode === "fullscreen";
   
   return (
     <div
@@ -418,54 +332,6 @@ function ShopInspector({ shop, isFavorite, onToggleFavorite, onClose, isDark, di
       </div>
     </div>
   );
-}
-
-interface ErrorBoundaryProps {
-  children: ReactNode;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          padding: "40px 20px",
-          textAlign: "center",
-          color: "#ef4444",
-          backgroundColor: "#fef2f2",
-          borderRadius: "8px",
-          margin: "20px",
-        }}>
-          <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
-            Something went wrong
-          </h2>
-          <p style={{ fontSize: "14px", color: "#7f1d1d" }}>
-            {this.state.error?.message || "An unexpected error occurred"}
-          </p>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
 }
 
 export default function CoffeeMap() {

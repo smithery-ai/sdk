@@ -1,7 +1,7 @@
 {
-  "name": "tic-tac-toe",
+  "name": "open-ai-solar-system",
   "version": "1.0.0",
-  "description": "An interactive tic-tac-toe game widget",
+  "description": "Interactive solar system visualization with CDN-based widget",
   "type": "module",
   "module": "./app/server/index.ts",
   "scripts": {
@@ -14,7 +14,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.5.2"
+    "@smithery/cli": "^1.5.3"
   }
 }
 
