@@ -5,8 +5,8 @@
   "type": "module",
   "module": "./app/server/index.ts",
   "scripts": {
-    "build": "node build.mjs",
-    "dev": "node build.mjs && node app/server/index.ts"
+    "build": "npx @smithery/cli build",
+    "dev": "npx @smithery/cli dev"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
@@ -17,6 +17,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@smithery/cli": "^1.6.1",
     "@types/canvas-confetti": "^1.6.4",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
