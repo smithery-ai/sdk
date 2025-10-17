@@ -3,4 +3,3 @@ export interface GreeterState extends Record<string, unknown> {
   greeting: string
   timestamp: string
 }
-

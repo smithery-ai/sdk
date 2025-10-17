@@ -1,11 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
 import { widget } from "@smithery/sdk/openai"
-import type { GreeterState } from "./types.js"
+import type { GreeterState } from "../shared/types.js"
 
 export default function createServer() {
   const server = new McpServer({
-    name: "Hello Widget",
+    name: "Hello App",
     version: "1.0.0",
   })
 
