@@ -22,7 +22,7 @@ export type { WidgetServerOptions } from "./server/widget.js"
 
 // === Widget SDK - OpenAI ===
 // widget.response() - Standard success response
-// widget.error() - Standard error response  
+// widget.error() - Standard error response
 // widget.resource() - Auto-generate widget HTML
 export { widget } from "./openai/index.js"
 export type {
