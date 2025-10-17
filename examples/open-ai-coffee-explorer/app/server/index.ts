@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { widget } from "@smithery/sdk";
-import type { CoffeeShop, MapState, SearchParams } from "../shared/types.js";
+import type { MapState, SearchParams } from "../shared/types.js";
 import { coffeeShops } from "./data.js";
 
 export default function createServer() {

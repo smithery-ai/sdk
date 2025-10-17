@@ -10,8 +10,9 @@ import {
   useWidgetState,
 } from "@smithery/sdk/react";
 import type { CoffeeShop } from "../../shared/types";
+import { MAPBOX_TOKEN } from "./config";
 
-mapboxgl.accessToken = "pk.eyJ1IjoiZXJpY25pbmciLCJhIjoiY21icXlubWM1MDRiczJvb2xwM2p0amNyayJ9.n-3O6JI5nOp_Lw96ZO5vJQ";
+mapboxgl.accessToken = MAPBOX_TOKEN;
 
 function fitMapToMarkers(map: mapboxgl.Map, coords: [number, number][]) {
   if (!map || !coords.length) return;
@@ -254,17 +255,6 @@ function ShopsSidebar({ shops, selectedId, favorites, onSelectShop, onToggleFavo
               border: `1px solid ${selectedId === shop.id ? (isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)") : "transparent"}`,
             }}
           >
-            <img
-              src={shop.thumbnail}
-              alt={shop.name}
-              style={{
-                width: "60px",
-                height: "60px",
-                borderRadius: "8px",
-                objectFit: "cover",
-                flexShrink: 0,
-              }}
-            />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 600, fontSize: "14px", marginBottom: "4px" }}>
                 {shop.name}

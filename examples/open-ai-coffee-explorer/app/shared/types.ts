@@ -8,8 +8,6 @@ export interface CoffeeShop {
   vibe: string[];
   priceRange: "$" | "$$" | "$$$";
   rating: number;
-  instagram?: string;
-  thumbnail: string;
   openHours: string;
 }
 

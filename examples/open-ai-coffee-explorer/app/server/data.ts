@@ -11,8 +11,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Cozy", "Artisanal", "European"],
     priceRange: "$$",
     rating: 4.6,
-    instagram: "@tiongbahrubakery",
-    thumbnail: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&auto=format&fit=crop",
     openHours: "8am - 6pm"
   },
   {
@@ -25,8 +23,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Minimalist", "Professional", "Specialty"],
     priceRange: "$$",
     rating: 4.7,
-    instagram: "@commonmancoffeeroasters",
-    thumbnail: "https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&auto=format&fit=crop",
     openHours: "8am - 5pm"
   },
   {
@@ -39,8 +35,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Industrial", "Authentic", "Local"],
     priceRange: "$",
     rating: 4.8,
-    instagram: "@nyloncoffeeroasters",
-    thumbnail: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&auto=format&fit=crop",
     openHours: "9am - 6pm"
   },
   {
@@ -53,8 +47,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Community", "Relaxed", "Friendly"],
     priceRange: "$$",
     rating: 4.5,
-    instagram: "@fortyhandscoffee",
-    thumbnail: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&auto=format&fit=crop",
     openHours: "8am - 10pm"
   },
   {
@@ -67,8 +59,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Heritage", "Spacious", "Instagram-worthy"],
     priceRange: "$$",
     rating: 4.4,
-    instagram: "@cshcafe",
-    thumbnail: "https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&auto=format&fit=crop",
     openHours: "9am - 6pm"
   },
   {
@@ -81,8 +71,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Cozy", "Hidden", "Intimate"],
     priceRange: "$",
     rating: 4.6,
-    instagram: "@apartmentcoffee",
-    thumbnail: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop",
     openHours: "11am - 7pm"
   },
   {
@@ -95,8 +83,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Eclectic", "Diverse", "Educational"],
     priceRange: "$$",
     rating: 4.5,
-    instagram: "@homegroundcoffee",
-    thumbnail: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&auto=format&fit=crop",
     openHours: "9am - 6pm"
   },
   {
@@ -109,8 +95,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Australian", "Brunch", "Vibrant"],
     priceRange: "$$",
     rating: 4.4,
-    instagram: "@sarniessg",
-    thumbnail: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=800&auto=format&fit=crop",
     openHours: "8am - 4pm"
   },
   {
@@ -123,8 +107,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Sophisticated", "Evening", "Wine"],
     priceRange: "$$$",
     rating: 4.5,
-    instagram: "@thecuriouspalette",
-    thumbnail: "https://images.unsplash.com/photo-1559496417-e7f25c2c3680?w=800&auto=format&fit=crop",
     openHours: "10am - 11pm"
   },
   {
@@ -137,8 +119,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Japanese", "Zen", "Quiet"],
     priceRange: "$$",
     rating: 4.7,
-    instagram: "@mellowercoffee",
-    thumbnail: "https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=800&auto=format&fit=crop",
     openHours: "10am - 7pm"
   },
   {
@@ -151,8 +131,6 @@ export const coffeeShops: CoffeeShop[] = [
     vibe: ["Contemporary", "Specialty", "Minimalist"],
     priceRange: "$$",
     rating: 4.6,
-    instagram: "@catacoffe",
-    thumbnail: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&auto=format&fit=crop",
     openHours: "9am - 6pm"
   }
 ];
