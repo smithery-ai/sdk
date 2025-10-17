@@ -1,22 +1,16 @@
-name: Publish TypeScript SDK to npm
+name: Release TypeScript SDK
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'typescript/sdk**'
-  workflow_dispatch:  # Allows manual triggering
-
-permissions:
-  contents: write
+    tags:
+      - 'typescript/sdk/v*'
 
 concurrency:
-  group: ts-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
 
     defaults:
@@ -24,36 +18,35 @@ jobs:
         working-directory: typescript/sdk
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
+          node-version: '22'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - run: npm ci
+      - run: npm run build
+      - run: npm run check
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: typescript/sdk
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-
-      - name: Configure Git
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-      - name: Bump version
-        run: |
-          mkdir -p .git
-          npm version patch -m "chore: bump version to %s [skip ci]"
-          git push
-          git push --tags
-
-      - name: Publish to npm
-        run: npm publish --access public
+      - run: npm ci
+      - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
