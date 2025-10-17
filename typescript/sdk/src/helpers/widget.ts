@@ -16,6 +16,7 @@ export interface WidgetResourceOptions {
     resource_domains?: string[]
   }
   bundle?: string
+  bundleURL?: string
   bundleCSS?: string | string[]
 }
 
@@ -71,12 +72,19 @@ export function resource<TState = Record<string, unknown>>(options: WidgetResour
   response: (options: WidgetResponseOptions<TState>) => ReturnType<typeof response<TState>>
   register: (server: { registerResource: (name: string, uri: string, metadata: Record<string, unknown>, handler: () => Promise<{ contents: Array<{ uri: string; text: string; mimeType: string; _meta?: Record<string, unknown> }> }>) => void }) => void
 } {
-  const { name, description, prefersBorder, csp, bundle = `.smithery/${name}.js` } = options
+  const { name, description, prefersBorder, csp, bundle = `.smithery/${name}.js`, bundleURL } = options
 
   const uri = `ui://widget/${name}.html`
 
   const handler = async () => {
-    const js = await readFile(resolve(process.cwd(), bundle), "utf-8")
+    let scriptTag: string
+    
+    if (bundleURL) {
+      scriptTag = `<script type="module" src="${bundleURL}"></script>`
+    } else {
+      const js = await readFile(resolve(process.cwd(), bundle), "utf-8")
+      scriptTag = `<script type="module">${js}</script>`
+    }
 
     const cssUrls = Array.isArray(options.bundleCSS) ? options.bundleCSS : (options.bundleCSS ? [options.bundleCSS] : [])
     const cssLinks = cssUrls.map(url => `<link rel="stylesheet" href="${url}">`).join('\n')
@@ -84,7 +92,7 @@ export function resource<TState = Record<string, unknown>>(options: WidgetResour
     const html = `
 <div id="${name}-root"></div>
 ${cssLinks}
-<script type="module">${js}</script>
+${scriptTag}
     `.trim()
 
     const _meta: Record<string, unknown> = {}
