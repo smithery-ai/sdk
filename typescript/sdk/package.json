@@ -11,7 +11,26 @@
 	"types": "./dist/index.d.ts",
 	"exports": {
 		".": "./dist/index.js",
-		"./*": "./dist/*"
+		"./server": "./dist/server/index.js",
+		"./server/stateful.js": "./dist/server/stateful.js",
+		"./server/stateless.js": "./dist/server/stateless.js",
+		"./server/logger.js": "./dist/server/logger.js",
+		"./server/session.js": "./dist/server/session.js",
+		"./server/widget.js": "./dist/server/widget.js",
+		"./server/auth/oauth.js": "./dist/server/auth/oauth.js",
+		"./server/auth/identity.js": "./dist/server/auth/identity.js",
+		"./shared/config.js": "./dist/shared/config.js",
+		"./shared/patch.js": "./dist/shared/patch.js",
+		"./helpers": "./dist/helpers/index.js",
+		"./helpers/tool.js": "./dist/helpers/tool.js",
+		"./helpers/widget.js": "./dist/helpers/widget.js",
+		"./react": "./dist/react/index.js",
+		"./react/hooks.js": "./dist/react/hooks.js",
+		"./react/types.js": "./dist/react/types.js",
+		"./react/ErrorBoundary.js": "./dist/react/ErrorBoundary.js",
+		"./react/WidgetRoot.js": "./dist/react/WidgetRoot.js",
+		"./openai": "./dist/openai/index.js",
+		"./openai/widget.js": "./dist/openai/widget.js"
 	},
 	"files": [
 		"dist"
