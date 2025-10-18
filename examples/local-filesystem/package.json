@@ -1,0 +1,25 @@
+{
+	"name": "smithery-local-filesystem",
+	"version": "1.0.0",
+	"description": "MCP server with local filesystem access",
+	"main": "index.js",
+	"module": "./src/index.ts",
+	"type": "module",
+	"scripts": {
+		"dev": "npx smithery dev",
+		"build": "npx smithery build"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.18.2",
+		"@smithery/sdk": "^1.6.4",
+		"glob": "^11.0.0",
+		"zod": "^3.25.46"
+	},
+	"devDependencies": {
+		"@smithery/cli": "^1.6.2"
+	}
+}
+
