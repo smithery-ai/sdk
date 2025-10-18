@@ -60,11 +60,16 @@ export function useToolInput<T = Record<string, unknown>>() {
 	return useOpenAiGlobal("toolInput") as T | undefined
 }
 
-export function useToolOutput<T = unknown>() {
+export function useToolOutput<
+	TStructured = unknown,
+	TMeta = Record<string, unknown>
+>() {
 	const output = useOpenAiGlobal("toolOutput")
+	const meta = useOpenAiGlobal("toolResponseMetadata")
 	return {
 		content: output?.content ?? [],
-		structuredContent: output?.structuredContent as T | undefined,
+		structuredContent: output?.structuredContent as TStructured | undefined,
+		meta: meta as TMeta | undefined,
 	}
 }
 
