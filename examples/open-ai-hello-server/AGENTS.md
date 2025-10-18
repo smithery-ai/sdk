@@ -138,30 +138,40 @@ server.registerTool(
 
 ### 3. Tool Response Structure
 
-Three fields control data distribution:
+**Three fields with distinct purposes:**
 
 ```typescript
 return {
   structuredContent: {
-    // Visible to BOTH model and app
-    // Model can reason about this data
-    // Keep concise - only what model needs
+    // For MODEL reasoning only - keep minimal!
+    // Model sees this in conversation context
+    // Example: { action: "move_made", position: 5, nextPlayer: "O" }
   },
   content: [
-    // Text for model conversation only
-    { type: "text", text: "Description for chat" }
+    // For MODEL conversation - natural language
+    { type: "text", text: "Move made. O's turn next." }
   ],
   _meta: {
-    // Invisible to model, visible to app only
-    // Use for: full datasets, UI config, internal IDs
+    // For UI rendering - INVISIBLE to model
+    // Put full state here
+    // Example: { gameState: { board: [...], currentPlayer: "O", ... } }
   }
 }
 ```
 
-**Design pattern:**
-- `structuredContent`: Summary for model reasoning (e.g., "5 tasks in 3 columns")
-- `content`: Natural language for conversation (e.g., "Here's your kanban board")
-- `_meta`: Full datasets for app UI (e.g., complete task objects with descriptions)
+**Example:**
+
+```typescript
+// Separate types for model summaries vs UI state
+type ActionSummary = { action: "task_added"; taskId: string; count: number }
+type FullState = { tasks: Task[]; columns: Column[]; ... }
+
+return widget.response({
+  structuredData: { action: "task_added", taskId: "123", count: 5 },
+  message: "Added task. You now have 5 tasks.",
+  meta: { appState: fullTaskBoardState },
+})
+```
 
 ---
 
@@ -171,30 +181,45 @@ return {
 
 ```typescript
 import { useToolOutput, useTheme, useDisplayMode } from "@smithery/sdk/react"
-import type { GreeterState } from "../../../shared/types.js"
+import type { GameState } from "../../shared/types.js"
 
-export default function Greeter() {
-  const { structuredContent: state } = useToolOutput<GreeterState>()
+// Action summaries for model (in structuredContent)
+type GameAction = 
+  | { action: "game_started"; firstPlayer: "X" }
+  | { action: "move_made"; position: number; player: "X" | "O" }
+
+export default function Game() {
+  // useToolOutput returns ALL three fields: content, structuredContent, meta
+  const { meta } = useToolOutput<GameAction, { gameState?: GameState }>()
+  
+  // Always use meta for UI state (full data, invisible to model)
+  const gameState = meta?.gameState
+  
   const theme = useTheme()
   const displayMode = useDisplayMode()
 
-  if (!state) {
+  if (!gameState) {
     return <div>Loading...</div>
   }
 
   return (
-    <div className={`greeter ${theme}`}>
-      <h1>{state.greeting}</h1>
-      <p>Greeted at: {state.timestamp}</p>
+    <div className={`game ${theme}`}>
+      <h1>Current Player: {gameState.currentPlayer}</h1>
+      {/* Render full board from meta.gameState */}
     </div>
   )
 }
 ```
 
 **Key hooks:**
-- `useToolOutput<T>()` - Access tool response data
+- `useToolOutput<TStructured, TMeta>()` - Returns `{ content, structuredContent, meta }`
+  - `content`: Text for model conversation
+  - `structuredContent`: Action summary for model (typed as `TStructured`)
+  - `meta`: Full state for UI rendering (typed as `TMeta`)
 - `useTheme()` - "light" | "dark" (default: "dark")
 - `useDisplayMode()` - "inline" | "pip" | "fullscreen" (default: "inline")
+
+**Pattern:** Destructure only what you need. UI typically only needs `meta`.
 
 ### 2. Calling Tools from App
 
@@ -499,10 +524,14 @@ npm run build
 - Make touch-friendly (buttons large enough, proper spacing)
 
 ### Data Management
-- `structuredContent`: Summary for model (e.g., counts, names, IDs)
-- `_meta`: Full objects for app (e.g., descriptions, URLs, nested data)
-- `widgetState`: User preferences and selections only
-- Keep widgetState lean (< 4k tokens)
+
+**Best practices for structuring data:**
+
+- **`structuredContent`**: Minimal summaries for model reasoning (actions, IDs, counts)
+- **`_meta`**: Full state for UI rendering (complete objects, arrays, nested data)
+- **`widgetState`**: User preferences and selections (persists across sessions, keep under 4k tokens)
+
+Use `structuredContent` for what the model needs to understand the action, and `_meta` for what the UI needs to render.
 
 ---
 
@@ -545,9 +574,9 @@ return myWidget.response({
 
 ```typescript
 import {
-  useToolOutput,          // Tool response data
+  useToolOutput,          // { content, structuredContent, meta } - ALL response fields
   useToolInput,           // Tool arguments
-  useToolResponseMetadata, // _meta field
+  useToolResponseMetadata, // _meta field (or use useToolOutput().meta)
   useWidgetState,         // Persistent state
   useCallTool,            // Call tools
   useSendFollowUp,        // Send messages
@@ -559,19 +588,33 @@ import {
   useSafeArea,            // Safe area insets
   useUserAgent,           // Device info
 } from "@smithery/sdk/react"
+
+// Primary pattern: useToolOutput returns all fields
+const { meta } = useToolOutput<ActionSummary, { appState: FullState }>()
+const appState = meta?.appState  // Use meta for UI rendering
+
+// Legacy pattern: Still works but less convenient
+const metadata = useToolResponseMetadata<{ appState: FullState }>()
+const appState = metadata?.appState
 ```
 
 ---
 
 ## Complete Example
 
-### Server
+### Server (Proper Pattern)
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
-import { widget } from "@smithery/sdk"
-import type { GameState } from "./types.js"
+import { widget } from "@smithery/sdk/openai"
+import type { GameState } from "../shared/types.js"
+
+// Separate types: Model summaries vs UI state
+type GameAction = 
+  | { action: "game_started"; firstPlayer: "X" }
+  | { action: "move_made"; position: number; player: "X" | "O"; gameOver: boolean }
+  | { action: "game_over"; winner: "X" | "O" | "draw" }
 
 export default function createServer() {
   const server = new McpServer({
@@ -579,7 +622,16 @@ export default function createServer() {
     version: "1.0.0",
   })
 
-  const gameWidget = widget.resource<GameState>({
+  // Server-side game state (single source of truth)
+  let currentGameState: GameState = {
+    board: Array(9).fill(null),
+    currentPlayer: "X",
+    winner: null,
+    moves: 0,
+    gameStatus: "playing",
+  }
+
+  const gameWidget = widget.resource<GameAction>({
     name: "game",
     description: "Interactive tic-tac-toe game",
   })
@@ -595,7 +647,7 @@ export default function createServer() {
     "make-move",
     {
       title: "Make Move",
-      description: "Place X or O on the board",
+      description: "Place mark at position (0-8)",
       inputSchema: {
         position: z.number().min(0).max(8).describe("Position (0-8)"),
       },
@@ -607,16 +659,22 @@ export default function createServer() {
     async (args) => {
       const { position } = args
       
-      // Game logic here
-      const newBoard = makeMove(position)
-      
+      // Game logic updates currentGameState
+      // ...
+
       return gameWidget.response({
+        // Minimal action for model
         structuredData: {
-          board: newBoard,
-          currentPlayer: "O",
-          winner: null,
+          action: "move_made",
+          position,
+          player: "X",
+          gameOver: false,
         },
-        message: `Placed X at position ${position}`,
+        message: `Move made at position ${position}. O's turn.`,
+        // Full state for UI
+        meta: {
+          gameState: currentGameState,
+        },
       })
     }
   )
@@ -625,30 +683,38 @@ export default function createServer() {
 }
 ```
 
-### Client
+### Client (Proper Pattern)
 
 ```typescript
 import { useToolOutput, useCallTool, useTheme } from "@smithery/sdk/react"
-import type { GameState } from "../../server/types.js"
+import type { GameState } from "../../shared/types.js"
+
+type GameAction = 
+  | { action: "game_started"; firstPlayer: "X" }
+  | { action: "move_made"; position: number; player: "X" | "O"; gameOver: boolean }
+  | { action: "game_over"; winner: "X" | "O" | "draw" }
 
 export default function Game() {
-  const { structuredContent: state } = useToolOutput<GameState>()
-  const makeMove = useCallTool<{ position: number }, GameState>("make-move")
+  // Get meta with full state for UI
+  const { meta } = useToolOutput<GameAction, { gameState?: GameState }>()
+  const gameState = meta?.gameState
+  
+  const makeMove = useCallTool<{ position: number }>("make-move")
   const theme = useTheme()
 
-  if (!state) {
+  if (!gameState) {
     return <div className={theme}>Loading game...</div>
   }
 
   const handleMove = async (pos: number) => {
-    if (state.board[pos] || state.winner) return
+    if (gameState.board[pos] || gameState.winner) return
     await makeMove.call({ position: pos })
   }
 
   return (
     <div className={`game ${theme}`}>
       <div className="board">
-        {state.board.map((cell, i) => (
+        {gameState.board.map((cell, i) => (
           <button
             key={i}
             onClick={() => handleMove(i)}
@@ -658,12 +724,17 @@ export default function Game() {
           </button>
         ))}
       </div>
-      {state.winner && <div className="winner">Winner: {state.winner}</div>}
-      {makeMove.error && <div className="error">{makeMove.error.message}</div>}
+      {gameState.winner && <div>Winner: {gameState.winner}</div>}
+      {makeMove.error && <div>Error: {makeMove.error.message}</div>}
     </div>
   )
 }
 ```
+
+**Key differences from naive approach:**
+- Server: Action summaries in `structuredData`, full state in `meta.gameState`
+- Client: Use `useToolOutput().meta` for rendering, not `structuredContent`
+- Benefit: Model context stays lean, UI gets full data
 
 ---
 
@@ -677,4 +748,3 @@ export default function Game() {
 
 - **Tic Tac Toe**: https://github.com/smithery-ai/sdk/tree/main/examples/open-ai-tic-tac-toe - Interactive game with widget state
 - **Cafe Explorer**: https://github.com/smithery-ai/sdk/tree/main/examples/open-ai-cafe-explorer - Map-based exploration app
-
