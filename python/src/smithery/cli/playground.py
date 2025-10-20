@@ -5,6 +5,7 @@ Interactive playground that runs the MCP server and connects the Smithery CLI cl
 """
 
 import argparse
+import platform
 import subprocess
 import threading
 import time
@@ -36,9 +37,12 @@ def start_playground(server_function: str | None, port: int, reload: bool = Fals
         time.sleep(2)
         try:
             console.info(f"Starting Smithery CLI client connected to port {actual_port}")
-            subprocess.run([
-                "npx", "-y", "@smithery/cli@latest", "playground", "--port", str(actual_port)
-            ], check=True)
+            # Use cmd /c for Windows platforms
+            if platform.system() == "Windows":
+                cmd = ["cmd", "/c", "npx", "-y", "@smithery/cli@latest", "playground", "--port", str(actual_port)]
+            else:
+                cmd = ["npx", "-y", "@smithery/cli@latest", "playground", "--port", str(actual_port)]
+            subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
             console.error(f"Failed to start Smithery CLI: {e}")
             console.info("Make sure you have Node.js installed and @smithery/cli is available")
