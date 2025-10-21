@@ -43,11 +43,13 @@ npm run dev          # or: bun run dev, pnpm run dev, yarn dev
 npm run build        # or: bun run build, pnpm run build, yarn build
 ```
 
-## Core Components: Tools, Resources, and Prompts
+## Concepts
+
+### Core Components: Tools, Resources, and Prompts
 
 MCP servers expose three types of components that AI applications can interact with. Learn when to use each and how they work together to build powerful integrations.
 
-### Tools: Executable Functions
+#### Tools: Executable Functions
 
 Tools are executable functions that AI applications can invoke to perform actions:
 
@@ -68,7 +70,7 @@ server.registerTool(
 )
 ```
 
-### Resources: Read-Only Data Sources
+#### Resources: Read-Only Data Sources
 
 Resources provide read-only data that gives AI applications context to work with. Unlike tools, resources do not perform actions—they simply return information:
 
@@ -93,7 +95,7 @@ server.registerResource(
 )
 ```
 
-### Prompts: Reusable Message Templates
+#### Prompts: Reusable Message Templates
 
 Prompts are predefined message templates that help structure conversations. Use them to guide AI applications toward consistent interaction patterns:
 
@@ -124,7 +126,7 @@ server.registerPrompt(
 )
 ```
 
-### When to Use Each Component
+#### When to Use Each Component
 
 **Use Tools when you need to:**
 - Perform actions (create, update, delete operations)
@@ -174,7 +176,6 @@ export const configSchema = z.object({
   weatherApiKey: z.string().describe("Your OpenWeatherMap API key"),
   temperatureUnit: z.enum(["celsius", "fahrenheit"]).default("celsius").describe("Temperature unit"),
   defaultLocation: z.string().default("New York").describe("Default city for weather queries"),
-  debug: z.boolean().default(false).describe("Enable debug logging"),
 })
 
 export default function createServer({
@@ -272,11 +273,11 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 
 Once your server is published to Smithery, users can securely manage their configurations through a configuration UI. Saved configurations are automatically applied whenever they connect to your server in any client—no need to manually pass config parameters each time.
 
-#### Stateful vs Stateless Servers
+### Stateful vs Stateless Servers
 
 The TypeScript SDK provides two server patterns. **Choose stateless for most use cases.**
 
-##### Stateless Servers (Recommended)
+#### Stateless Servers (Recommended)
 
 Stateless servers create a fresh instance for each request—no session state is maintained:
 
@@ -312,7 +313,7 @@ export default function createServer({ config }: { config: z.infer<typeof config
 - File operations
 - Most MCP servers
 
-##### Stateful Servers (For Persistent State)
+#### Stateful Servers (For Persistent State)
 
 Stateful servers maintain state between calls within a session:
 
