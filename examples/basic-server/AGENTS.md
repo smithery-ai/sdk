@@ -17,10 +17,6 @@ This is the template project that gets cloned when you run `npx create-smithery`
 - [Quick Start Commands](#quick-start-commands)
 - [smithery.yaml Configuration](#smitheryyaml-configuration)
 - [Concepts](#concepts)
-  - [Core Components: Tools, Resources, and Prompts](#core-components-tools-resources-and-prompts)
-  - [Session Configuration](#session-configuration)
-  - [Transports](#transports)
-  - [Stateful vs Stateless Servers](#stateful-vs-stateless-servers)
 - [Development Workflow](#development-workflow)
 - [Deployment & CI/CD](#deployment--cicd)
 - [Troubleshooting](#troubleshooting)
@@ -48,14 +44,12 @@ npm run dev          # or: bun run dev, pnpm run dev, yarn dev
 # Run on a custom port
 npm run dev -- --port 3000
 
+# Kill existing process if port 8081 is in use
+lsof -ti:8081 | xargs kill
+
 # Build for production
 npm run build        # or: bun run build, pnpm run build, yarn build
 ```
-
-**Port Configuration:**
-- Default port: **8081**
-- Change port: Use `--port` flag (e.g., `npm run dev -- --port 3000`)
-- Port conflicts: If port 8081 is in use, either use a different port or kill the existing process: `lsof -ti:8081 | xargs kill`
 
 ## smithery.yaml Configuration
 
@@ -95,16 +89,6 @@ env:
   NODE_ENV: "production"
   DEBUG: "true"
   LOG_LEVEL: "info"
-```
-
-### Complete Example
-
-```yaml
-runtime: typescript
-target: remote
-env:
-  NODE_ENV: "production"
-  DEBUG: "true"
 ```
 
 ## Concepts
@@ -219,119 +203,45 @@ Pass personalized settings to each connection—API keys, preferences, and user-
 - **Security**: API keys stay session-scoped, not stored server-wide
 - **Flexibility**: Users customize behavior at connection time without code changes
 
-When you define a configuration schema using Zod, **Smithery automatically generates a configuration UI** and passes your settings as URL parameters. Each session gets isolated configuration—Session A and Session B don't interfere with each other.
+When you define a configuration schema using Zod, Smithery automatically generates a configuration UI with appropriate input types, passes configurations as URL parameters to your server, and applies default values and enforces required fields. Each session gets isolated configuration—Session A and Session B don't interfere with each other.
 
-#### How Smithery Uses Configuration
+#### How Session Config Works
 
-Smithery automatically:
-- Generates a configuration form with appropriate input types
-- Passes configurations as URL parameters to your server
-- Shows helpful descriptions as form labels and tooltips
-- Applies default values and enforces required fields
-
-#### Real-World Example: Weather Server
-
-Consider a weather server where different users need different settings. Users can customize their temperature unit, provide their API key, and set their default location:
+1. **Define config schema** - Example weather server where different users have different settings:
 
 ```typescript
 import { z } from "zod"
 
 export const configSchema = z.object({
+  // Required field - users must provide this
   weatherApiKey: z.string().describe("Your OpenWeatherMap API key"),
+  // Optional fields with defaults - users can customize or use defaults
   temperatureUnit: z.enum(["celsius", "fahrenheit"]).default("celsius").describe("Temperature unit"),
   defaultLocation: z.string().default("New York").describe("Default city for weather queries"),
 })
-
-export default function createServer({
-  config,
-}: {
-  config: z.infer<typeof configSchema>
-}) {
-  // Your weather tools use config.weatherApiKey, config.temperatureUnit, etc.
-}
 ```
 
-**Usage scenarios:**
-- **User A**: API key `abc123`, prefers Fahrenheit, lives in San Francisco
-- **User B**: API key `xyz789`, prefers Celsius, lives in Singapore
+2. **Pass config via URL parameters**:
+```
+http://localhost:3000/mcp?weatherApiKey=abc123&temperatureUnit=fahrenheit
+```
 
-Each user gets personalized weather data without affecting others.
-
-#### Using Configuration in Your Server
-
-The `config` object passed to your server function contains the session-specific settings. Here's how to access and use them:
-
+3. **Use config in your server**:
 ```typescript
-export default function createServer({
-  config,
-}: {
-  config: z.infer<typeof configSchema>
-}) {
-  const server = new McpServer({
-    name: "My Server",
-    version: "1.0.0",
+export default function createServer({ config }: { config: z.infer<typeof configSchema> }) {
+  const server = new McpServer({ name: "Weather Server", version: "1.0.0" })
+  
+  server.registerTool("get-weather", { /* ... */ }, async ({ city }) => {
+    // Access session-specific config
+    const temp = await fetchWeather(city, config.weatherApiKey)
+    return formatTemp(temp, config.temperatureUnit)
   })
-
-  server.registerTool(
-    "my-tool",
-    {
-      title: "My Tool",
-      description: "Tool that uses session config",
-      inputSchema: { name: z.string() },
-    },
-    async ({ name }) => {
-      // Access session-specific config
-      if (config.debug) {
-        console.log(`DEBUG: Processing request for ${name}`)
-      }
-      
-      // Use config values (API keys, preferences, etc.)
-      const response = config.debug 
-        ? `DEBUG: Hello ${name}`
-        : `Hello ${name}`
-      
-      return {
-        content: [{ type: "text", text: response }],
-      }
-    },
-  )
-
+  
   return server.server
 }
 ```
 
-#### How Session Config Works
-
-1. **Define config schema**:
-```typescript
-export const configSchema = z.object({
-  // Required field - users must provide this
-  userApiKey: z.string().describe("Your API key"),
-  
-  // Optional fields with defaults - users can customize or use defaults
-  debug: z.boolean().default(false).describe("Debug mode"),
-  maxResults: z.number().default(10).describe("Maximum results to return"),
-  
-  // Optional field without default - can be undefined
-  customEndpoint: z.string().optional().describe("Custom API endpoint"),
-})
-```
-
-**Field Types:**
-- **Required**: Use `z.string()`, `z.number()`, etc. - users must provide a value
-- **Optional with default**: Use `.default(value)` - users can customize or use the default
-- **Optional without default**: Use `.optional()` - completely optional
-
-2. **Pass config via URL parameters** (the key-value pairs after the `?` in the URL):
-```
-http://localhost:3000/mcp?userApiKey=xyz123&debug=true
-                          ↑ config passed as URL parameters
-```
-
-3. **Each session gets isolated config**:
-- Session A: `debug=true, userApiKey=xyz123`
-- Session B: `debug=false, userApiKey=abc456`
-- Sessions don't interfere with each other
+Each user gets personalized weather data without affecting others
 
 #### Configuration Management in Production
 
@@ -475,8 +385,6 @@ export default function createServer({ config }: { config: z.infer<typeof config
 
 ## Development Workflow
 
-This section covers how to customize the scaffold, test your server during development, and prepare for deployment.
-
 ### Customizing Your Project
 
 **Customize the scaffold to match your actual project:**
@@ -490,40 +398,12 @@ This section covers how to customize the scaffold, test your server during devel
    }
    ```
 
-2. **Choose stateless or stateful:**
-   
-   **Consider stateful if you want to:**
-   - Track and understand how your server is used per session
-   - Log analytics and usage patterns for improving your server
-   - Maintain conversation history or multi-step workflows
-   - Debug issues with full session context
-   
-   For stateful (default):
-   ```typescript
-   // Omit 'stateless' export for stateful behavior (this is the default)
-   
-   export default function createServer({ sessionId, config }) {
-     // sessionId lets you maintain state and track usage per session
-   }
-   ```
-   
-   **Consider stateless if you:**
-   - Don't need to track individual sessions
-   - Want simpler, per-request behavior
-   
-   For stateless (opt-in):
-   ```typescript
-   export const stateless = true
-   
-   export default function createServer({ config }) {
-     // Server created fresh for each request
-   }
-   ```
+2. **Choose stateless or stateful:** See [Stateful vs Stateless Servers](#stateful-vs-stateless-servers) for details. Servers are stateful by default. For stateless, export `export const stateless = true`.
 
 3. **Define your config schema (optional):**
    
-   With config schema:
    ```typescript
+   // With config schema
    export const configSchema = z.object({
      apiKey: z.string().describe("Your API key"),
      debug: z.boolean().default(false).describe("Enable debug mode"),
@@ -543,25 +423,13 @@ This section covers how to customize the scaffold, test your server during devel
      
      return server.server
    }
-   ```
    
-   Without config schema:
-   ```typescript
-   export default function createServer() {
-     const server = new McpServer({
-       name: "Your Server Name",
-       version: "1.0.0",
-     })
-     
-     // Add your tools, resources, and prompts here
-     
-     return server.server
-   }
+   // Without config schema: omit configSchema export and createServer takes no parameters
    ```
 
 ### Testing Your Server: Three Approaches
 
-Your MCP server can be tested in three different ways depending on your needs.
+Your MCP server can be tested in three different ways depending on your needs. All approaches require running `npm run dev` first to start the server.
 
 #### Smithery Playground
 
@@ -588,9 +456,8 @@ Connect any MCP client to your server. Two options depending on your client type
 
 For command-line tools or local applications on the same machine:
 
-1. Start the server: `npm run dev`
-2. Connect to: `http://127.0.0.1:8081/mcp`
-3. Include config parameters as URL query parameters:
+1. Connect to: `http://127.0.0.1:8081/mcp`
+2. Include config parameters as URL query parameters:
 ```bash
 http://127.0.0.1:8081/mcp?apiKey=your_key&debug=true
 ```
@@ -607,10 +474,9 @@ curl -X POST "http://127.0.0.1:8081/mcp" \
 
 For browser-based clients or testing from remote machines:
 
-1. Start the server: `npm run dev`
-2. Look for the ngrok tunnel URL in the console output (e.g., `https://abcd-1234-5678.ngrok.io`)
-3. Connect your browser client to: `https://your-ngrok-id.ngrok.io/mcp`
-4. Pass config as URL parameters:
+1. Look for the ngrok tunnel URL in the console output (e.g., `https://abcd-1234-5678.ngrok.io`)
+2. Connect your browser client to: `https://your-ngrok-id.ngrok.io/mcp`
+3. Pass config as URL parameters:
 ```
 https://your-ngrok-id.ngrok.io/mcp?apiKey=your_key&debug=true
 ```
@@ -623,12 +489,7 @@ Test directly with curl commands for deep debugging or understanding the MCP pro
 
 **Full MCP Testing Workflow:**
 
-1. Start server:
-```bash
-npm run dev
-```
-
-2. Initialize connection (always include config params):
+1. Initialize connection (always include config params):
 ```bash
 curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
@@ -636,7 +497,7 @@ curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
 ```
 
-3. Send initialized notification:
+2. Send initialized notification:
 ```bash
 curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
@@ -644,7 +505,7 @@ curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
 ```
 
-4. List available tools:
+3. List available tools:
 ```bash
 curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
@@ -652,7 +513,7 @@ curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
 ```
 
-5. Call a tool from the list (replace `tool-name` and arguments with your actual tool):
+4. Call a tool from the list (replace `tool-name` and arguments with your actual tool):
 ```bash
 curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
