@@ -25,7 +25,12 @@ export default function createServer({
 			inputSchema: { name: z.string().describe("Name to greet") },
 		},
 		async ({ name }) => ({
-			content: [{ type: "text", text: `Hello, ${name}!` }],
+			content: [
+				{ 
+					type: "text", 
+					text: config.debug ? `DEBUG: Hello ${name}` : `Hello, ${name}!` // use provided config
+				}
+			],
 		}),
 	)
 
