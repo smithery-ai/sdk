@@ -268,20 +268,22 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 - Session B: `debug=false, userApiKey=abc456`
 - Sessions don't interfere with each other
 
-#### Secure Config Distribution (Production)
+#### Configuration Management in Production
 
-Smithery handles sensitive configuration securely in production environments:
+Once your server is published to Smithery, users configure it once and Smithery automatically applies their settings on every connection.
 
-1. **Users save config in Smithery** (API keys, tokens, etc.)
-2. **OAuth authentication** is built-in - no manual key management
-3. **Smithery Gateway** securely forwards config to your server
-4. **Your server receives config** via the `config` parameter as usual
+**Development vs Production:**
 
-**The flow:**
-```
-User → Smithery Platform → Gateway (OAuth) → Your Server
-     (saves config)    (secure forwarding)   (receives config)
-```
+- **Local**: Config passed as URL params each time: `http://localhost:8081/mcp?apiKey=xyz&debug=true`
+- **Production**: Users configure once in Smithery, settings automatically applied forever
+
+**Benefits:**
+- One-time setup - users save API keys and preferences once
+- Secure storage - sensitive data encrypted and never exposed  
+- OAuth support - no manual key management
+- Multi-server management in one place
+
+**Your server code stays the same** - you always receive the `config` parameter. The difference is purely in user experience: configure once vs reconfigure every time.
 
 #### Stateful vs Stateless Servers
 
@@ -445,9 +447,9 @@ This section covers how to customize the scaffold, test your server during devel
 
 ### Testing Your Server: Three Approaches
 
-Your MCP server can be tested at three levels depending on your needs. **Start with Level 1 for quick iteration**, then move to Level 2 for real-world testing, and Level 3 for deep debugging.
+Your MCP server can be tested in three different ways depending on your needs.
 
-#### Level 1: Smithery Playground
+#### Smithery Playground
 
 The fastest way to test your server during development:
 
@@ -464,7 +466,7 @@ This starts your server locally on port 8081 with hot reload and opens an intera
 
 **Best for:** Quick iteration, UI testing, tool validation
 
-#### Level 2: Custom Clients (Real-World Testing)
+#### Custom Clients
 
 Connect any MCP client to your server. Two options depending on your client type:
 
@@ -499,11 +501,9 @@ For browser-based clients or testing from remote machines:
 https://your-ngrok-id.ngrok.io/mcp?apiKey=your_key&debug=true
 ```
 
-**Why ngrok?** It creates a secure public URL to your localhost server, allowing browser clients and remote testers to access your server without deployment.
-
 **Best for:** Testing with remote clients, browser-based integrations, sharing with team members
 
-#### Level 3: Direct Protocol Testing (Advanced Debugging)
+#### Direct Protocol Testing
 
 Test directly with curl commands for deep debugging or understanding the MCP protocol.
 
