@@ -9,7 +9,8 @@ This is the template project that gets cloned when you run `npx create-smithery`
 - [What's Included](#whats-included)
 - [Quick Start Commands](#quick-start-commands)
 - [Development Workflow](#development-workflow)
-- [Session Configuration](#session-configuration)
+- [Concepts](#concepts)
+  - [Session Configuration](#session-configuration)
 - [Deployment & CI/CD](#deployment--cicd)
 - [Architecture Notes](#architecture-notes)
 - [Pre-Deployment Checklist](#pre-deployment-checklist)
@@ -209,7 +210,9 @@ your-server/
    npm run dev
    ```
 
-## Session Configuration
+## Concepts
+
+### Session Configuration
 
 Session configuration allows clients to connect to your MCP server with personalized settings. Think of it like user preferences - each connection gets its own configuration that doesn't affect other sessions, perfect for passing API keys, customizing behavior, and personalizing responses.
 
@@ -219,7 +222,7 @@ When you define a configuration schema using Zod, Smithery automatically:
 - **Shows helpful descriptions** as form labels and tooltips
 - **Applies default values** and enforces required fields
 
-### Real-World Example: Weather Server
+#### Real-World Example: Weather Server
 
 Let's say you're building a weather server. You might want users to customize their preferred temperature unit, provide an API key, or set their default location:
 
@@ -248,7 +251,7 @@ export default function createServer({
 
 Each user gets personalized weather data without affecting others.
 
-### Understanding Configuration
+#### Understanding Configuration
 
 The `config` object is passed to your server creation function and contains session-specific configuration:
 
@@ -291,7 +294,7 @@ export default function createServer({
 }
 ```
 
-### How Session Config Works
+#### How Session Config Works
 
 1. **Define config schema**:
 ```typescript
@@ -323,7 +326,7 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 - Session B: `debug=false, userApiKey=abc456`
 - Sessions don't interfere with each other
 
-### Stateful vs Stateless Servers
+#### Stateful vs Stateless Servers
 
 The TypeScript SDK provides two server patterns:
 
@@ -500,6 +503,7 @@ runtime: typescript
 ```bash
 # TypeScript server deployment prep
 npm run build             # Creates build artifacts
+git init
 git add . && git commit -m "Deploy ready"
 git push origin main
 ```
