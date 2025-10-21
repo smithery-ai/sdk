@@ -176,23 +176,9 @@ server.registerPrompt(
 
 #### When to Use Each Component
 
-**Use Tools when you need to:**
-- Perform actions (create, update, delete operations)
-- Execute computations or transformations
-- Call external APIs
-- Interact with databases or file systems
-
-**Use Resources when you need to:**
-- Provide reference data or documentation
-- Share static or semi-static information
-- Offer context without side effects
-- Return data that AI applications can read
-
-**Use Prompts when you need to:**
-- Guide AI toward specific conversation patterns
-- Reuse common interaction templates
-- Structure multi-step workflows
-- Maintain consistency across similar requests
+- **Tools**: Perform actions (create/update/delete, API calls, computations, database operations)
+- **Resources**: Provide read-only data (documentation, reference info, context without side effects)
+- **Prompts**: Guide conversation patterns (reusable templates, multi-step workflows, consistent interactions)
 
 ### Session Configuration
 
@@ -301,32 +287,13 @@ The TypeScript SDK provides two server patterns. **Servers are stateful by defau
 
 #### Stateful Servers (Default)
 
-Stateful servers maintain state between calls within a session. Each session becomes a meaningful chunk that you can track, log, and analyze:
+Stateful servers maintain state between calls within a session. The framework automatically provides `sessionId`:
 
 ```typescript
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { z } from 'zod'
-
-// Optional: Define config schema
-export const configSchema = z.object({
-  apiKey: z.string().optional(),
-  debug: z.boolean().default(false),
-})
-
 // Omit 'stateless' export for stateful behavior (this is the default)
 
-// Your server creation function
-export default function createServer({ 
-  sessionId, 
-  config 
-}: { 
-  sessionId: string
-  config: z.infer<typeof configSchema> 
-}) {
-  const server = new McpServer({
-    name: "My Stateful App",
-    version: "1.0.0"
-  })
+export default function createServer({ sessionId, config }) {
+  const server = new McpServer({ name: "My Stateful App", version: "1.0.0" })
   
   // Track session-level analytics and usage patterns
   console.log(`Session ${sessionId} started`)
@@ -338,50 +305,24 @@ export default function createServer({
 }
 ```
 
-**Use stateful servers for:**
-- Chat conversations that need memory
-- Multi-step workflows
-- Game servers
-- **Understanding how your server is used per session** - each session becomes a meaningful unit for analytics
-- **Improving your server** - track usage patterns, debug issues, and optimize based on real session data
-- Better logging and observability
-- Any scenario requiring persistent state
+**Use stateful for:** Chat conversations, multi-step workflows, game servers, session analytics, or any scenario requiring persistent state.
 
 #### Stateless Servers
 
 Stateless servers create a fresh instance for each request—no session state is maintained:
 
 ```typescript
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { z } from 'zod'
-
-// Optional: Define config schema
-export const configSchema = z.object({
-  apiKey: z.string().optional(),
-  debug: z.boolean().default(false),
-})
-
 // Explicitly mark as stateless (opt-in behavior)
 export const stateless = true
 
-// Your server creation function
-export default function createServer({ config }: { config: z.infer<typeof configSchema> }) {
-  const server = new McpServer({
-    name: "My App",
-    version: "1.0.0"
-  })
-  
+export default function createServer({ config }) {
+  const server = new McpServer({ name: "My App", version: "1.0.0" })
   // Add tools, resources, prompts...
-  
   return server.server
 }
 ```
 
-**Use stateless servers for:**
-- Simple API integrations
-- One-off database queries
-- File operations
-- Servers where you don't need to track usage per session
+**Use stateless for:** Simple API integrations, one-off database queries, file operations, or servers that don't need session tracking.
 
 ## Development Workflow
 
@@ -433,13 +374,11 @@ Your MCP server can be tested in three different ways depending on your needs. A
 
 #### Smithery Playground
 
-The fastest way to test your server during development:
-
 ```bash
 npm run dev                # Actually runs: npx @smithery/cli dev
 ```
 
-This starts your server locally on port 8081 with hot reload and opens an interactive Smithery playground in your browser. The playground lets you:
+Starts your server on port 8081 with hot reload and opens an interactive playground in your browser:
 - Test your tools with a user-friendly UI
 - Explore resources
 - Try prompts
@@ -454,25 +393,12 @@ Connect any MCP client to your server. Two options depending on your client type
 
 ##### Option A: Local HTTP Clients
 
-For command-line tools or local applications on the same machine:
-
-1. Connect to: `http://127.0.0.1:8081/mcp`
-2. Include config parameters as URL query parameters:
-```bash
+Connect to `http://127.0.0.1:8081/mcp` with config as URL parameters:
+```
 http://127.0.0.1:8081/mcp?apiKey=your_key&debug=true
 ```
 
-**Example with curl (simple test):**
-```bash
-curl -X POST "http://127.0.0.1:8081/mcp" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
-```
-
 ##### Option B: Browser/Remote Clients (ngrok Tunnel)
-
-For browser-based clients or testing from remote machines:
 
 1. Look for the ngrok tunnel URL in the console output (e.g., `https://abcd-1234-5678.ngrok.io`)
 2. Connect your browser client to: `https://your-ngrok-id.ngrok.io/mcp`
@@ -485,9 +411,7 @@ https://your-ngrok-id.ngrok.io/mcp?apiKey=your_key&debug=true
 
 #### Direct Protocol Testing
 
-Test directly with curl commands for deep debugging or understanding the MCP protocol.
-
-**Full MCP Testing Workflow:**
+For deep debugging or understanding the MCP protocol:
 
 1. Initialize connection (always include config params):
 ```bash
