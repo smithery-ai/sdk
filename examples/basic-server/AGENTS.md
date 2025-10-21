@@ -287,15 +287,12 @@ The TypeScript SDK provides two server patterns. **Servers are stateful by defau
 
 #### Stateful Servers (Default)
 
-Stateful servers maintain state between calls within a session. The framework automatically provides `sessionId`:
+Stateful servers maintain state between calls within a session:
 
 ```typescript
-// Omit 'stateless' export for stateful behavior (this is the default)
-
 export default function createServer({ sessionId, config }) {
   const server = new McpServer({ name: "My Stateful App", version: "1.0.0" })
   
-  // Track session-level analytics and usage patterns
   console.log(`Session ${sessionId} started`)
   
   // Store session-specific state
