@@ -48,10 +48,10 @@ your-server/
 
 ```bash
 # Run development server (streamable HTTP on port 8081)
-npm run dev
+npm run dev          # or: bun run dev, pnpm run dev, yarn dev
 
 # Build for production
-npm run build
+npm run build        # or: bun run build, pnpm run build, yarn build
 ```
 
 ## Concepts

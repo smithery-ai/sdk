@@ -1,8 +1,28 @@
+---
+title: Smithery TypeScript MCP Server Scaffold
+description: TypeScript MCP server template with tools, resources, prompts, and session configuration.
+overview: Complete scaffold for building production-ready MCP servers. Run `npm run dev` to start or `npm run build` for production.
+version: "1.0.0"
+---
+
 # AGENTS.md
 
 Welcome to the **Smithery TypeScript MCP Server Scaffold**!
 
-This is the template project that gets cloned when you run `npx create-smithery`. It provides everything you need to build, test, and deploy a Model Context Protocol (MCP) server as a local **MCPB bundle** that runs on users' machines.
+This is the template project that gets cloned when you run `npx create-smithery`. It provides everything you need to build, test, and deploy a Model Context Protocol (MCP) server with Smithery.
+
+## Table of Contents
+
+- [What's Included](#whats-included)
+- [Quick Start Commands](#quick-start-commands)
+- [Concepts](#concepts)
+- [Development Workflow](#development-workflow)
+- [Deployment & CI/CD](#deployment--cicd)
+- [Architecture Notes](#architecture-notes)
+- [Pre-Deployment Checklist](#pre-deployment-checklist)
+- [Troubleshooting](#troubleshooting)
+- [Resources](#resources)
+- [Community & Support](#community--support)
 
 ## What's Included
 
@@ -10,50 +30,34 @@ This is the template project that gets cloned when you run `npx create-smithery`
 - **Example Tool** (`hello` tool with debug mode configuration)
 - **Example Resource** (`history://hello-world` with Hello World origin story)
 - **Example Prompt** (`greet` prompt for generating greeting messages)
-- **Development Workflow** (`npm run dev` for local testing with hot reload)
-- **MCPB Bundle Deployment** - Your server gets packaged as a `.mcpb` file for one-click local installation
-- **Session Management** via `createStatefulServer` or `createStatelessServer` with optional config schemas
+- **Interactive Development** (`npm run dev` opens Smithery playground for testing with hot reload)
+- **Deployment Ready** configuration for the Smithery platform
 
-## Local-First Architecture
+### Project Structure
 
-Your MCP server runs **locally on the user's machine**, not in the cloud. When you deploy to Smithery, your code is packaged into an [MCPB (MCP Bundle)](https://github.com/anthropics/mcpb) - a portable format similar to browser extensions that enables:
-
-- **One-Click Installation** in Claude Desktop (macOS/Windows)
-- **Local Execution** with full access to the user's filesystem and environment
-- **Cross-Client Support** - Other MCP clients can install via Smithery CLI
-- **Automatic Updates** when you push new versions
-- **Secure Configuration** - API keys and settings stay on the user's machine
-
-This means your server has the power of a native application while maintaining the ease of web distribution.
+```
+your-server/
+├── package.json           # Project dependencies and scripts
+├── smithery.yaml          # Runtime specification (runtime: typescript)
+├── src/
+│   └── index.ts          # Main server implementation
+└── README.md
+```
 
 ## Quick Start Commands
 
 ```bash
-# Run development server (streamable HTTP on port 3000)
+# Run development server (streamable HTTP on port 8081)
 npm run dev
 
 # Build for production
 npm run build
 ```
 
-## Why Build Local MCP Servers?
+## Concepts
 
-Local MCP servers unlock capabilities that cloud APIs cannot provide:
+### Tools
 
-- **Filesystem Access** - Read/write files, search codebases, manage projects
-- **System Integration** - Launch applications, control system settings, run scripts
-- **Privacy** - Sensitive data never leaves the user's machine
-- **No API Costs** - No rate limits or usage fees for local operations
-- **Offline Capable** - Works without internet connectivity
-- **Performance** - Zero network latency for local operations
-
-Examples: Code editors, file managers, screenshot tools, local databases, system monitors, clipboard managers, terminal emulators, and more.
-
-## Development Workflow
-
-Based on the [Model Context Protocol architecture](https://modelcontextprotocol.io/docs/learn/architecture.md), MCP servers provide three core primitives:
-
-### 1. Tools (for actions)
 Add executable functions that AI applications can invoke to perform actions:
 
 ```typescript
@@ -78,7 +82,8 @@ server.registerTool(
 )
 ```
 
-### 2. Resources (for static data) 
+### Resources
+
 Add data sources that provide contextual information:
 
 ```typescript
@@ -102,7 +107,8 @@ server.registerResource(
 )
 ```
 
-### 3. Prompts (for interaction templates)
+### Prompts
+
 Add reusable templates that help structure interactions:
 
 ```typescript
@@ -132,54 +138,7 @@ server.registerPrompt(
 )
 ```
 
-### Project Structure
-
-```
-your-server/
-├── package.json           # Project dependencies and scripts
-├── smithery.yaml          # Runtime specification (runtime: typescript)
-├── src/
-│   └── index.ts          # Main server implementation
-└── README.md
-```
-
-### Customizing Your Project
-
-**Important:** You'll want to customize the scaffold to match your actual project:
-
-1. **Update package.json:**
-   ```json
-   {
-     "name": "your-project-name",
-     "description": "Your MCP server description",
-     "author": "Your Name"
-   }
-   ```
-
-2. **Update your server function:**
-   ```typescript
-   export default function createServer({
-     config,
-   }: {
-     config: z.infer<typeof configSchema>
-   }) {
-     const server = new McpServer({
-       name: "Your Server Name",
-       version: "1.0.0",
-     })
-     
-     // Add your tools, resources, and prompts here
-     
-     return server.server
-   }
-   ```
-
-3. **Test your server works:**
-   ```bash
-   npm run dev
-   ```
-
-## Session Configuration
+### Session Configuration
 
 Session configuration allows clients to connect to your MCP server with personalized settings. Think of it like user preferences - each connection gets its own configuration that doesn't affect other sessions, perfect for passing API keys, customizing behavior, and personalizing responses.
 
@@ -189,7 +148,7 @@ When you define a configuration schema using Zod, Smithery automatically:
 - **Shows helpful descriptions** as form labels and tooltips
 - **Applies default values** and enforces required fields
 
-### Real-World Example: Weather Server
+#### Real-World Example: Weather Server
 
 Let's say you're building a weather server. You might want users to customize their preferred temperature unit, provide an API key, or set their default location:
 
@@ -218,7 +177,7 @@ export default function createServer({
 
 Each user gets personalized weather data without affecting others.
 
-### Understanding Configuration
+#### Understanding Configuration
 
 The `config` object is passed to your server creation function and contains session-specific configuration:
 
@@ -261,7 +220,7 @@ export default function createServer({
 }
 ```
 
-### How Session Config Works
+#### How Session Config Works
 
 1. **Define config schema**:
 ```typescript
@@ -293,19 +252,53 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 - Session B: `debug=false, userApiKey=abc456`
 - Sessions don't interfere with each other
 
-### Stateful vs Stateless Servers
+#### Why This Matters
+
+- **Multi-user support**: Different users can have different API keys/settings
+- **Security**: API keys stay session-scoped, not server-global
+
+**Benefits:**
+- Users never expose sensitive keys directly to your server
+- OAuth handles authentication automatically
+- You focus on your server logic, not security infrastructure
+
+#### Secure Config Distribution (Production)
+
+In production, Smithery handles sensitive configuration securely:
+
+1. **Users save config in Smithery** (API keys, tokens, etc.)
+2. **OAuth authentication** is built-in - no manual key management
+3. **Smithery Gateway** securely forwards config to your server
+4. **Your server receives config** via the `config` parameter as usual
+
+**The flow:**
+```
+User → Smithery Platform → Gateway (OAuth) → Your Server
+     (saves config)    (secure forwarding)   (receives config)
+```
+
+#### Stateful vs Stateless Servers
 
 The TypeScript SDK provides two server patterns:
 
-#### Stateless Servers (Recommended for most use cases)
+##### Stateless Servers (Recommended for most use cases)
 Each request creates a new server instance - no session state is maintained:
 
 ```typescript
-import { createStatelessServer } from '@smithery/sdk/server/stateless.js'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+
+// Optional: Define config schema
+export const configSchema = z.object({
+  apiKey: z.string().optional(),
+  debug: z.boolean().default(false),
+})
+
+// Mark as stateless
+export const stateless = true
 
 // Your server creation function
-function createMcpServer({ config }) {
-  // Create and return a server instance
+export default function createServer({ config }: { config: z.infer<typeof configSchema> }) {
   const server = new McpServer({
     name: "My App",
     version: "1.0.0"
@@ -315,13 +308,6 @@ function createMcpServer({ config }) {
   
   return server.server
 }
-
-// Create the stateless server
-createStatelessServer(createMcpServer, {
-  schema: configSchema, // Optional Zod schema for config validation
-})
-  .app
-  .listen(process.env.PORT || 3000)
 ```
 
 **Use stateless servers for:**
@@ -330,32 +316,39 @@ createStatelessServer(createMcpServer, {
 - File operations
 - Most MCP servers
 
-#### Stateful Servers (For persistent state)
+##### Stateful Servers (For persistent state)
 Maintains state between calls within a session:
 
 ```typescript
-import { createStatefulServer } from '@smithery/sdk/server/stateful.js'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+
+// Optional: Define config schema
+export const configSchema = z.object({
+  apiKey: z.string().optional(),
+  debug: z.boolean().default(false),
+})
+
+// Omit 'stateless' export or set to false for stateful behavior
 
 // Your server creation function
-function createMcpServer({ sessionId, config }) {
-  // sessionId allows you to maintain state per session
+export default function createServer({ 
+  sessionId, 
+  config 
+}: { 
+  sessionId: string
+  config: z.infer<typeof configSchema> 
+}) {
   const server = new McpServer({
     name: "My Stateful App",
     version: "1.0.0"
   })
   
-  // You can store session-specific state here
-  const sessionState = new Map()
+  // You can store session-specific state here using sessionId
+  // Example: const sessionState = getOrCreateState(sessionId)
   
   return server.server
 }
-
-// Create the stateful server
-createStatefulServer(createMcpServer, {
-  schema: configSchema, // Optional Zod schema for config validation
-})
-  .app
-  .listen(process.env.PORT || 3000)
 ```
 
 **Use stateful servers for:**
@@ -364,66 +357,19 @@ createStatefulServer(createMcpServer, {
 - Game servers
 - Any scenario requiring persistent state
 
-### Why This Matters
+#### Testing Your Server
 
-- **Multi-user support**: Different users can have different API keys/settings
-- **Environment isolation**: Dev/staging/prod configs per session
-- **Security**: API keys stay session-scoped, not server-global
+The easiest way to test your MCP server during development:
 
-### Secure Config Distribution
-
-Configuration is handled securely depending on the client:
-
-**In Claude Desktop:**
-1. User installs your MCPB bundle with one click
-2. Claude prompts for required configuration (API keys, settings, etc.)
-3. Configuration is stored locally in Claude's secure storage
-4. Your server receives config when launched via the `config` parameter
-5. Updates to config don't require reinstalling the bundle
-
-**Configuration Flow (Claude Desktop):**
-```
-User enters config → Claude Desktop → Local Storage → Your Server
-    (API keys)      (secure prompt)  (encrypted)     (receives config)
-```
-
-**For Other MCP Clients:**
-1. User installs via Smithery CLI: `npx @smithery/cli install <your-server>`
-2. User configures server through Smithery platform
-3. Configuration is stored securely in Smithery's encrypted storage
-4. Smithery forwards config to your local server when launched
-5. Your server receives config via the `config` parameter
-
-**Configuration Flow (Other Clients):**
-```
-User enters config → Smithery Platform → Secure Storage → Your Local Server
-    (API keys)      (web interface)    (encrypted)    (receives config)
-```
-
-**Benefits:**
-- **Privacy First**: Sensitive data handled securely by both Claude Desktop and Smithery
-- **User Control**: Users can view/edit their configuration anytime
-- **Per-User Settings**: Each user has their own isolated configuration
-- **OAuth Support**: Optional OAuth flows for third-party services
-- **Local Execution**: Your server always runs locally with full system access
-
-Regardless of the client, your server always runs locally on the user's machine with native capabilities.
-
-### Testing Your Server
-
-There are two main ways to test your MCP server:
-
-#### Method 1: Smithery CLI Development Server
 ```bash
 npm run dev                # Actually runs: npx @smithery/cli dev
 ```
-This starts your server locally with hot reload. Perfect for development and testing changes quickly.
 
-#### Method 2: Direct MCP Protocol Testing
-```bash
-# Start server
-npm run dev               # Runs on port 3000 by default
-```
+This starts your server locally on port 8081 with hot reload and opens an interactive playground in your browser. The playground lets you test your tools, resources, and prompts.
+
+##### Advanced: Direct MCP Protocol Testing
+
+For debugging or understanding the low-level MCP protocol, you can manually test using curl commands. Most developers won't need this.
 
 **Complete MCP Testing Workflow:**
 1. Start server: `npm run dev` (runs on port 3000 by default)
@@ -449,23 +395,24 @@ curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"hello","arguments":{"name":"World"}}}'
 ```
-Expected response: `"Hello, World!"` (with debug=false) or enhanced debug output (with debug=true)
+Expected response: `"Hello, World!"`
 
-### Deployment Configuration
+#### Deployment Configuration
 
 **package.json:**
 ```json
 {
   "scripts": {
-    "dev": "npx @smithery/cli dev",
-    "build": "npx @smithery/cli build"
+    "dev": "smithery dev",
+    "build": "smithery build"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "@smithery/sdk": "^1.7.4",
     "zod": "^3.25.46"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.2.4"
+    "@smithery/cli": "^1.6.2"
   }
 }
 ```
@@ -475,89 +422,149 @@ Expected response: `"Hello, World!"` (with debug=false) or enhanced debug output
 runtime: typescript
 ```
 
+## Development Workflow
+
+Based on the [Model Context Protocol architecture](https://modelcontextprotocol.io/docs/learn/architecture.md), MCP servers provide three core primitives: Tools (for actions), Resources (for static data), and Prompts (for interaction templates). Learn more about each in the [Concepts](#concepts) section below.
+
+### Customizing Your Project
+
+**Important:** You'll want to customize the scaffold to match your actual project:
+
+1. **Update package.json:**
+   ```json
+   {
+     "name": "your-project-name",
+     "description": "Your MCP server description",
+     "author": "Your Name"
+   }
+   ```
+
+2. **Choose stateless or stateful (optional):**
+   
+   Most servers should be stateless. Only use stateful if you need to maintain state between requests (chat history, game state, etc.).
+   
+   For stateless (default, recommended):
+   ```typescript
+   export const stateless = true  // Optional: stateless is default behavior
+   
+   export default function createServer({ config }) {
+     // Server created fresh for each request
+   }
+   ```
+   
+   For stateful:
+   ```typescript
+   // Omit 'stateless' export for stateful behavior
+   
+   export default function createServer({ sessionId, config }) {
+     // sessionId lets you maintain state per session
+   }
+   ```
+
+3. **Define your config schema (optional):**
+   
+   With config schema:
+   ```typescript
+   export const configSchema = z.object({
+     apiKey: z.string().describe("Your API key"),
+     debug: z.boolean().default(false).describe("Enable debug mode"),
+   })
+   
+   export default function createServer({
+     config,
+   }: {
+     config: z.infer<typeof configSchema>
+   }) {
+     const server = new McpServer({
+       name: "Your Server Name",
+       version: "1.0.0",
+     })
+     
+     // Add your tools, resources, and prompts here
+     
+     return server.server
+   }
+   ```
+   
+   Without config schema:
+   ```typescript
+   export default function createServer() {
+     const server = new McpServer({
+       name: "Your Server Name",
+       version: "1.0.0",
+     })
+     
+     // Add your tools, resources, and prompts here
+     
+     return server.server
+   }
+   ```
+
+4. **Test your server works:**
+   ```bash
+   npm run dev
+   ```
+
 ## Deployment & CI/CD
 
-### How MCPB Deployment Works
-
-When you deploy to Smithery, your server gets packaged into an **MCPB bundle** (`.mcpb` file) - a standardized format for distributing local MCP servers. Learn more about the [MCPB specification](https://github.com/anthropics/mcpb).
-
-**What happens during deployment:**
-
-1. **Build Phase**: Your TypeScript code is compiled and bundled with all dependencies
-2. **MCPB Packaging**: Smithery creates a `.mcpb` file containing:
-   - Your compiled server code
-   - All required `node_modules`
-   - A `manifest.json` with metadata and configuration schema
-   - Icon and other assets
-3. **Distribution**: The bundle is published to:
-   - **Smithery Registry** - One-click install for Claude Desktop users
-   - **MCP Registry** - Discoverable by other MCP clients
-4. **Installation**: Users click "Install" and the bundle runs locally on their machine
-
-### Deploying Your Server
-
+### Local Development & Testing
 ```bash
-# 1. Prepare your code
-git add . && git commit -m "Ready for deployment"
-git push origin main
+# Run development server locally (opens interactive playground)
+npm run dev
 
-# 2. Deploy to Smithery (creates MCPB bundle)
-# Visit smithery.ai/new and connect your GitHub repo
-# Smithery will automatically build and package your server
+# Build for local testing
+npm run build
 ```
 
-### Production Deployment Steps
+The `target: local` setting in `smithery.yaml` means this server is optimized for local development and testing environments.
 
-1. **Push code to GitHub repository** - Ensure your code is in a GitHub repo
-2. **Deploy via [smithery.ai/new](https://smithery.ai/new)** - Connect your repo
-3. **Smithery packages as MCPB** - Automatic bundling with dependencies
-4. **Users install locally** - One-click installation in Claude Desktop or via Smithery CLI
-5. **Automatic updates** - Push updates and users get notified
+### Local Deployment
+For local deployment and testing:
 
-### Installing Your Bundle
+1. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   The server will run on `http://localhost:8081` with hot reload enabled.
 
-**For Claude Desktop Users:**
-- Visit your server's page on smithery.ai
-- Click "Install in Claude Desktop"
-- Server runs locally with full system access
+2. **Test with the interactive playground** that opens automatically in your browser, or make direct requests:
+   ```bash
+   curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json, text/event-stream" \
+     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
+   ```
 
-**For Other MCP Clients:**
-```bash
-# Install via Smithery CLI
-npx @smithery/cli install <your-server-name>
+3. **For persistent local deployment**, consider using process managers like:
+   ```bash
+   # Using PM2
+   npm install -g pm2
+   pm2 start npm --name "local-server" -- run dev
+   
+   # Using systemd (Linux/macOS)
+   # Create a service file and manage with systemctl
+   ```
 
-# Or download the .mcpb file directly
-# and open it with any MCPB-compatible client
-```
+### Sharing Locally
+
+If you need to share your local server:
+- **Local network**: Share your machine's IP (e.g., `192.168.x.x:8081`)
+- **Tunneling**: Use tools like `ngrok` for temporary public access
+- **Docker**: Build and run in a container for consistent local environments
 
 ## Architecture Notes
 
-### Development vs Production
-
-**During Development (`npm run dev`):**
-- Runs as HTTP server on `localhost:3000`
-- Hot reload for quick iteration
-- Direct protocol testing with curl/HTTP clients
-
-**In Production (MCPB Bundle):**
-- Runs as **local stdio-based MCP server** on user's machine
-- No HTTP server - communicates via stdin/stdout
-- Full filesystem access and native capabilities
-- Packaged as `.mcpb` with Node.js runtime included
-
-The HTTP development server is just for convenience - Smithery automatically converts your code to work locally when creating the MCPB bundle.
-
 ### Key Dependencies
 - **@modelcontextprotocol/sdk**: Official MCP TypeScript SDK
-- **@smithery/sdk**: Smithery server adapters (stateful/stateless)
+- **@smithery/cli**: Smithery CLI tools for development and deployment
 - **zod**: Schema validation for configuration
-- **Node.js >=18**: Required runtime version (bundled with MCPB)
+- **Node.js >=18**: Required runtime version
 
 ### Security Considerations
-- **Local execution**: Server runs on user's machine, not in cloud
-- **Session-scoped config**: Each user has their own API keys/settings
-- **Sandboxed by OS**: Standard operating system security applies
-- **No central authentication**: Users manage their own credentials locally
+- Session-scoped API keys and configuration
+- CORS headers for web client compatibility
+- Request logging and monitoring via gateway
+- Authentication handled by Smithery platform
 
 ## Pre-Deployment Checklist
 
@@ -593,9 +600,8 @@ node -e "import('./src/index.ts').then(m => console.log(m.configSchema.parse({ d
 ## Troubleshooting
 
 ### Port Issues
-- Default port is **3000**
-- Change with: `PORT=8000 npm run dev`
-- Kill existing process: `lsof -ti:3000 | xargs kill`
+- Default port is **8081**
+- Kill existing process: `lsof -ti:8081 | xargs kill`
 
 ### Config Issues
 ```bash
@@ -618,10 +624,9 @@ node -e "import('./src/index.ts').then(m => console.log(JSON.stringify(m.configS
 
 - **Documentation**: [smithery.ai/docs](https://smithery.ai/docs)
 - **MCP Protocol**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-- **MCPB Specification**: [github.com/anthropics/mcpb](https://github.com/anthropics/mcpb) - Bundle format for local MCP servers
 - **TypeScript Quickstart**: [smithery.ai/docs/getting_started/quickstart_build_typescript.md](https://smithery.ai/docs/getting_started/quickstart_build_typescript.md)
 - **GitHub**: [github.com/smithery-ai/sdk](https://github.com/smithery-ai/sdk)
-- **Registry**: [smithery.ai](https://smithery.ai) for discovering and installing local MCP servers
+- **Registry**: [smithery.ai](https://smithery.ai) for discovering and deploying MCP servers
 
 ## Community & Support
 
