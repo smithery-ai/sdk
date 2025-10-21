@@ -1,3 +1,10 @@
+---
+title: Smithery TypeScript MCP Server Scaffold
+description: TypeScript MCP server template with tools, resources, prompts, and session configuration.
+overview: Complete scaffold for building production-ready MCP servers. Run `npm run dev` to start or `npm run build` for production.
+version: "1.0.0"
+---
+
 # AGENTS.md
 
 Welcome to the **Smithery TypeScript MCP Server Scaffold**!
@@ -9,20 +16,7 @@ This is the template project that gets cloned when you run `npx create-smithery`
 - [What's Included](#whats-included)
 - [Quick Start Commands](#quick-start-commands)
 - [Concepts](#concepts)
-  - [Tools](#tools)
-  - [Resources](#resources)
-  - [Prompts](#prompts)
-  - [Session Configuration](#session-configuration)
-    - [Real-World Example: Weather Server](#real-world-example-weather-server)
-    - [Understanding Configuration](#understanding-configuration)
-    - [How Session Config Works](#how-session-config-works)
-    - [Stateful vs Stateless Servers](#stateful-vs-stateless-servers)
-    - [Why This Matters](#why-this-matters)
-    - [Secure Config Distribution (Production)](#secure-config-distribution-production)
-    - [Testing Your Server](#testing-your-server)
-    - [Deployment Configuration](#deployment-configuration)
 - [Development Workflow](#development-workflow)
-  - [Customizing Your Project](#customizing-your-project)
 - [Deployment & CI/CD](#deployment--cicd)
 - [Architecture Notes](#architecture-notes)
 - [Pre-Deployment Checklist](#pre-deployment-checklist)
@@ -31,8 +25,6 @@ This is the template project that gets cloned when you run `npx create-smithery`
 - [Community & Support](#community--support)
 
 ## What's Included
-
-### Overview
 
 - **TypeScript MCP Server** with Zod-based configuration schema support
 - **Example Tool** (`hello` tool with debug mode configuration)
@@ -260,6 +252,31 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 - Session B: `debug=false, userApiKey=abc456`
 - Sessions don't interfere with each other
 
+#### Why This Matters
+
+- **Multi-user support**: Different users can have different API keys/settings
+- **Security**: API keys stay session-scoped, not server-global
+
+**Benefits:**
+- Users never expose sensitive keys directly to your server
+- OAuth handles authentication automatically
+- You focus on your server logic, not security infrastructure
+
+#### Secure Config Distribution (Production)
+
+In production, Smithery handles sensitive configuration securely:
+
+1. **Users save config in Smithery** (API keys, tokens, etc.)
+2. **OAuth authentication** is built-in - no manual key management
+3. **Smithery Gateway** securely forwards config to your server
+4. **Your server receives config** via the `config` parameter as usual
+
+**The flow:**
+```
+User → Smithery Platform → Gateway (OAuth) → Your Server
+     (saves config)    (secure forwarding)   (receives config)
+```
+
 #### Stateful vs Stateless Servers
 
 The TypeScript SDK provides two server patterns:
@@ -340,33 +357,6 @@ export default function createServer({
 - Game servers
 - Any scenario requiring persistent state
 
-#### Why This Matters
-
-- **Multi-user support**: Different users can have different API keys/settings
-- **Environment isolation**: Dev/staging/prod configs per session
-- **Security**: API keys stay session-scoped, not server-global
-
-#### Secure Config Distribution (Production)
-
-In production, Smithery handles sensitive configuration securely:
-
-1. **Users save config in Smithery** (API keys, tokens, etc.)
-2. **OAuth authentication** is built-in - no manual key management
-3. **Smithery Gateway** securely forwards config to your server
-4. **Your server receives config** via the `config` parameter as usual
-
-**The flow:**
-```
-User → Smithery Platform → Gateway (OAuth) → Your Server
-     (saves config)    (secure forwarding)   (receives config)
-```
-
-**Benefits:**
-- Users never expose sensitive keys directly to your server
-- OAuth handles authentication automatically
-- Config is encrypted in transit through the gateway
-- You focus on your server logic, not security infrastructure
-
 #### Testing Your Server
 
 The easiest way to test your MCP server during development:
@@ -375,7 +365,7 @@ The easiest way to test your MCP server during development:
 npm run dev                # Actually runs: npx @smithery/cli dev
 ```
 
-This starts your server locally on port 3000 with hot reload and opens an interactive playground in your browser. The playground lets you test your tools, resources, and prompts with a user-friendly interface - no need to write curl commands or understand the MCP protocol details.
+This starts your server locally on port 8081 with hot reload and opens an interactive playground in your browser. The playground lets you test your tools, resources, and prompts.
 
 ##### Advanced: Direct MCP Protocol Testing
 
@@ -405,7 +395,7 @@ curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"hello","arguments":{"name":"World"}}}'
 ```
-Expected response: `"Hello, World!"` (with debug=false) or enhanced debug output (with debug=true)
+Expected response: `"Hello, World!"`
 
 #### Deployment Configuration
 
@@ -413,15 +403,16 @@ Expected response: `"Hello, World!"` (with debug=false) or enhanced debug output
 ```json
 {
   "scripts": {
-    "dev": "npx @smithery/cli dev",
-    "build": "npx @smithery/cli build"
+    "dev": "smithery dev",
+    "build": "smithery build"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "@smithery/sdk": "^1.7.4",
     "zod": "^3.25.46"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.2.4"
+    "@smithery/cli": "^1.6.2"
   }
 }
 ```
@@ -579,9 +570,8 @@ node -e "import('./src/index.ts').then(m => console.log(m.configSchema.parse({ d
 ## Troubleshooting
 
 ### Port Issues
-- Default port is **3000**
-- Change with: `PORT=8000 npm run dev`
-- Kill existing process: `lsof -ti:3000 | xargs kill`
+- Default port is **8081**
+- Kill existing process: `lsof -ti:8081 | xargs kill`
 
 ### Config Issues
 ```bash
