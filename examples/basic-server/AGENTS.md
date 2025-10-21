@@ -8,9 +8,21 @@ This is the template project that gets cloned when you run `npx create-smithery`
 
 - [What's Included](#whats-included)
 - [Quick Start Commands](#quick-start-commands)
-- [Development Workflow](#development-workflow)
 - [Concepts](#concepts)
+  - [Tools](#tools)
+  - [Resources](#resources)
+  - [Prompts](#prompts)
   - [Session Configuration](#session-configuration)
+    - [Real-World Example: Weather Server](#real-world-example-weather-server)
+    - [Understanding Configuration](#understanding-configuration)
+    - [How Session Config Works](#how-session-config-works)
+    - [Stateful vs Stateless Servers](#stateful-vs-stateless-servers)
+    - [Why This Matters](#why-this-matters)
+    - [Secure Config Distribution (Production)](#secure-config-distribution-production)
+    - [Testing Your Server](#testing-your-server)
+    - [Deployment Configuration](#deployment-configuration)
+- [Development Workflow](#development-workflow)
+  - [Customizing Your Project](#customizing-your-project)
 - [Deployment & CI/CD](#deployment--cicd)
 - [Architecture Notes](#architecture-notes)
 - [Pre-Deployment Checklist](#pre-deployment-checklist)
@@ -20,12 +32,25 @@ This is the template project that gets cloned when you run `npx create-smithery`
 
 ## What's Included
 
+### Overview
+
 - **TypeScript MCP Server** with Zod-based configuration schema support
 - **Example Tool** (`hello` tool with debug mode configuration)
 - **Example Resource** (`history://hello-world` with Hello World origin story)
 - **Example Prompt** (`greet` prompt for generating greeting messages)
 - **Interactive Development** (`npm run dev` opens Smithery playground for testing with hot reload)
 - **Deployment Ready** configuration for the Smithery platform
+
+### Project Structure
+
+```
+your-server/
+├── package.json           # Project dependencies and scripts
+├── smithery.yaml          # Runtime specification (runtime: typescript)
+├── src/
+│   └── index.ts          # Main server implementation
+└── README.md
+```
 
 ## Quick Start Commands
 
@@ -37,11 +62,10 @@ npm run dev
 npm run build
 ```
 
-## Development Workflow
+## Concepts
 
-Based on the [Model Context Protocol architecture](https://modelcontextprotocol.io/docs/learn/architecture.md), MCP servers provide three core primitives:
+### Tools
 
-### 1. Tools (for actions)
 Add executable functions that AI applications can invoke to perform actions:
 
 ```typescript
@@ -66,7 +90,8 @@ server.registerTool(
 )
 ```
 
-### 2. Resources (for static data) 
+### Resources
+
 Add data sources that provide contextual information:
 
 ```typescript
@@ -90,7 +115,8 @@ server.registerResource(
 )
 ```
 
-### 3. Prompts (for interaction templates)
+### Prompts
+
 Add reusable templates that help structure interactions:
 
 ```typescript
@@ -119,98 +145,6 @@ server.registerPrompt(
   },
 )
 ```
-
-### Project Structure
-
-```
-your-server/
-├── package.json           # Project dependencies and scripts
-├── smithery.yaml          # Runtime specification (runtime: typescript)
-├── src/
-│   └── index.ts          # Main server implementation
-└── README.md
-```
-
-### Customizing Your Project
-
-**Important:** You'll want to customize the scaffold to match your actual project:
-
-1. **Update package.json:**
-   ```json
-   {
-     "name": "your-project-name",
-     "description": "Your MCP server description",
-     "author": "Your Name"
-   }
-   ```
-
-2. **Choose stateless or stateful (optional):**
-   
-   Most servers should be stateless. Only use stateful if you need to maintain state between requests (chat history, game state, etc.).
-   
-   For stateless (default, recommended):
-   ```typescript
-   export const stateless = true  // Optional: stateless is default behavior
-   
-   export default function createServer({ config }) {
-     // Server created fresh for each request
-   }
-   ```
-   
-   For stateful:
-   ```typescript
-   // Omit 'stateless' export for stateful behavior
-   
-   export default function createServer({ sessionId, config }) {
-     // sessionId lets you maintain state per session
-   }
-   ```
-
-3. **Define your config schema (optional):**
-   
-   With config schema:
-   ```typescript
-   export const configSchema = z.object({
-     apiKey: z.string().describe("Your API key"),
-     debug: z.boolean().default(false).describe("Enable debug mode"),
-   })
-   
-   export default function createServer({
-     config,
-   }: {
-     config: z.infer<typeof configSchema>
-   }) {
-     const server = new McpServer({
-       name: "Your Server Name",
-       version: "1.0.0",
-     })
-     
-     // Add your tools, resources, and prompts here
-     
-     return server.server
-   }
-   ```
-   
-   Without config schema:
-   ```typescript
-   export default function createServer() {
-     const server = new McpServer({
-       name: "Your Server Name",
-       version: "1.0.0",
-     })
-     
-     // Add your tools, resources, and prompts here
-     
-     return server.server
-   }
-   ```
-
-4. **Test your server works:**
-   ```bash
-   npm run dev
-   ```
-
-## Concepts
 
 ### Session Configuration
 
@@ -330,7 +264,7 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 
 The TypeScript SDK provides two server patterns:
 
-#### Stateless Servers (Recommended for most use cases)
+##### Stateless Servers (Recommended for most use cases)
 Each request creates a new server instance - no session state is maintained:
 
 ```typescript
@@ -365,7 +299,7 @@ export default function createServer({ config }: { config: z.infer<typeof config
 - File operations
 - Most MCP servers
 
-#### Stateful Servers (For persistent state)
+##### Stateful Servers (For persistent state)
 Maintains state between calls within a session:
 
 ```typescript
@@ -406,13 +340,13 @@ export default function createServer({
 - Game servers
 - Any scenario requiring persistent state
 
-### Why This Matters
+#### Why This Matters
 
 - **Multi-user support**: Different users can have different API keys/settings
 - **Environment isolation**: Dev/staging/prod configs per session
 - **Security**: API keys stay session-scoped, not server-global
 
-### Secure Config Distribution (Production)
+#### Secure Config Distribution (Production)
 
 In production, Smithery handles sensitive configuration securely:
 
@@ -433,7 +367,7 @@ User → Smithery Platform → Gateway (OAuth) → Your Server
 - Config is encrypted in transit through the gateway
 - You focus on your server logic, not security infrastructure
 
-### Testing Your Server
+#### Testing Your Server
 
 The easiest way to test your MCP server during development:
 
@@ -443,7 +377,7 @@ npm run dev                # Actually runs: npx @smithery/cli dev
 
 This starts your server locally on port 3000 with hot reload and opens an interactive playground in your browser. The playground lets you test your tools, resources, and prompts with a user-friendly interface - no need to write curl commands or understand the MCP protocol details.
 
-#### Advanced: Direct MCP Protocol Testing
+##### Advanced: Direct MCP Protocol Testing
 
 For debugging or understanding the low-level MCP protocol, you can manually test using curl commands. Most developers won't need this.
 
@@ -473,7 +407,7 @@ curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
 ```
 Expected response: `"Hello, World!"` (with debug=false) or enhanced debug output (with debug=true)
 
-### Deployment Configuration
+#### Deployment Configuration
 
 **package.json:**
 ```json
@@ -496,6 +430,89 @@ Expected response: `"Hello, World!"` (with debug=false) or enhanced debug output
 ```yaml
 runtime: typescript
 ```
+
+## Development Workflow
+
+Based on the [Model Context Protocol architecture](https://modelcontextprotocol.io/docs/learn/architecture.md), MCP servers provide three core primitives: Tools (for actions), Resources (for static data), and Prompts (for interaction templates). Learn more about each in the [Concepts](#concepts) section below.
+
+### Customizing Your Project
+
+**Important:** You'll want to customize the scaffold to match your actual project:
+
+1. **Update package.json:**
+   ```json
+   {
+     "name": "your-project-name",
+     "description": "Your MCP server description",
+     "author": "Your Name"
+   }
+   ```
+
+2. **Choose stateless or stateful (optional):**
+   
+   Most servers should be stateless. Only use stateful if you need to maintain state between requests (chat history, game state, etc.).
+   
+   For stateless (default, recommended):
+   ```typescript
+   export const stateless = true  // Optional: stateless is default behavior
+   
+   export default function createServer({ config }) {
+     // Server created fresh for each request
+   }
+   ```
+   
+   For stateful:
+   ```typescript
+   // Omit 'stateless' export for stateful behavior
+   
+   export default function createServer({ sessionId, config }) {
+     // sessionId lets you maintain state per session
+   }
+   ```
+
+3. **Define your config schema (optional):**
+   
+   With config schema:
+   ```typescript
+   export const configSchema = z.object({
+     apiKey: z.string().describe("Your API key"),
+     debug: z.boolean().default(false).describe("Enable debug mode"),
+   })
+   
+   export default function createServer({
+     config,
+   }: {
+     config: z.infer<typeof configSchema>
+   }) {
+     const server = new McpServer({
+       name: "Your Server Name",
+       version: "1.0.0",
+     })
+     
+     // Add your tools, resources, and prompts here
+     
+     return server.server
+   }
+   ```
+   
+   Without config schema:
+   ```typescript
+   export default function createServer() {
+     const server = new McpServer({
+       name: "Your Server Name",
+       version: "1.0.0",
+     })
+     
+     // Add your tools, resources, and prompts here
+     
+     return server.server
+   }
+   ```
+
+4. **Test your server works:**
+   ```bash
+   npm run dev
+   ```
 
 ## Deployment & CI/CD
 
