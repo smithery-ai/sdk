@@ -275,9 +275,57 @@ Once your server is published to Smithery, users can securely manage their confi
 
 ### Stateful vs Stateless Servers
 
-The TypeScript SDK provides two server patterns. **Choose stateless for most use cases.**
+The TypeScript SDK provides two server patterns. Choose based on your needs.
 
-#### Stateless Servers (Recommended)
+#### Stateful Servers
+
+Stateful servers maintain state between calls within a session. Each session becomes a meaningful chunk that you can track, log, and analyze:
+
+```typescript
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+
+// Optional: Define config schema
+export const configSchema = z.object({
+  apiKey: z.string().optional(),
+  debug: z.boolean().default(false),
+})
+
+// Omit 'stateless' export or set to false for stateful behavior
+
+// Your server creation function
+export default function createServer({ 
+  sessionId, 
+  config 
+}: { 
+  sessionId: string
+  config: z.infer<typeof configSchema> 
+}) {
+  const server = new McpServer({
+    name: "My Stateful App",
+    version: "1.0.0"
+  })
+  
+  // Track session-level analytics and usage patterns
+  console.log(`Session ${sessionId} started`)
+  
+  // Store session-specific state
+  // Example: const sessionState = getOrCreateState(sessionId)
+  
+  return server.server
+}
+```
+
+**Use stateful servers for:**
+- Chat conversations that need memory
+- Multi-step workflows
+- Game servers
+- **Understanding how your server is used per session** - each session becomes a meaningful unit for analytics
+- **Improving your server** - track usage patterns, debug issues, and optimize based on real session data
+- Better logging and observability
+- Any scenario requiring persistent state
+
+#### Stateless Servers
 
 Stateless servers create a fresh instance for each request—no session state is maintained:
 
@@ -308,52 +356,10 @@ export default function createServer({ config }: { config: z.infer<typeof config
 ```
 
 **Use stateless servers for:**
-- API integrations
-- Database queries
+- Simple API integrations
+- One-off database queries
 - File operations
-- Most MCP servers
-
-#### Stateful Servers (For Persistent State)
-
-Stateful servers maintain state between calls within a session:
-
-```typescript
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { z } from 'zod'
-
-// Optional: Define config schema
-export const configSchema = z.object({
-  apiKey: z.string().optional(),
-  debug: z.boolean().default(false),
-})
-
-// Omit 'stateless' export or set to false for stateful behavior
-
-// Your server creation function
-export default function createServer({ 
-  sessionId, 
-  config 
-}: { 
-  sessionId: string
-  config: z.infer<typeof configSchema> 
-}) {
-  const server = new McpServer({
-    name: "My Stateful App",
-    version: "1.0.0"
-  })
-  
-  // You can store session-specific state here using sessionId
-  // Example: const sessionState = getOrCreateState(sessionId)
-  
-  return server.server
-}
-```
-
-**Use stateful servers for:**
-- Chat conversations that need memory
-- Multi-step workflows
-- Game servers
-- Any scenario requiring persistent state
+- Servers where you don't need to track usage per session
 
 ## Development Workflow
 
@@ -372,25 +378,33 @@ This section covers how to customize the scaffold, test your server during devel
    }
    ```
 
-2. **Choose stateless or stateful (optional):**
+2. **Choose stateless or stateful:**
    
-   **Most servers should be stateless.** Only use stateful if you need to maintain state between requests (chat history, game state, etc.).
-   
-   For stateless (default, recommended):
-   ```typescript
-   export const stateless = true  // Optional: stateless is default behavior
-   
-   export default function createServer({ config }) {
-     // Server created fresh for each request
-   }
-   ```
+   **Consider stateful if you want to:**
+   - Track and understand how your server is used per session
+   - Log analytics and usage patterns for improving your server
+   - Maintain conversation history or multi-step workflows
+   - Debug issues with full session context
    
    For stateful:
    ```typescript
-   // Omit 'stateless' export for stateful behavior
+   // Omit 'stateless' export for stateful behavior (default)
    
    export default function createServer({ sessionId, config }) {
-     // sessionId lets you maintain state per session
+     // sessionId lets you maintain state and track usage per session
+   }
+   ```
+   
+   **Consider stateless if you:**
+   - Don't need to track individual sessions
+   - Want simpler, per-request behavior
+   
+   For stateless:
+   ```typescript
+   export const stateless = true
+   
+   export default function createServer({ config }) {
+     // Server created fresh for each request
    }
    ```
 
@@ -510,9 +524,7 @@ curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
 ```
 
-3. Get session ID from server response or logs (if using stateful server)
-
-4. Send initialized notification:
+3. Send initialized notification:
 ```bash
 curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
@@ -520,15 +532,21 @@ curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
 ```
 
-5. Test tools:
+4. List available tools:
 ```bash
 curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"hello","arguments":{"name":"World"}}}'
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
 ```
 
-Expected response: `"Hello, World!"`
+5. Call a tool from the list (replace `tool-name` and arguments with your actual tool):
+```bash
+curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"tool-name","arguments":{"key":"value"}}}'
+```
 
 **Best for:** Protocol debugging, understanding MCP internals, automated testing scripts
 
