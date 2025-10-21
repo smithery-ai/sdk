@@ -15,6 +15,7 @@ This is the template project that gets cloned when you run `npx create-smithery`
 
 - [Project Structure](#project-structure)
 - [Quick Start Commands](#quick-start-commands)
+- [smithery.yaml Configuration](#smitheryyaml-configuration)
 - [Core Components: Tools, Resources, and Prompts](#core-components-tools-resources-and-prompts)
 - [Development Workflow](#development-workflow)
 - [Deployment & CI/CD](#deployment--cicd)
@@ -41,6 +42,56 @@ npm run dev          # or: bun run dev, pnpm run dev, yarn dev
 
 # Build for production
 npm run build        # or: bun run build, pnpm run build, yarn build
+```
+
+## smithery.yaml Configuration
+
+The `smithery.yaml` file configures how your server runs. For this TypeScript setup, it only needs:
+
+### Required Field
+
+```yaml
+runtime: typescript
+```
+
+This tells Smithery to use the TypeScript runtime for your server.
+
+### Optional Fields
+
+#### target (optional)
+
+Specifies where your server runs and determines the transport protocol. Can be `local` or `remote`:
+
+```yaml
+runtime: typescript
+target: remote    # Options: remote (default) or local
+```
+
+- `local`: Server runs on the user's machine using stdio transport. When published, bundled into `.mcpb` file for distribution
+- `remote`: Server runs on Smithery's infrastructure using HTTP transport (default)
+
+See [Transports](#transports) for more details on how this affects your server's communication protocol.
+
+#### env (optional)
+
+Environment variables to inject when running your server. Available for both runtime types:
+
+```yaml
+runtime: typescript
+env:
+  NODE_ENV: "production"
+  DEBUG: "true"
+  LOG_LEVEL: "info"
+```
+
+### Complete Example
+
+```yaml
+runtime: typescript
+target: remote
+env:
+  NODE_ENV: "production"
+  DEBUG: "true"
 ```
 
 ## Concepts
@@ -273,11 +324,59 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 
 Once your server is published to Smithery, users can securely manage their configurations through a configuration UI. Saved configurations are automatically applied whenever they connect to your server in any client—no need to manually pass config parameters each time.
 
+### Transports
+
+Transports define how your MCP server communicates with clients. The transport protocol is determined by the `target` field in your `smithery.yaml` file.
+
+#### stdio Transport (Local Servers)
+
+When `target: local`, your server uses **stdio transport**:
+
+```yaml
+runtime: typescript
+target: local
+```
+
+**How it works:**
+- Server communicates via standard input/output (stdin/stdout)
+- Runs as a local process on the user's machine
+- When published to Smithery, your server is bundled into a `.mcpb` file for distribution
+- Users install and run it locally through their MCP client
+
+**Best for:**
+- File system access
+- Local development tools
+- Privacy-sensitive operations
+- Servers that need direct access to user's machine
+
+#### HTTP Transport (Remote Servers - Default)
+
+When `target: remote` (or omitted, as remote is the default), your server uses **HTTP transport** and is hosted by Smithery:
+
+```yaml
+runtime: typescript
+target: remote
+```
+
+**How it works:**
+- Server communicates over HTTP/HTTPS
+- Hosted on Smithery's infrastructure
+- Accessible from anywhere via URL
+- Smithery handles deployment, scaling, and availability
+
+**Best for:**
+- API integrations
+- Cloud service wrappers
+- Servers that don't need local file access
+- Multi-user shared resources
+
+**Note:** During development with `npm run dev`, all servers use HTTP transport (port 8081) regardless of the target setting. The target setting only affects production deployment.
+
 ### Stateful vs Stateless Servers
 
-The TypeScript SDK provides two server patterns. Choose based on your needs.
+The TypeScript SDK provides two server patterns. **Servers are stateful by default.** Choose based on your needs.
 
-#### Stateful Servers
+#### Stateful Servers (Default)
 
 Stateful servers maintain state between calls within a session. Each session becomes a meaningful chunk that you can track, log, and analyze:
 
@@ -291,7 +390,7 @@ export const configSchema = z.object({
   debug: z.boolean().default(false),
 })
 
-// Omit 'stateless' export or set to false for stateful behavior
+// Omit 'stateless' export for stateful behavior (this is the default)
 
 // Your server creation function
 export default function createServer({ 
@@ -339,7 +438,7 @@ export const configSchema = z.object({
   debug: z.boolean().default(false),
 })
 
-// Mark as stateless
+// Explicitly mark as stateless (opt-in behavior)
 export const stateless = true
 
 // Your server creation function
@@ -386,9 +485,9 @@ This section covers how to customize the scaffold, test your server during devel
    - Maintain conversation history or multi-step workflows
    - Debug issues with full session context
    
-   For stateful:
+   For stateful (default):
    ```typescript
-   // Omit 'stateless' export for stateful behavior (default)
+   // Omit 'stateless' export for stateful behavior (this is the default)
    
    export default function createServer({ sessionId, config }) {
      // sessionId lets you maintain state and track usage per session
@@ -399,7 +498,7 @@ This section covers how to customize the scaffold, test your server during devel
    - Don't need to track individual sessions
    - Want simpler, per-request behavior
    
-   For stateless:
+   For stateless (opt-in):
    ```typescript
    export const stateless = true
    
