@@ -13,25 +13,15 @@ This is the template project that gets cloned when you run `npx create-smithery`
 
 ## Table of Contents
 
-- [What's Included](#whats-included)
+- [Project Structure](#project-structure)
 - [Quick Start Commands](#quick-start-commands)
+- [smithery.yaml Configuration](#smitheryyaml-configuration)
 - [Concepts](#concepts)
 - [Development Workflow](#development-workflow)
 - [Deployment & CI/CD](#deployment--cicd)
-- [Architecture Notes](#architecture-notes)
-- [Pre-Deployment Checklist](#pre-deployment-checklist)
 - [Troubleshooting](#troubleshooting)
 - [Resources](#resources)
 - [Community & Support](#community--support)
-
-## What's Included
-
-- **TypeScript MCP Server** with Zod-based configuration schema support
-- **Example Tool** (`hello` tool with debug mode configuration)
-- **Example Resource** (`history://hello-world` with Hello World origin story)
-- **Example Prompt** (`greet` prompt for generating greeting messages)
-- **Interactive Development** (`npm run dev` opens Smithery playground for testing with hot reload)
-- **Deployment Ready** configuration for the Smithery platform
 
 ### Project Structure
 
@@ -48,17 +38,68 @@ your-server/
 
 ```bash
 # Run development server (streamable HTTP on port 8081)
-npm run dev
+# Opens interactive Smithery playground in your browser for testing
+npm run dev          # or: bun run dev, pnpm run dev, yarn dev
+
+# Run on a custom port
+npm run dev -- --port 3000
+
+# Kill existing process if port 8081 is in use
+lsof -ti:8081 | xargs kill
 
 # Build for production
-npm run build
+npm run build        # or: bun run build, pnpm run build, yarn build
+```
+
+## smithery.yaml Configuration
+
+The `smithery.yaml` file configures how your server runs. For this TypeScript setup, it only needs:
+
+### Required Field
+
+```yaml
+runtime: typescript
+```
+
+This tells Smithery to use the TypeScript runtime for your server.
+
+### Optional Fields
+
+#### target (optional)
+
+Specifies where your server runs and determines the transport protocol. Can be `local` or `remote`:
+
+```yaml
+runtime: typescript
+target: remote    # Options: remote (default) or local
+```
+
+- `local`: Server runs on the user's machine using stdio transport. When published, bundled into `.mcpb` file for distribution
+- `remote`: Server runs on Smithery's infrastructure using HTTP transport (default)
+
+See [Transports](#transports) for more details on how this affects your server's communication protocol.
+
+#### env (optional)
+
+Environment variables to inject when running your server. Available for both runtime types:
+
+```yaml
+runtime: typescript
+env:
+  NODE_ENV: "production"
+  DEBUG: "true"
+  LOG_LEVEL: "info"
 ```
 
 ## Concepts
 
-### Tools
+### Core Components: Tools, Resources, and Prompts
 
-Add executable functions that AI applications can invoke to perform actions:
+MCP servers expose three types of components that AI applications can interact with. Learn when to use each and how they work together to build powerful integrations.
+
+#### Tools: Executable Functions
+
+Tools are executable functions that AI applications can invoke to perform actions:
 
 ```typescript
 // Add a tool
@@ -70,21 +111,16 @@ server.registerTool(
     inputSchema: { name: z.string().describe("Name to greet") },
   },
   async ({ name }) => {
-    // Access session config if using stateful server
-    const greeting = config.debug 
-      ? `DEBUG: Hello, ${name}!`
-      : `Hello, ${name}!`
-    
     return {
-      content: [{ type: "text", text: greeting }],
+      content: [{ type: "text", text: `Hello, ${name}!` }],
     }
   },
 )
 ```
 
-### Resources
+#### Resources: Read-Only Data Sources
 
-Add data sources that provide contextual information:
+Resources provide read-only data that gives AI applications context to work with. Unlike tools, resources do not perform actions—they simply return information:
 
 ```typescript
 // Add a resource
@@ -107,9 +143,9 @@ server.registerResource(
 )
 ```
 
-### Prompts
+#### Prompts: Reusable Message Templates
 
-Add reusable templates that help structure interactions:
+Prompts are predefined message templates that help structure conversations. Use them to guide AI applications toward consistent interaction patterns:
 
 ```typescript
 // Add a prompt
@@ -138,297 +174,158 @@ server.registerPrompt(
 )
 ```
 
+#### When to Use Each Component
+
+- **Tools**: Perform actions (create/update/delete, API calls, computations, database operations)
+- **Resources**: Provide read-only data (documentation, reference info, context without side effects)
+- **Prompts**: Guide conversation patterns (reusable templates, multi-step workflows, consistent interactions)
+
 ### Session Configuration
 
-Session configuration allows clients to connect to your MCP server with personalized settings. Think of it like user preferences - each connection gets its own configuration that doesn't affect other sessions, perfect for passing API keys, customizing behavior, and personalizing responses.
+Pass personalized settings to each connection—API keys, preferences, and user-specific configuration—without affecting other sessions.
 
-When you define a configuration schema using Zod, Smithery automatically:
-- **Generates a configuration UI** with form elements (text inputs, dropdowns, checkboxes)
-- **Passes configurations to your server** as URL parameters  
-- **Shows helpful descriptions** as form labels and tooltips
-- **Applies default values** and enforces required fields
+**Why configuration matters:**
+- **Multi-user support**: Different users have different API keys and settings
+- **Security**: API keys stay session-scoped, not stored server-wide
+- **Flexibility**: Users customize behavior at connection time without code changes
 
-#### Real-World Example: Weather Server
+When you define a configuration schema using Zod, Smithery automatically generates a configuration UI with appropriate input types, passes configurations as URL parameters to your server, and applies default values and enforces required fields. Each session gets isolated configuration—Session A and Session B don't interfere with each other.
 
-Let's say you're building a weather server. You might want users to customize their preferred temperature unit, provide an API key, or set their default location:
+#### How Session Config Works
+
+1. **Define config schema** - Example weather server where different users have different settings:
 
 ```typescript
 import { z } from "zod"
 
 export const configSchema = z.object({
+  // Required field - users must provide this
   weatherApiKey: z.string().describe("Your OpenWeatherMap API key"),
+  // Optional fields with defaults - users can customize or use defaults
   temperatureUnit: z.enum(["celsius", "fahrenheit"]).default("celsius").describe("Temperature unit"),
   defaultLocation: z.string().default("New York").describe("Default city for weather queries"),
-  debug: z.boolean().default(false).describe("Enable debug logging"),
-})
-
-export default function createServer({
-  config,
-}: {
-  config: z.infer<typeof configSchema>
-}) {
-  // Your weather tools use config.weatherApiKey, config.temperatureUnit, etc.
-}
-```
-
-**Usage scenarios:**
-- **User A**: API key `abc123`, prefers Fahrenheit, lives in San Francisco
-- **User B**: API key `xyz789`, prefers Celsius, lives in Singapore
-
-Each user gets personalized weather data without affecting others.
-
-#### Understanding Configuration
-
-The `config` object is passed to your server creation function and contains session-specific configuration:
-
-```typescript
-export default function createServer({
-  config,
-}: {
-  config: z.infer<typeof configSchema>
-}) {
-  const server = new McpServer({
-    name: "My Server",
-    version: "1.0.0",
-  })
-
-  server.registerTool(
-    "my-tool",
-    {
-      title: "My Tool",
-      description: "Tool that uses session config",
-      inputSchema: { name: z.string() },
-    },
-    async ({ name }) => {
-      // Access session-specific config
-      if (config.debug) {
-        console.log(`DEBUG: Processing request for ${name}`)
-      }
-      
-      // Use config values (API keys, preferences, etc.)
-      const response = config.debug 
-        ? `DEBUG: Hello ${name}`
-        : `Hello ${name}`
-      
-      return {
-        content: [{ type: "text", text: response }],
-      }
-    },
-  )
-
-  return server.server
-}
-```
-
-#### How Session Config Works
-
-1. **Define config schema**:
-```typescript
-export const configSchema = z.object({
-  // Required field - users must provide this
-  userApiKey: z.string().describe("Your API key"),
-  
-  // Optional fields with defaults - users can customize or use defaults
-  debug: z.boolean().default(false).describe("Debug mode"),
-  maxResults: z.number().default(10).describe("Maximum results to return"),
-  
-  // Optional field without default - can be undefined
-  customEndpoint: z.string().optional().describe("Custom API endpoint"),
 })
 ```
-
-**Field Types:**
-- **Required**: Use `z.string()`, `z.number()`, etc. - users must provide a value
-- **Optional with default**: Use `.default(value)` - users can customize or use the default
-- **Optional without default**: Use `.optional()` - completely optional
 
 2. **Pass config via URL parameters**:
 ```
-http://localhost:3000/mcp?userApiKey=xyz123&debug=true
+http://localhost:3000/mcp?weatherApiKey=abc123&temperatureUnit=fahrenheit
 ```
 
-3. **Each session gets isolated config**:
-- Session A: `debug=true, userApiKey=xyz123`
-- Session B: `debug=false, userApiKey=abc456`
-- Sessions don't interfere with each other
-
-#### Why This Matters
-
-- **Multi-user support**: Different users can have different API keys/settings
-- **Security**: API keys stay session-scoped, not server-global
-
-**Benefits:**
-- Users never expose sensitive keys directly to your server
-- OAuth handles authentication automatically
-- You focus on your server logic, not security infrastructure
-
-#### Secure Config Distribution (Production)
-
-In production, Smithery handles sensitive configuration securely:
-
-1. **Users save config in Smithery** (API keys, tokens, etc.)
-2. **OAuth authentication** is built-in - no manual key management
-3. **Smithery Gateway** securely forwards config to your server
-4. **Your server receives config** via the `config` parameter as usual
-
-**The flow:**
-```
-User → Smithery Platform → Gateway (OAuth) → Your Server
-     (saves config)    (secure forwarding)   (receives config)
-```
-
-#### Stateful vs Stateless Servers
-
-The TypeScript SDK provides two server patterns:
-
-##### Stateless Servers (Recommended for most use cases)
-Each request creates a new server instance - no session state is maintained:
-
+3. **Use config in your server**:
 ```typescript
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { z } from 'zod'
-
-// Optional: Define config schema
-export const configSchema = z.object({
-  apiKey: z.string().optional(),
-  debug: z.boolean().default(false),
-})
-
-// Mark as stateless
-export const stateless = true
-
-// Your server creation function
 export default function createServer({ config }: { config: z.infer<typeof configSchema> }) {
-  const server = new McpServer({
-    name: "My App",
-    version: "1.0.0"
-  })
+  const server = new McpServer({ name: "Weather Server", version: "1.0.0" })
   
-  // Add tools, resources, prompts...
+  server.registerTool("get-weather", { /* ... */ }, async ({ city }) => {
+    // Access session-specific config
+    const temp = await fetchWeather(city, config.weatherApiKey)
+    return formatTemp(temp, config.temperatureUnit)
+  })
   
   return server.server
 }
 ```
 
-**Use stateless servers for:**
-- API integrations
-- Database queries
-- File operations
-- Most MCP servers
+Each user gets personalized weather data without affecting others
 
-##### Stateful Servers (For persistent state)
-Maintains state between calls within a session:
+#### Configuration Management in Production
+
+Once your server is published to Smithery, users can securely manage their configurations through a configuration UI. Saved configurations are automatically applied whenever they connect to your server in any client—no need to manually pass config parameters each time.
+
+### Transports
+
+Transports define how your MCP server communicates with clients. The transport protocol is determined by the `target` field in your `smithery.yaml` file.
+
+#### stdio Transport (Local Servers)
+
+When `target: local`, your server uses **stdio transport**:
+
+```yaml
+runtime: typescript
+target: local
+```
+
+**How it works:**
+- Server communicates via standard input/output (stdin/stdout)
+- Runs as a local process on the user's machine
+- When published to Smithery, your server is bundled into a `.mcpb` file for distribution
+- Users install and run it locally through their MCP client
+
+**Best for:**
+- File system access
+- Local development tools
+- Privacy-sensitive operations
+- Servers that need direct access to user's machine
+
+#### HTTP Transport (Remote Servers - Default)
+
+When `target: remote` (or omitted, as remote is the default), your server uses **HTTP transport** and is hosted by Smithery:
+
+```yaml
+runtime: typescript
+target: remote
+```
+
+**How it works:**
+- Server communicates over HTTP/HTTPS
+- Hosted on Smithery's infrastructure
+- Accessible from anywhere via URL
+- Smithery handles deployment, scaling, and availability
+
+**Best for:**
+- API integrations
+- Cloud service wrappers
+- Servers that don't need local file access
+- Multi-user shared resources
+
+**Note:** During development with `npm run dev`, all servers use HTTP transport (port 8081) regardless of the target setting. The target setting only affects production deployment.
+
+### Stateful vs Stateless Servers
+
+The TypeScript SDK provides two server patterns. **Servers are stateful by default.** Choose based on your needs.
+
+#### Stateful Servers (Default)
+
+Stateful servers maintain state between calls within a session:
 
 ```typescript
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { z } from 'zod'
-
-// Optional: Define config schema
-export const configSchema = z.object({
-  apiKey: z.string().optional(),
-  debug: z.boolean().default(false),
-})
-
-// Omit 'stateless' export or set to false for stateful behavior
-
-// Your server creation function
-export default function createServer({ 
-  sessionId, 
-  config 
-}: { 
-  sessionId: string
-  config: z.infer<typeof configSchema> 
-}) {
-  const server = new McpServer({
-    name: "My Stateful App",
-    version: "1.0.0"
-  })
+export default function createServer({ sessionId, config }) {
+  const server = new McpServer({ name: "My Stateful App", version: "1.0.0" })
   
-  // You can store session-specific state here using sessionId
+  console.log(`Session ${sessionId} started`)
+  
+  // Store session-specific state
   // Example: const sessionState = getOrCreateState(sessionId)
   
   return server.server
 }
 ```
 
-**Use stateful servers for:**
-- Chat conversations that need memory
-- Multi-step workflows
-- Game servers
-- Any scenario requiring persistent state
+**Use stateful for:** Chat conversations, multi-step workflows, game servers, session analytics, or any scenario requiring persistent state.
 
-#### Testing Your Server
+#### Stateless Servers
 
-The easiest way to test your MCP server during development:
+Stateless servers create a fresh instance for each request—no session state is maintained:
 
-```bash
-npm run dev                # Actually runs: npx @smithery/cli dev
-```
+```typescript
+// Explicitly mark as stateless (opt-in behavior)
+export const stateless = true
 
-This starts your server locally on port 8081 with hot reload and opens an interactive playground in your browser. The playground lets you test your tools, resources, and prompts.
-
-##### Advanced: Direct MCP Protocol Testing
-
-For debugging or understanding the low-level MCP protocol, you can manually test using curl commands. Most developers won't need this.
-
-**Complete MCP Testing Workflow:**
-1. Start server: `npm run dev` (runs on port 3000 by default)
-2. Initialize with config (always include config params): 
-```bash
-curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
-```
-3. Get session ID from server response or logs (if using stateful server)
-4. Send notifications/initialized:
-```bash
-curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
-```
-5. Test the hello tool with debug mode:
-```bash
-curl -X POST "http://127.0.0.1:3000/mcp?debug=true" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"hello","arguments":{"name":"World"}}}'
-```
-Expected response: `"Hello, World!"`
-
-#### Deployment Configuration
-
-**package.json:**
-```json
-{
-  "scripts": {
-    "dev": "smithery dev",
-    "build": "smithery build"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.20.0",
-    "@smithery/sdk": "^1.7.4",
-    "zod": "^3.25.46"
-  },
-  "devDependencies": {
-    "@smithery/cli": "^1.6.2"
-  }
+export default function createServer({ config }) {
+  const server = new McpServer({ name: "My App", version: "1.0.0" })
+  // Add tools, resources, prompts...
+  return server.server
 }
 ```
 
-**smithery.yaml:**
-```yaml
-runtime: typescript
-```
+**Use stateless for:** Simple API integrations, one-off database queries, file operations, or servers that don't need session tracking.
 
 ## Development Workflow
 
-Based on the [Model Context Protocol architecture](https://modelcontextprotocol.io/docs/learn/architecture.md), MCP servers provide three core primitives: Tools (for actions), Resources (for static data), and Prompts (for interaction templates). Learn more about each in the [Concepts](#concepts) section below.
-
 ### Customizing Your Project
 
-**Important:** You'll want to customize the scaffold to match your actual project:
+**Customize the scaffold to match your actual project:**
 
 1. **Update package.json:**
    ```json
@@ -439,32 +336,12 @@ Based on the [Model Context Protocol architecture](https://modelcontextprotocol.
    }
    ```
 
-2. **Choose stateless or stateful (optional):**
-   
-   Most servers should be stateless. Only use stateful if you need to maintain state between requests (chat history, game state, etc.).
-   
-   For stateless (default, recommended):
-   ```typescript
-   export const stateless = true  // Optional: stateless is default behavior
-   
-   export default function createServer({ config }) {
-     // Server created fresh for each request
-   }
-   ```
-   
-   For stateful:
-   ```typescript
-   // Omit 'stateless' export for stateful behavior
-   
-   export default function createServer({ sessionId, config }) {
-     // sessionId lets you maintain state per session
-   }
-   ```
+2. **Choose stateless or stateful:** See [Stateful vs Stateless Servers](#stateful-vs-stateless-servers) for details. Servers are stateful by default. For stateless, export `export const stateless = true`.
 
 3. **Define your config schema (optional):**
    
-   With config schema:
    ```typescript
+   // With config schema
    export const configSchema = z.object({
      apiKey: z.string().describe("Your API key"),
      debug: z.boolean().default(false).describe("Enable debug mode"),
@@ -484,118 +361,99 @@ Based on the [Model Context Protocol architecture](https://modelcontextprotocol.
      
      return server.server
    }
-   ```
    
-   Without config schema:
-   ```typescript
-   export default function createServer() {
-     const server = new McpServer({
-       name: "Your Server Name",
-       version: "1.0.0",
-     })
-     
-     // Add your tools, resources, and prompts here
-     
-     return server.server
-   }
+   // Without config schema: omit configSchema export and createServer takes no parameters
    ```
 
-4. **Test your server works:**
-   ```bash
-   npm run dev
-   ```
+### Testing Your Server: Three Approaches
+
+Your MCP server can be tested in three different ways depending on your needs. All approaches require running `npm run dev` first to start the server.
+
+#### Smithery Playground
+
+```bash
+npm run dev                # Actually runs: npx @smithery/cli dev
+```
+
+Starts your server on port 8081 with hot reload and opens an interactive playground in your browser:
+- Test your tools with a user-friendly UI
+- Explore resources
+- Try prompts
+- Configure session settings in real-time
+- View request/response details
+
+**Best for:** Quick iteration, UI testing, tool validation
+
+#### Custom Clients
+
+Connect any MCP client to your server. Two options depending on your client type:
+
+##### Option A: Local HTTP Clients
+
+Connect to `http://127.0.0.1:8081/mcp` with config as URL parameters:
+```
+http://127.0.0.1:8081/mcp?apiKey=your_key&debug=true
+```
+
+##### Option B: Browser/Remote Clients (ngrok Tunnel)
+
+1. Look for the ngrok tunnel URL in the console output (e.g., `https://abcd-1234-5678.ngrok.io`)
+2. Connect your browser client to: `https://your-ngrok-id.ngrok.io/mcp`
+3. Pass config as URL parameters:
+```
+https://your-ngrok-id.ngrok.io/mcp?apiKey=your_key&debug=true
+```
+
+**Best for:** Testing with remote clients, browser-based integrations, sharing with team members
+
+#### Direct Protocol Testing
+
+For deep debugging or understanding the MCP protocol:
+
+1. Initialize connection (always include config params):
+```bash
+curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
+```
+
+2. Send initialized notification:
+```bash
+curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+```
+
+3. List available tools:
+```bash
+curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+```
+
+4. Call a tool from the list (replace `tool-name` and arguments with your actual tool):
+```bash
+curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"tool-name","arguments":{"key":"value"}}}'
+```
+
+**Best for:** Protocol debugging, understanding MCP internals, automated testing scripts
 
 ## Deployment & CI/CD
 
-### Local Development & Testing
-```bash
-# Run development server locally (opens interactive playground)
-npm run dev
+Once you're ready to share your MCP server with the world, deploy it to Smithery:
 
-# Build for local testing
-npm run build
-```
+1. **Publish your server**: Visit [smithery.ai/new](https://smithery.ai/new)
+2. **Connect your repository**: Authorize Smithery to access your GitHub repository
+3. **Automatic deployments**: By default, your server automatically deploys on every commit to the `main` branch
+4. **Server scanning**: Smithery automatically discovers and indexes your tools, resources, and prompts
 
-The `target: local` setting in `smithery.yaml` means this server is optimized for local development and testing environments.
-
-### Local Deployment
-For local deployment and testing:
-
-1. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-   The server will run on `http://localhost:8081` with hot reload enabled.
-
-2. **Test with the interactive playground** that opens automatically in your browser, or make direct requests:
-   ```bash
-   curl -X POST "http://127.0.0.1:8081/mcp?debug=true" \
-     -H "Content-Type: application/json" \
-     -H "Accept: application/json, text/event-stream" \
-     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
-   ```
-
-3. **For persistent local deployment**, consider using process managers like:
-   ```bash
-   # Using PM2
-   npm install -g pm2
-   pm2 start npm --name "local-server" -- run dev
-   
-   # Using systemd (Linux/macOS)
-   # Create a service file and manage with systemctl
-   ```
-
-### Sharing Locally
-
-If you need to share your local server:
-- **Local network**: Share your machine's IP (e.g., `192.168.x.x:8081`)
-- **Tunneling**: Use tools like `ngrok` for temporary public access
-- **Docker**: Build and run in a container for consistent local environments
-
-## Architecture Notes
-
-### Key Dependencies
-- **@modelcontextprotocol/sdk**: Official MCP TypeScript SDK
-- **@smithery/cli**: Smithery CLI tools for development and deployment
-- **zod**: Schema validation for configuration
-- **Node.js >=18**: Required runtime version
-
-### Security Considerations
-- Session-scoped API keys and configuration
-- CORS headers for web client compatibility
-- Request logging and monitoring via gateway
-- Authentication handled by Smithery platform
-
-## Pre-Deployment Checklist
-
-Before deploying, ensure your server works locally:
-
-### 1. Basic Server Test
-```bash
-# This should start your server on localhost:3000
-npm run dev
-```
-
-**Common issues:**
-- **"Module not found"**: Run `npm install` first
-- **"Server function not callable"**: Check your default export in `src/index.ts`
-- **"Config schema errors"**: Verify your Zod schema can be instantiated
-
-### 2. Validate Server Creation
-```bash
-# Test that your server function works
-node -e "import('./src/index.ts').then(m => console.log(m.default({ config: {} })))"
-```
-
-**Expected output:** Should print something like `[object Object]` without errors. If you see import errors or exceptions, check your server configuration.
-
-### 3. Test Configuration Schema
-```bash
-# Check that your config schema validates properly
-node -e "import('./src/index.ts').then(m => console.log(m.configSchema.parse({ debug: true })))"
-```
-
-**Expected behavior:** Should parse and validate your config without errors.
+You can customize deployment settings (branch name, deployment triggers) in your Smithery dashboard after publishing.
 
 ## Troubleshooting
 
