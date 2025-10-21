@@ -16,11 +16,16 @@ This is the template project that gets cloned when you run `npx create-smithery`
 - [Project Structure](#project-structure)
 - [Quick Start Commands](#quick-start-commands)
 - [smithery.yaml Configuration](#smitheryyaml-configuration)
-- [Core Components: Tools, Resources, and Prompts](#core-components-tools-resources-and-prompts)
+- [Concepts](#concepts)
+  - [Core Components: Tools, Resources, and Prompts](#core-components-tools-resources-and-prompts)
+  - [Session Configuration](#session-configuration)
+  - [Transports](#transports)
+  - [Stateful vs Stateless Servers](#stateful-vs-stateless-servers)
 - [Development Workflow](#development-workflow)
 - [Deployment & CI/CD](#deployment--cicd)
-- [Architecture Notes](#architecture-notes)
-- [Pre-Deployment Checklist](#pre-deployment-checklist)
+- [Troubleshooting](#troubleshooting)
+- [Resources](#resources)
+- [Community & Support](#community--support)
 
 ### Project Structure
 
@@ -40,9 +45,17 @@ your-server/
 # Opens interactive Smithery playground in your browser for testing
 npm run dev          # or: bun run dev, pnpm run dev, yarn dev
 
+# Run on a custom port
+npm run dev -- --port 3000
+
 # Build for production
 npm run build        # or: bun run build, pnpm run build, yarn build
 ```
+
+**Port Configuration:**
+- Default port: **8081**
+- Change port: Use `--port` flag (e.g., `npm run dev -- --port 3000`)
+- Port conflicts: If port 8081 is in use, either use a different port or kill the existing process: `lsof -ti:8081 | xargs kill`
 
 ## smithery.yaml Configuration
 
