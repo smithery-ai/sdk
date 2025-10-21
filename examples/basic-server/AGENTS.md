@@ -4,20 +4,32 @@ Welcome to the **Smithery TypeScript MCP Server Scaffold**!
 
 This is the template project that gets cloned when you run `npx create-smithery`. It provides everything you need to build, test, and deploy a Model Context Protocol (MCP) server with Smithery.
 
+## Table of Contents
+
+- [What's Included](#whats-included)
+- [Quick Start Commands](#quick-start-commands)
+- [Development Workflow](#development-workflow)
+- [Session Configuration](#session-configuration)
+- [Deployment & CI/CD](#deployment--cicd)
+- [Architecture Notes](#architecture-notes)
+- [Pre-Deployment Checklist](#pre-deployment-checklist)
+- [Troubleshooting](#troubleshooting)
+- [Resources](#resources)
+- [Community & Support](#community--support)
+
 ## What's Included
 
 - **TypeScript MCP Server** with Zod-based configuration schema support
 - **Example Tool** (`hello` tool with debug mode configuration)
 - **Example Resource** (`history://hello-world` with Hello World origin story)
 - **Example Prompt** (`greet` prompt for generating greeting messages)
-- **Development Workflow** (`npm run dev` for local testing with hot reload)
+- **Interactive Development** (`npm run dev` opens Smithery playground for testing with hot reload)
 - **Deployment Ready** configuration for the Smithery platform
-- **Session Management** via `createStatefulServer` or `createStatelessServer` with optional config schemas
 
 ## Quick Start Commands
 
 ```bash
-# Run development server (streamable HTTP on port 3000)
+# Run development server (streamable HTTP on port 8081)
 npm run dev
 
 # Build for production
@@ -131,8 +143,37 @@ your-server/
    }
    ```
 
-2. **Update your server function:**
+2. **Choose stateless or stateful (optional):**
+   
+   Most servers should be stateless. Only use stateful if you need to maintain state between requests (chat history, game state, etc.).
+   
+   For stateless (default, recommended):
    ```typescript
+   export const stateless = true  // Optional: stateless is default behavior
+   
+   export default function createServer({ config }) {
+     // Server created fresh for each request
+   }
+   ```
+   
+   For stateful:
+   ```typescript
+   // Omit 'stateless' export for stateful behavior
+   
+   export default function createServer({ sessionId, config }) {
+     // sessionId lets you maintain state per session
+   }
+   ```
+
+3. **Define your config schema (optional):**
+   
+   With config schema:
+   ```typescript
+   export const configSchema = z.object({
+     apiKey: z.string().describe("Your API key"),
+     debug: z.boolean().default(false).describe("Enable debug mode"),
+   })
+   
    export default function createServer({
      config,
    }: {
@@ -148,8 +189,22 @@ your-server/
      return server.server
    }
    ```
+   
+   Without config schema:
+   ```typescript
+   export default function createServer() {
+     const server = new McpServer({
+       name: "Your Server Name",
+       version: "1.0.0",
+     })
+     
+     // Add your tools, resources, and prompts here
+     
+     return server.server
+   }
+   ```
 
-3. **Test your server works:**
+4. **Test your server works:**
    ```bash
    npm run dev
    ```
@@ -276,11 +331,20 @@ The TypeScript SDK provides two server patterns:
 Each request creates a new server instance - no session state is maintained:
 
 ```typescript
-import { createStatelessServer } from '@smithery/sdk/server/stateless.js'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+
+// Optional: Define config schema
+export const configSchema = z.object({
+  apiKey: z.string().optional(),
+  debug: z.boolean().default(false),
+})
+
+// Mark as stateless
+export const stateless = true
 
 // Your server creation function
-function createMcpServer({ config }) {
-  // Create and return a server instance
+export default function createServer({ config }: { config: z.infer<typeof configSchema> }) {
   const server = new McpServer({
     name: "My App",
     version: "1.0.0"
@@ -290,13 +354,6 @@ function createMcpServer({ config }) {
   
   return server.server
 }
-
-// Create the stateless server
-createStatelessServer(createMcpServer, {
-  schema: configSchema, // Optional Zod schema for config validation
-})
-  .app
-  .listen(process.env.PORT || 3000)
 ```
 
 **Use stateless servers for:**
@@ -309,28 +366,35 @@ createStatelessServer(createMcpServer, {
 Maintains state between calls within a session:
 
 ```typescript
-import { createStatefulServer } from '@smithery/sdk/server/stateful.js'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+
+// Optional: Define config schema
+export const configSchema = z.object({
+  apiKey: z.string().optional(),
+  debug: z.boolean().default(false),
+})
+
+// Omit 'stateless' export or set to false for stateful behavior
 
 // Your server creation function
-function createMcpServer({ sessionId, config }) {
-  // sessionId allows you to maintain state per session
+export default function createServer({ 
+  sessionId, 
+  config 
+}: { 
+  sessionId: string
+  config: z.infer<typeof configSchema> 
+}) {
   const server = new McpServer({
     name: "My Stateful App",
     version: "1.0.0"
   })
   
-  // You can store session-specific state here
-  const sessionState = new Map()
+  // You can store session-specific state here using sessionId
+  // Example: const sessionState = getOrCreateState(sessionId)
   
   return server.server
 }
-
-// Create the stateful server
-createStatefulServer(createMcpServer, {
-  schema: configSchema, // Optional Zod schema for config validation
-})
-  .app
-  .listen(process.env.PORT || 3000)
 ```
 
 **Use stateful servers for:**
@@ -368,19 +432,17 @@ User → Smithery Platform → Gateway (OAuth) → Your Server
 
 ### Testing Your Server
 
-There are two main ways to test your MCP server:
+The easiest way to test your MCP server during development:
 
-#### Method 1: Smithery CLI Development Server
 ```bash
 npm run dev                # Actually runs: npx @smithery/cli dev
 ```
-This starts your server locally with hot reload. Perfect for development and testing changes quickly.
 
-#### Method 2: Direct MCP Protocol Testing
-```bash
-# Start server
-npm run dev               # Runs on port 3000 by default
-```
+This starts your server locally on port 3000 with hot reload and opens an interactive playground in your browser. The playground lets you test your tools, resources, and prompts with a user-friendly interface - no need to write curl commands or understand the MCP protocol details.
+
+#### Advanced: Direct MCP Protocol Testing
+
+For debugging or understanding the low-level MCP protocol, you can manually test using curl commands. Most developers won't need this.
 
 **Complete MCP Testing Workflow:**
 1. Start server: `npm run dev` (runs on port 3000 by default)

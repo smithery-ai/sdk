@@ -1,20 +1,20 @@
 {
-	"name": "smithery-scaffold",
+	"name": "hello-server",
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
 	"module": "./src/index.ts",
 	"type": "module",
 	"scripts": {
-		"dev": "npx smithery dev",
-		"build": "npx smithery build"
+		"dev": "smithery dev",
+		"build": "smithery build"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.18.2",
-		"@smithery/sdk": "^1.6.4",
+		"@modelcontextprotocol/sdk": "^1.20.0",
+		"@smithery/sdk": "^1.7.4",
 		"zod": "^3.25.46"
 	},
 	"devDependencies": {
