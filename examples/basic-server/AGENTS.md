@@ -270,20 +270,7 @@ http://localhost:3000/mcp?userApiKey=xyz123&debug=true
 
 #### Configuration Management in Production
 
-Once your server is published to Smithery, users configure it once and Smithery automatically applies their settings on every connection.
-
-**Development vs Production:**
-
-- **Local**: Config passed as URL params each time: `http://localhost:8081/mcp?apiKey=xyz&debug=true`
-- **Production**: Users configure once in Smithery, settings automatically applied forever
-
-**Benefits:**
-- One-time setup - users save API keys and preferences once
-- Secure storage - sensitive data encrypted and never exposed  
-- OAuth support - no manual key management
-- Multi-server management in one place
-
-**Your server code stays the same** - you always receive the `config` parameter. The difference is purely in user experience: configure once vs reconfigure every time.
+Once your server is published to Smithery, users can securely manage their configurations through a configuration UI. Saved configurations are automatically applied whenever they connect to your server in any client—no need to manually pass config parameters each time.
 
 #### Stateful vs Stateless Servers
 
@@ -546,4 +533,48 @@ Expected response: `"Hello, World!"`
 
 ## Deployment & CI/CD
 
-### Local Deployment
+Once you're ready to share your MCP server with the world, deploy it to Smithery:
+
+1. **Publish your server**: Visit [smithery.ai/new](https://smithery.ai/new)
+2. **Connect your repository**: Authorize Smithery to access your GitHub repository
+3. **Automatic deployments**: By default, your server automatically deploys on every commit to the `main` branch
+4. **Server scanning**: Smithery automatically discovers and indexes your tools, resources, and prompts
+
+You can customize deployment settings (branch name, deployment triggers) in your Smithery dashboard after publishing.
+
+## Troubleshooting
+
+### Port Issues
+- Default port is **8081**
+- Kill existing process: `lsof -ti:8081 | xargs kill`
+
+### Config Issues
+```bash
+# Check your configuration schema
+node -e "import('./src/index.ts').then(m => console.log(JSON.stringify(m.configSchema._def, null, 2)))"
+```
+
+### Import Issues
+- Ensure you're in the project root directory
+- Run `npm install` to install dependencies
+- Check that your TypeScript configuration is correct
+- Verify Node.js version is 18 or higher
+
+### TypeScript Issues
+- Run `npx tsc --noEmit` to check for TypeScript errors
+- Ensure all imports use `.js` extensions (TypeScript + ESM requirement)
+- Check that your `package.json` has `"type": "module"`
+
+## Resources
+
+- **Documentation**: [smithery.ai/docs](https://smithery.ai/docs)
+- **MCP Protocol**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
+- **TypeScript Quickstart**: [smithery.ai/docs/getting_started/quickstart_build_typescript.md](https://smithery.ai/docs/getting_started/quickstart_build_typescript.md)
+- **GitHub**: [github.com/smithery-ai/sdk](https://github.com/smithery-ai/sdk)
+- **Registry**: [smithery.ai](https://smithery.ai) for discovering and deploying MCP servers
+
+## Community & Support
+
+- **Discord**: Join our community for help and discussions: [discord.gg/Afd38S5p9A](https://discord.gg/Afd38S5p9A)
+- **Bug Reports**: Found an issue? Report it on GitHub: [github.com/smithery-ai/sdk/issues](https://github.com/smithery-ai/sdk/issues)
+- **Feature Requests**: Suggest new features on our GitHub discussions: [github.com/smithery-ai/sdk/discussions](https://github.com/smithery-ai/sdk/discussions)
