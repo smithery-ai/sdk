@@ -4,12 +4,13 @@ build-backend = "uv_build"
 
 [project]
 name = "smithery"
-version = "0.4.3"
+version = "0.4.4"
 description = "SDK for using Smithery with Python"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "toml>=0.10.2",
+    "tomli>=2.0.0; python_version < '3.11'",
     "typer>=0.17.3", 
     "art>=6.3",
     "uvicorn>=0.30.0",

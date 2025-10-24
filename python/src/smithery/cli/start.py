@@ -17,7 +17,10 @@ def run_production_server(
         log_level = "warning"
 
         if server_ref is None:
-            import tomllib
+            try:
+                import tomllib  # Python 3.11+
+            except ModuleNotFoundError:
+                import tomli as tomllib  # Python 3.10 fallback
             with open("pyproject.toml", "rb") as f:
                 config = tomllib.load(f)
                 smithery_config = config["tool"]["smithery"]
