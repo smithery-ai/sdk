@@ -8,7 +8,10 @@ from .console import console
 
 def get_server_ref_from_config() -> str:
     """Get server reference from pyproject.toml config."""
-    import tomllib
+    try:
+        import tomllib  # Python 3.11+
+    except ModuleNotFoundError:
+        import tomli as tomllib  # Python 3.10 fallback
 
     pyproject_path = Path("pyproject.toml")
     if not pyproject_path.exists():
@@ -39,7 +42,10 @@ def get_server_ref_from_config() -> str:
 
 def get_smithery_config() -> dict:
     """Get complete [tool.smithery] configuration from pyproject.toml."""
-    import tomllib
+    try:
+        import tomllib  # Python 3.11+
+    except ModuleNotFoundError:
+        import tomli as tomllib  # Python 3.10 fallback
 
     pyproject_path = Path("pyproject.toml")
     if not pyproject_path.exists():
