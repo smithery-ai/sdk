@@ -12,14 +12,12 @@ import { Params, pathToFunc } from "./url.js";
  */
 export const ServerList = [
   /**
-   * Registry API Server
+   * Production API
    */
   "https://registry.smithery.ai",
 ] as const;
 
 export type SDKOptions = {
-  bearerAuth?: string | (() => Promise<string>) | undefined;
-
   httpClient?: HTTPClient;
   /**
    * Allows overriding the default server used by the SDK
@@ -61,7 +59,7 @@ export function serverURLFromOptions(options: SDKOptions): URL | null {
 export const SDK_METADATA = {
   language: "typescript",
   openapiDocVersion: "1.0.0",
-  sdkVersion: "0.4.4",
-  genVersion: "2.722.2",
-  userAgent: "speakeasy-sdk/typescript 0.4.4 2.722.2 1.0.0 @smithery/registry",
+  sdkVersion: "0.5.3",
+  genVersion: "2.760.2",
+  userAgent: "speakeasy-sdk/typescript 0.5.3 2.760.2 1.0.0 @smithery/registry",
 } as const;

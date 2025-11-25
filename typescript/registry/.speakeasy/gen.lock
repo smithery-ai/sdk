@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: ee057120bff5d9dbf85e22a3a1ea1991
+  docChecksum: b5a4a2aa892508152a0268dbdf6e09d3
   docVersion: 1.0.0
-  speakeasyVersion: 1.635.1
-  generationVersion: 2.722.2
-  releaseVersion: 0.4.4
-  configChecksum: 24be9ac9956ac4a95ac3ef68bcdc1e81
+  speakeasyVersion: 1.660.0
+  generationVersion: 2.760.2
+  releaseVersion: 0.5.3
+  configChecksum: 6999c81b6cd8406ba3ba8b056db3d7e2
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -14,24 +14,22 @@ management:
 features:
   typescript:
     additionalDependencies: 0.1.0
-    additionalProperties: 0.1.1
     constsAndDefaults: 0.1.12
-    core: 3.21.26
+    core: 3.26.9
     defaultEnabledRetries: 0.1.0
     devContainers: 2.90.1
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.1.2
-    globalSecurity: 2.82.14
     globalSecurityCallbacks: 0.1.0
-    globalSecurityFlattening: 0.1.0
-    globalServerURLs: 2.82.5
-    groups: 2.81.2
+    globalServerURLs: 2.83.0
+    groups: 2.81.3
     nameOverrides: 2.81.2
     nullables: 0.1.1
     pagination: 2.83.0
     responseFormat: 0.2.3
     retries: 2.83.0
     sdkHooks: 0.3.0
+    unions: 2.86.0
 generatedFiles:
   - .devcontainer/README.md
   - .devcontainer/devcontainer.json
@@ -42,36 +40,79 @@ generatedFiles:
   - RUNTIMES.md
   - USAGE.md
   - docs/lib/utils/retryconfig.md
-  - docs/models/components/connectioninfo.md
-  - docs/models/components/connectioninfotype.md
+  - docs/models/components/configrequest.md
+  - docs/models/components/configresponse.md
+  - docs/models/components/configvalidationresponse.md
+  - docs/models/components/connection.md
+  - docs/models/components/connectionhttp.md
+  - docs/models/components/connectionstdio.md
+  - docs/models/components/connectiontype.md
+  - docs/models/components/getuserconfigresponse.md
+  - docs/models/components/health.md
   - docs/models/components/inputschema.md
-  - docs/models/components/pagination.md
-  - docs/models/components/runtime.md
+  - docs/models/components/profile.md
+  - docs/models/components/profileserversresponse.md
+  - docs/models/components/profileserversresponsepagination.md
+  - docs/models/components/profileserversresponseserver.md
+  - docs/models/components/profilesresponse.md
+  - docs/models/components/profilesresponsepagination.md
+  - docs/models/components/properties.md
+  - docs/models/components/result.md
+  - docs/models/components/saveuserconfigrequest.md
+  - docs/models/components/saveuserconfigresponse.md
   - docs/models/components/security.md
-  - docs/models/components/serverdetailresponse.md
-  - docs/models/components/serverdetailresponsesecurity.md
-  - docs/models/components/serverlistitem.md
-  - docs/models/components/serverlistresponse.md
+  - docs/models/components/server.md
+  - docs/models/components/serverslistresponse.md
+  - docs/models/components/serverslistresponsepagination.md
+  - docs/models/components/serverslistresponseserver.md
   - docs/models/components/tool.md
-  - docs/models/components/tooltype.md
-  - docs/models/errors/notfounderror.md
-  - docs/models/errors/servererror.md
-  - docs/models/errors/unauthorizederror.md
-  - docs/models/operations/getserverrequest.md
-  - docs/models/operations/listserversrequest.md
-  - docs/models/operations/listserversresponse.md
+  - docs/models/components/uplinktokenresponse.md
+  - docs/models/errors/errort.md
+  - docs/models/errors/uplinkerror.md
+  - docs/models/operations/client.md
+  - docs/models/operations/deleteprofilesbyslugserversbyconfigslugrequest.md
+  - docs/models/operations/getconfigbyidrequest.md
+  - docs/models/operations/getconfigstatusbyidrequest.md
+  - docs/models/operations/getprofilesbyslugserversbyconfigslugrequest.md
+  - docs/models/operations/getprofilesbyslugserversbyconfigslugresponse.md
+  - docs/models/operations/getprofilesbyslugserversrequest.md
+  - docs/models/operations/getprofilesrequest.md
+  - docs/models/operations/getserversbyidrequest.md
+  - docs/models/operations/getserversrequest.md
+  - docs/models/operations/getserversresponse.md
+  - docs/models/operations/oauthdata.md
+  - docs/models/operations/postprofilesbyslugserversrequest.md
+  - docs/models/operations/postprofilesbyslugserversrequestbody.md
+  - docs/models/operations/postprofilesbyslugserversresponse.md
+  - docs/models/operations/postserversbyidrequest.md
+  - docs/models/operations/putconfigbyidrequest.md
+  - docs/models/operations/tokens.md
+  - docs/sdks/config/README.md
+  - docs/sdks/profiles/README.md
   - docs/sdks/servers/README.md
-  - docs/sdks/smitheryregistry/README.md
+  - docs/sdks/system/README.md
+  - docs/sdks/uplink/README.md
   - eslint.config.mjs
   - examples/.env.template
   - examples/README.md
   - examples/package.json
-  - examples/serversList.example.ts
+  - examples/systemCheckHealth.example.ts
   - jsr.json
   - package.json
   - src/core.ts
+  - src/funcs/configGet.ts
+  - src/funcs/configGetStatus.ts
+  - src/funcs/configUpdate.ts
+  - src/funcs/profilesAddServer.ts
+  - src/funcs/profilesDeleteServer.ts
+  - src/funcs/profilesGetServer.ts
+  - src/funcs/profilesList.ts
+  - src/funcs/profilesListServers.ts
+  - src/funcs/serversConfigure.ts
   - src/funcs/serversGet.ts
   - src/funcs/serversList.ts
+  - src/funcs/systemCheckHealth.ts
+  - src/funcs/uplinkCreateToken.ts
   - src/hooks/hooks.ts
   - src/hooks/index.ts
   - src/hooks/types.ts
@@ -92,29 +133,46 @@ generatedFiles:
   - src/lib/sdks.ts
   - src/lib/security.ts
   - src/lib/url.ts
-  - src/models/components/connectioninfo.ts
+  - src/models/components/configrequest.ts
+  - src/models/components/configresponse.ts
+  - src/models/components/configvalidationresponse.ts
+  - src/models/components/getuserconfigresponse.ts
+  - src/models/components/health.ts
   - src/models/components/index.ts
-  - src/models/components/pagination.ts
-  - src/models/components/security.ts
-  - src/models/components/serverdetailresponse.ts
-  - src/models/components/serverlistitem.ts
-  - src/models/components/serverlistresponse.ts
-  - src/models/components/tool.ts
+  - src/models/components/profileserversresponse.ts
+  - src/models/components/profilesresponse.ts
+  - src/models/components/saveuserconfigrequest.ts
+  - src/models/components/saveuserconfigresponse.ts
+  - src/models/components/server.ts
+  - src/models/components/serverslistresponse.ts
+  - src/models/components/uplinktokenresponse.ts
   - src/models/errors/apierror.ts
-  - src/models/errors/getserver.ts
+  - src/models/errors/error.ts
   - src/models/errors/httpclienterrors.ts
   - src/models/errors/index.ts
   - src/models/errors/responsevalidationerror.ts
   - src/models/errors/sdkvalidationerror.ts
-  - src/models/errors/servererror.ts
   - src/models/errors/smitheryregistryerror.ts
-  - src/models/errors/unauthorizederror.ts
-  - src/models/operations/getserver.ts
+  - src/models/errors/uplinkerror.ts
+  - src/models/operations/deleteprofilesbyslugserversbyconfigslug.ts
+  - src/models/operations/getconfigbyid.ts
+  - src/models/operations/getconfigstatusbyid.ts
+  - src/models/operations/getprofiles.ts
+  - src/models/operations/getprofilesbyslugservers.ts
+  - src/models/operations/getprofilesbyslugserversbyconfigslug.ts
+  - src/models/operations/getservers.ts
+  - src/models/operations/getserversbyid.ts
   - src/models/operations/index.ts
-  - src/models/operations/listservers.ts
+  - src/models/operations/postprofilesbyslugservers.ts
+  - src/models/operations/postserversbyid.ts
+  - src/models/operations/putconfigbyid.ts
+  - src/sdk/config.ts
   - src/sdk/index.ts
+  - src/sdk/profiles.ts
   - src/sdk/sdk.ts
   - src/sdk/servers.ts
+  - src/sdk/system.ts
+  - src/sdk/uplink.ts
   - src/types/async.ts
   - src/types/blobs.ts
   - src/types/constdatetime.ts
@@ -124,6 +182,7 @@ generatedFiles:
   - src/types/operations.ts
   - src/types/rfcdate.ts
   - src/types/streams.ts
+  - src/types/unrecognized.ts
   - tsconfig.json
 examples:
   listServers:
@@ -154,8 +213,138 @@ examples:
           application/json: {"error": "Server not found"}
         "500":
           application/json: {"error": "An unexpected error occurred"}
+  getHealth:
+    speakeasy-default-get-health:
+      responses:
+        "200":
+          application/json: {"status": "<value>", "timestamp": "<value>"}
+  getServers:
+    speakeasy-default-get-servers:
+      parameters:
+        query:
+          page: 1
+          pageSize: 10
+          q: "search term"
+          profile: "my-profile"
+      responses:
+        "200":
+          application/json: {"servers": [{"qualifiedName": "smithery/hello-world", "displayName": "Hello World", "description": "A simple hello world server", "iconUrl": "https://example.com/icon.png", "verified": true, "useCount": 42, "remote": true, "createdAt": "1709973305456", "homepage": "https://smithery.ai/server/smithery/hello-world"}], "pagination": {"currentPage": 1, "pageSize": 10, "totalPages": 5, "totalCount": 42}}
+        "400":
+          application/json: {"error": "Server not found"}
+  getServersById:
+    speakeasy-default-get-servers-by-id:
+      parameters:
+        path:
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"qualifiedName": "smithery/hello-world", "displayName": "Hello World", "description": "A simple hello world server", "iconUrl": "https://example.com/icon.png", "remote": true, "deploymentUrl": "https://api.example.com", "connections": [], "security": {"scanPassed": true}, "tools": []}
+        "404":
+          application/json: {"error": "Server not found"}
+        "500":
+          application/json: {"error": "Server not found"}
+  postServersById:
+    speakeasy-default-post-servers-by-id:
+      parameters:
+        path:
+          id: "<id>"
+      requestBody:
+        application/json: {"connectionType": "stdio", "config": {"host": "localhost", "port": 8080}}
+      responses:
+        "200":
+          application/json: {"success": true, "result": {"command": "npx", "args": ["@smithery/hello-world", "--config", "{}"], "env": {"NODE_ENV": "production"}}}
+        "400":
+          application/json: {"error": "Server not found"}
+        "500":
+          application/json: {"error": "Server not found"}
+  getConfigStatusById:
+    speakeasy-default-get-config-status-by-id:
+      parameters:
+        path:
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"isComplete": false, "hasExistingConfig": true, "missingFields": ["exaApiKey", "enabledTools"], "fieldSchemas": {"exaApiKey": {"type": "string", "description": "API key"}}}
+        "401":
+          application/json: {"error": "Server not found"}
+  getConfigById:
+    speakeasy-default-get-config-by-id:
+      parameters:
+        path:
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"config": {"apiKey": "xxx", "debug": false}}
+        "401":
+          application/json: {"error": "Server not found"}
+        "500":
+          application/json: {"error": "Server not found"}
+  putConfigById:
+    speakeasy-default-put-config-by-id:
+      parameters:
+        path:
+          id: "<id>"
+      requestBody:
+        application/json: {"config": {"apiKey": "xxx", "debug": false}}
+      responses:
+        "200":
+          application/json: {"success": true, "message": "Configuration saved successfully"}
+        "400":
+          application/json: {"error": "Server not found"}
+        "500":
+          application/json: {"error": "Server not found"}
+  postUplinkToken:
+    speakeasy-default-post-uplink-token:
+      responses:
+        "200":
+          application/json: {"authtoken": "2abcdefg_1a2b3c4d5e6f7g8h9i0j", "domain": "ngrok.smithery.ai"}
+        "401":
+          application/json: {"error": "Failed to create tunnel token"}
+        "500":
+          application/json: {"error": "Failed to create tunnel token"}
+  getProfiles:
+    speakeasy-default-get-profiles:
+      parameters:
+        query:
+          page: 1
+          pageSize: 10
+      responses:
+        "200":
+          application/json: {"profiles": [{"slug": "<value>", "displayName": "Carlie6", "description": null, "type": null}], "pagination": {"page": 4915.69, "pageSize": 2847.11, "totalCount": 9400.16, "totalPages": 265.21}}
+  getProfilesBySlugServers:
+    speakeasy-default-get-profiles-by-slug-servers:
+      parameters:
+        path:
+          slug: "<value>"
+        query:
+          page: 1
+          pageSize: 10
+      responses:
+        "200":
+          application/json: {"servers": [], "pagination": {"page": 3815.49, "pageSize": 9201.86, "totalCount": 9360.89, "totalPages": 1968.03}}
+  postProfilesBySlugServers:
+    speakeasy-default-post-profiles-by-slug-servers:
+      parameters:
+        path:
+          slug: "<value>"
+      responses:
+        "201":
+          application/json: {"slug": "<value>", "displayName": "Trevion39", "mcpUrl": "https://next-ghost.net", "description": null}
+  getProfilesBySlugServersByConfigSlug:
+    speakeasy-default-get-profiles-by-slug-servers-by-config-slug:
+      parameters:
+        path:
+          slug: "<value>"
+          configSlug: "<value>"
+      responses:
+        "200":
+          application/json: {"slug": "<value>", "displayName": "Alanna_Kessler", "mcpUrl": "https://smart-relative.biz", "description": "woot sweet continually discourse plus yowza majestically yearly"}
+  deleteProfilesBySlugServersByConfigSlug:
+    speakeasy-default-delete-profiles-by-slug-servers-by-config-slug:
+      parameters:
+        path:
+          slug: "<value>"
+          configSlug: "<value>"
 examplesVersion: 1.0.2
 generatedTests: {}
-releaseNotes: |
-  ## Typescript SDK Changes Detected:
-  * `smitheryregistry.servers.list()`:  `response.servers.[]` **Changed**
+releaseNotes: "## Typescript SDK Changes Detected:\n* `smitheryregistry.servers.list()`: \n  *  `request` **Changed**\n  *  `response` **Changed** **Breaking** :warning:\n  *  `error` **Changed** **Breaking** :warning:\n* `smitheryregistry.servers.get()`: \n  *  `request` **Changed** **Breaking** :warning:\n  *  `response` **Changed** **Breaking** :warning:\n  *  `error` **Changed** **Breaking** :warning:\n* `smitheryregistry.profiles.list()`: **Added**\n* `smitheryregistry.config.get()`: **Added**\n* `smitheryregistry.config.update()`: **Added**\n* `smitheryregistry.uplink.createToken()`: **Added**\n* `smitheryregistry.system.checkHealth()`: **Added**\n* `smitheryregistry.profiles.listServers()`: **Added**\n* `smitheryregistry.profiles.addServer()`: **Added**\n* `smitheryregistry.profiles.getServer()`: **Added**\n* `smitheryregistry.profiles.deleteServer()`: **Added**\n* `smitheryregistry.config.getStatus()`: **Added**\n* `smitheryregistry.servers.configure()`: **Added**\n"

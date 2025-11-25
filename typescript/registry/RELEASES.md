@@ -87,3 +87,13 @@ Based on:
 - [typescript v0.4.4] typescript/registry
 ### Releases
 - [NPM v0.4.4] https://www.npmjs.com/package/@smithery/registry/v/0.4.4 - typescript/registry
+
+## 2025-11-25 09:38:01
+### Changes
+Based on:
+- OpenAPI Doc  
+- Speakeasy CLI 1.660.0 (2.760.2) https://github.com/speakeasy-api/speakeasy
+### Generated
+- [typescript v0.5.3] typescript/registry
+### Releases
+- [NPM v0.5.3] https://www.npmjs.com/package/@smithery/registry/v/0.5.3 - typescript/registry

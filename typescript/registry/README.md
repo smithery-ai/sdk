@@ -15,8 +15,7 @@ Developer-friendly & type-safe Typescript SDK specifically catered to leverage *
 <!-- Start Summary [summary] -->
 ## Summary
 
-Smithery Registry API: The Smithery Registry API provides a programmatic way to search for MCP servers.
-This API allows you to discover and retrieve details about available MCP servers.
+Smithery Registry API: Smithery API for managing servers, profiles, and configurations
 <!-- End Summary [summary] -->
 
 <!-- Start Table of Contents [toc] -->
@@ -26,7 +25,6 @@ This API allows you to discover and retrieve details about available MCP servers
   * [SDK Installation](#sdk-installation)
   * [Requirements](#requirements)
   * [SDK Example Usage](#sdk-example-usage)
-  * [Authentication](#authentication)
   * [Available Resources and Operations](#available-resources-and-operations)
   * [Standalone functions](#standalone-functions)
   * [Pagination](#pagination)
@@ -88,18 +86,12 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
-  const result = await smitheryRegistry.servers.list({
-    q: "owner:mem0ai is:verified memory",
-  });
+  const result = await smitheryRegistry.system.checkHealth();
 
-  for await (const page of result) {
-    console.log(page);
-  }
+  console.log(result);
 }
 
 run();
@@ -107,51 +99,39 @@ run();
 ```
 <!-- End SDK Example Usage [usage] -->
 
-<!-- Start Authentication [security] -->
-## Authentication
-
-### Per-Client Security Schemes
-
-This SDK supports the following security scheme globally:
-
-| Name         | Type | Scheme      | Environment Variable   |
-| ------------ | ---- | ----------- | ---------------------- |
-| `bearerAuth` | http | HTTP Bearer | `SMITHERY_BEARER_AUTH` |
-
-To authenticate with the API the `bearerAuth` parameter must be set when initializing the SDK client instance. For example:
-```typescript
-import { SmitheryRegistry } from "@smithery/registry";
-
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
-
-async function run() {
-  const result = await smitheryRegistry.servers.list({
-    q: "owner:mem0ai is:verified memory",
-  });
-
-  for await (const page of result) {
-    console.log(page);
-  }
-}
-
-run();
-
-```
-<!-- End Authentication [security] -->
-
 <!-- Start Available Resources and Operations [operations] -->
 ## Available Resources and Operations
 
 <details open>
 <summary>Available methods</summary>
 
+### [config](docs/sdks/config/README.md)
+
+* [getStatus](docs/sdks/config/README.md#getstatus) - Get configuration status
+* [get](docs/sdks/config/README.md#get) - Get saved user configuration for a server
+* [update](docs/sdks/config/README.md#update) - Save user configuration for a server
+
+### [profiles](docs/sdks/profiles/README.md)
+
+* [list](docs/sdks/profiles/README.md#list) - List user profiles
+* [listServers](docs/sdks/profiles/README.md#listservers) - List MCP servers for a profile
+* [addServer](docs/sdks/profiles/README.md#addserver) - Save a server to a profile
+* [getServer](docs/sdks/profiles/README.md#getserver) - Get a profile server
+* [deleteServer](docs/sdks/profiles/README.md#deleteserver) - Delete a profile server
+
 ### [servers](docs/sdks/servers/README.md)
 
-* [list](docs/sdks/servers/README.md#list) - List Servers
-* [get](docs/sdks/servers/README.md#get) - Get Server
+* [list](docs/sdks/servers/README.md#list) - List all servers
+* [get](docs/sdks/servers/README.md#get) - Get a server by ID
+* [configure](docs/sdks/servers/README.md#configure) - Generate server configuration
 
+### [system](docs/sdks/system/README.md)
+
+* [checkHealth](docs/sdks/system/README.md#checkhealth) - Health check
+
+### [uplink](docs/sdks/uplink/README.md)
+
+* [createToken](docs/sdks/uplink/README.md#createtoken) - Create uplink token
 
 </details>
 <!-- End Available Resources and Operations [operations] -->
@@ -171,8 +151,19 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [`serversGet`](docs/sdks/servers/README.md#get) - Get Server
-- [`serversList`](docs/sdks/servers/README.md#list) - List Servers
+- [`configGet`](docs/sdks/config/README.md#get) - Get saved user configuration for a server
+- [`configGetStatus`](docs/sdks/config/README.md#getstatus) - Get configuration status
+- [`configUpdate`](docs/sdks/config/README.md#update) - Save user configuration for a server
+- [`profilesAddServer`](docs/sdks/profiles/README.md#addserver) - Save a server to a profile
+- [`profilesDeleteServer`](docs/sdks/profiles/README.md#deleteserver) - Delete a profile server
+- [`profilesGetServer`](docs/sdks/profiles/README.md#getserver) - Get a profile server
+- [`profilesList`](docs/sdks/profiles/README.md#list) - List user profiles
+- [`profilesListServers`](docs/sdks/profiles/README.md#listservers) - List MCP servers for a profile
+- [`serversConfigure`](docs/sdks/servers/README.md#configure) - Generate server configuration
+- [`serversGet`](docs/sdks/servers/README.md#get) - Get a server by ID
+- [`serversList`](docs/sdks/servers/README.md#list) - List all servers
+- [`systemCheckHealth`](docs/sdks/system/README.md#checkhealth) - Health check
+- [`uplinkCreateToken`](docs/sdks/uplink/README.md#createtoken) - Create uplink token
 
 </details>
 <!-- End Standalone functions [standalone-funcs] -->
@@ -192,13 +183,14 @@ Here's an example of one such pagination call:
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.servers.list({
-    q: "owner:mem0ai is:verified memory",
+    page: 1,
+    pageSize: 10,
+    q: "search term",
+    profile: "my-profile",
   });
 
   for await (const page of result) {
@@ -220,14 +212,10 @@ To change the default retry strategy for a single API call, simply provide a ret
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
-  const result = await smitheryRegistry.servers.list({
-    q: "owner:mem0ai is:verified memory",
-  }, {
+  const result = await smitheryRegistry.system.checkHealth({
     retries: {
       strategy: "backoff",
       backoff: {
@@ -240,9 +228,7 @@ async function run() {
     },
   });
 
-  for await (const page of result) {
-    console.log(page);
-  }
+  console.log(result);
 }
 
 run();
@@ -264,17 +250,12 @@ const smitheryRegistry = new SmitheryRegistry({
     },
     retryConnectionErrors: false,
   },
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await smitheryRegistry.servers.list({
-    q: "owner:mem0ai is:verified memory",
-  });
+  const result = await smitheryRegistry.system.checkHealth();
 
-  for await (const page of result) {
-    console.log(page);
-  }
+  console.log(result);
 }
 
 run();
@@ -301,14 +282,15 @@ run();
 import { SmitheryRegistry } from "@smithery/registry";
 import * as errors from "@smithery/registry/models/errors";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   try {
     const result = await smitheryRegistry.servers.list({
-      q: "owner:mem0ai is:verified memory",
+      page: 1,
+      pageSize: 10,
+      q: "search term",
+      profile: "my-profile",
     });
 
     for await (const page of result) {
@@ -323,7 +305,7 @@ async function run() {
       console.log(error.headers);
 
       // Depending on the method different errors may be thrown
-      if (error instanceof errors.UnauthorizedError) {
+      if (error instanceof errors.ErrorT) {
         console.log(error.data$.error); // string
       }
     }
@@ -335,12 +317,10 @@ run();
 ```
 
 ### Error Classes
-**Primary errors:**
+**Primary error:**
 * [`SmitheryRegistryError`](./src/models/errors/smitheryregistryerror.ts): The base class for HTTP error responses.
-  * [`UnauthorizedError`](./src/models/errors/unauthorizederror.ts): Authentication information is missing or invalid. Status code `401`.
-  * [`ServerError`](./src/models/errors/servererror.ts): An unexpected error occurred. Status code `500`.
 
-<details><summary>Less common errors (7)</summary>
+<details><summary>Less common errors (8)</summary>
 
 <br />
 
@@ -353,7 +333,8 @@ run();
 
 
 **Inherit from [`SmitheryRegistryError`](./src/models/errors/smitheryregistryerror.ts)**:
-* [`NotFoundError`](./src/models/errors/notfounderror.ts): Server not found. Status code `404`. Applicable to 1 of 2 methods.*
+* [`ErrorT`](./src/models/errors/errort.ts): Applicable to 6 of 13 methods.*
+* [`UplinkError`](./src/models/errors/uplinkerror.ts): Unauthorized - Missing API key. Applicable to 1 of 13 methods.*
 * [`ResponseValidationError`](./src/models/errors/responsevalidationerror.ts): Type mismatch between the data returned from the server and the structure expected by the SDK. See `error.rawValue` for the raw value and `error.pretty()` for a nicely formatted multi-line string.
 
 </details>
@@ -372,17 +353,12 @@ import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
   serverURL: "https://registry.smithery.ai",
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await smitheryRegistry.servers.list({
-    q: "owner:mem0ai is:verified memory",
-  });
+  const result = await smitheryRegistry.system.checkHealth();
 
-  for await (const page of result) {
-    console.log(page);
-  }
+  console.log(result);
 }
 
 run();

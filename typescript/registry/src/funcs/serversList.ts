@@ -9,7 +9,6 @@ import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
 import { RequestOptions } from "../lib/sdks.js";
-import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
 import {
   ConnectionError,
@@ -33,21 +32,20 @@ import {
 } from "../types/operations.js";
 
 /**
- * List Servers
+ * List all servers
  *
  * @remarks
- * Retrieves a paginated list of all available servers with optional filtering.
+ * Get a paginated list of all servers
  */
 export function serversList(
   client: SmitheryRegistryCore,
-  request: operations.ListServersRequest,
+  request: operations.GetServersRequest,
   options?: RequestOptions,
 ): APIPromise<
   PageIterator<
     Result<
-      operations.ListServersResponse,
-      | errors.UnauthorizedError
-      | errors.ServerError
+      operations.GetServersResponse,
+      | errors.ErrorT
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -69,15 +67,14 @@ export function serversList(
 
 async function $do(
   client: SmitheryRegistryCore,
-  request: operations.ListServersRequest,
+  request: operations.GetServersRequest,
   options?: RequestOptions,
 ): Promise<
   [
     PageIterator<
       Result<
-        operations.ListServersResponse,
-        | errors.UnauthorizedError
-        | errors.ServerError
+        operations.GetServersResponse,
+        | errors.ErrorT
         | SmitheryRegistryError
         | ResponseValidationError
         | ConnectionError
@@ -94,7 +91,7 @@ async function $do(
 > {
   const parsed = safeParse(
     request,
-    (value) => operations.ListServersRequest$outboundSchema.parse(value),
+    (value) => operations.GetServersRequest$outboundSchema.parse(value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -108,6 +105,7 @@ async function $do(
   const query = encodeFormQuery({
     "page": payload.page,
     "pageSize": payload.pageSize,
+    "profile": payload.profile,
     "q": payload.q,
   });
 
@@ -115,19 +113,15 @@ async function $do(
     Accept: "application/json",
   }));
 
-  const secConfig = await extractSecurity(client._options.bearerAuth);
-  const securityInput = secConfig == null ? {} : { bearerAuth: secConfig };
-  const requestSecurity = resolveGlobalSecurity(securityInput);
-
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "listServers",
-    oAuth2Scopes: [],
+    operationID: "getServers",
+    oAuth2Scopes: null,
 
-    resolvedSecurity: requestSecurity,
+    resolvedSecurity: null,
 
-    securitySource: client._options.bearerAuth,
+    securitySource: null,
     retryConfig: options?.retries
       || client._options.retryConfig
       || {
@@ -145,7 +139,6 @@ async function $do(
   };
 
   const requestRes = client._createRequest(context, {
-    security: requestSecurity,
     method: "GET",
     baseURL: options?.serverURL,
     path: path,
@@ -162,7 +155,7 @@ async function $do(
 
   const doResult = await client._do(req, {
     context,
-    errorCodes: ["401", "4XX", "500", "5XX"],
+    errorCodes: ["400", "401", "422", "4XX", "5XX"],
     retryConfig: context.retryConfig,
     retryCodes: context.retryCodes,
   });
@@ -176,9 +169,8 @@ async function $do(
   };
 
   const [result, raw] = await M.match<
-    operations.ListServersResponse,
-    | errors.UnauthorizedError
-    | errors.ServerError
+    operations.GetServersResponse,
+    | errors.ErrorT
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -188,11 +180,8 @@ async function $do(
     | UnexpectedClientError
     | SDKValidationError
   >(
-    M.json(200, operations.ListServersResponse$inboundSchema, {
-      key: "Result",
-    }),
-    M.jsonErr(401, errors.UnauthorizedError$inboundSchema),
-    M.jsonErr(500, errors.ServerError$inboundSchema),
+    M.json(200, operations.GetServersResponse$inboundSchema, { key: "Result" }),
+    M.jsonErr([400, 401, 422], errors.ErrorT$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });
@@ -209,9 +198,8 @@ async function $do(
   ): {
     next: Paginator<
       Result<
-        operations.ListServersResponse,
-        | errors.UnauthorizedError
-        | errors.ServerError
+        operations.GetServersResponse,
+        | errors.ErrorT
         | SmitheryRegistryError
         | ResponseValidationError
         | ConnectionError
