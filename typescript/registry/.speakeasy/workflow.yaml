@@ -1,9 +1,9 @@
 workflowVersion: 1.0.0
-speakeasyVersion: latest
+speakeasyVersion: v1.650.0
 sources:
     Smithery Registry API:
         inputs:
-            - location: ../../openapi/registry.yaml
+            - location: http://registry.smithery.ai/openapi
         overlays:
             - location: .speakeasy/speakeasy-modifications-overlay.yaml
         registry:

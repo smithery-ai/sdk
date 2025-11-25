@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: b5a4a2aa892508152a0268dbdf6e09d3
+  docChecksum: 49b52a34a8abd87d5b36008ea5636ae2
   docVersion: 1.0.0
-  speakeasyVersion: 1.660.0
-  generationVersion: 2.760.2
-  releaseVersion: 0.5.3
-  configChecksum: 6999c81b6cd8406ba3ba8b056db3d7e2
+  speakeasyVersion: 1.650.0
+  generationVersion: 2.743.2
+  releaseVersion: 0.5.4
+  configChecksum: 84dc835b2deb38a985e2275b0311f6a0
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -15,7 +15,7 @@ features:
   typescript:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.1.12
-    core: 3.26.9
+    core: 3.26.3
     defaultEnabledRetries: 0.1.0
     devContainers: 2.90.1
     enumUnions: 0.1.0
@@ -182,7 +182,6 @@ generatedFiles:
   - src/types/operations.ts
   - src/types/rfcdate.ts
   - src/types/streams.ts
-  - src/types/unrecognized.ts
   - tsconfig.json
 examples:
   listServers:
@@ -347,4 +346,3 @@ examples:
           configSlug: "<value>"
 examplesVersion: 1.0.2
 generatedTests: {}
-releaseNotes: "## Typescript SDK Changes Detected:\n* `smitheryregistry.servers.list()`: \n  *  `request` **Changed**\n  *  `response` **Changed** **Breaking** :warning:\n  *  `error` **Changed** **Breaking** :warning:\n* `smitheryregistry.servers.get()`: \n  *  `request` **Changed** **Breaking** :warning:\n  *  `response` **Changed** **Breaking** :warning:\n  *  `error` **Changed** **Breaking** :warning:\n* `smitheryregistry.profiles.list()`: **Added**\n* `smitheryregistry.config.get()`: **Added**\n* `smitheryregistry.config.update()`: **Added**\n* `smitheryregistry.uplink.createToken()`: **Added**\n* `smitheryregistry.system.checkHealth()`: **Added**\n* `smitheryregistry.profiles.listServers()`: **Added**\n* `smitheryregistry.profiles.addServer()`: **Added**\n* `smitheryregistry.profiles.getServer()`: **Added**\n* `smitheryregistry.profiles.deleteServer()`: **Added**\n* `smitheryregistry.config.getStatus()`: **Added**\n* `smitheryregistry.servers.configure()`: **Added**\n"
