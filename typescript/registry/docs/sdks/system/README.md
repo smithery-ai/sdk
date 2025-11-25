@@ -17,7 +17,9 @@ Check if the service is running
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry();
+const smitheryRegistry = new SmitheryRegistry({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const result = await smitheryRegistry.system.checkHealth();
@@ -38,7 +40,9 @@ import { systemCheckHealth } from "@smithery/registry/funcs/systemCheckHealth.js
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore();
+const smitheryRegistry = new SmitheryRegistryCore({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const res = await systemCheckHealth(smitheryRegistry);

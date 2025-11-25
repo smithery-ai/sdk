@@ -23,7 +23,7 @@ export type ConnectionStdio = {
 
 export type Connection = ConnectionHTTP | ConnectionStdio;
 
-export type Security = {
+export type ServerSecurity = {
   scanPassed: boolean;
 };
 
@@ -48,7 +48,7 @@ export type Server = {
   remote: boolean;
   deploymentUrl: string | null;
   connections: Array<ConnectionHTTP | ConnectionStdio>;
-  security: Security | null;
+  security: ServerSecurity | null;
   tools: Array<Tool> | null;
 };
 
@@ -117,21 +117,21 @@ export function connectionFromJSON(
 }
 
 /** @internal */
-export const Security$inboundSchema: z.ZodType<
-  Security,
+export const ServerSecurity$inboundSchema: z.ZodType<
+  ServerSecurity,
   z.ZodTypeDef,
   unknown
 > = z.object({
   scanPassed: z.boolean(),
 });
 
-export function securityFromJSON(
+export function serverSecurityFromJSON(
   jsonString: string,
-): SafeParseResult<Security, SDKValidationError> {
+): SafeParseResult<ServerSecurity, SDKValidationError> {
   return safeParse(
     jsonString,
-    (x) => Security$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'Security' from JSON`,
+    (x) => ServerSecurity$inboundSchema.parse(JSON.parse(x)),
+    `Failed to parse 'ServerSecurity' from JSON`,
   );
 }
 
@@ -205,7 +205,7 @@ export const Server$inboundSchema: z.ZodType<Server, z.ZodTypeDef, unknown> = z
         z.lazy(() => ConnectionStdio$inboundSchema),
       ]),
     ),
-    security: z.nullable(z.lazy(() => Security$inboundSchema)),
+    security: z.nullable(z.lazy(() => ServerSecurity$inboundSchema)),
     tools: z.nullable(z.array(z.lazy(() => Tool$inboundSchema))),
   });
 

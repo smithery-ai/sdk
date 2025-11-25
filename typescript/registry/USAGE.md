@@ -2,7 +2,9 @@
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry();
+const smitheryRegistry = new SmitheryRegistry({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const result = await smitheryRegistry.system.checkHealth();

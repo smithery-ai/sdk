@@ -3,7 +3,8 @@ speakeasyVersion: v1.650.0
 sources:
     Smithery Registry API:
         inputs:
-            - location: http://registry.smithery.ai/openapi
+            - location: https://registry.smithery.ai/openapi
+            # - location: http://localhost:8081/openapi
         overlays:
             - location: .speakeasy/speakeasy-modifications-overlay.yaml
         registry:
