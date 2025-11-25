@@ -2,18 +2,12 @@
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
-  const result = await smitheryRegistry.servers.list({
-    q: "owner:mem0ai is:verified memory",
-  });
+  const result = await smitheryRegistry.system.checkHealth();
 
-  for await (const page of result) {
-    console.log(page);
-  }
+  console.log(result);
 }
 
 run();

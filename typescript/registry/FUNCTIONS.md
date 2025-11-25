@@ -20,25 +20,19 @@ specific category of applications.
 
 ```typescript
 import { SmitheryRegistryCore } from "@smithery/registry/core.js";
-import { serversList } from "@smithery/registry/funcs/serversList.js";
+import { systemCheckHealth } from "@smithery/registry/funcs/systemCheckHealth.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
-  const res = await serversList(smitheryRegistry, {
-    q: "owner:mem0ai is:verified memory",
-  });
+  const res = await systemCheckHealth(smitheryRegistry);
   if (res.ok) {
     const { value: result } = res;
-    for await (const page of result) {
-    console.log(page);
-  }
+    console.log(result);
   } else {
-    console.log("serversList failed:", res.error);
+    console.log("systemCheckHealth failed:", res.error);
   }
 }
 

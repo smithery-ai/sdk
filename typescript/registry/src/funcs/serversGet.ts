@@ -8,7 +8,6 @@ import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
 import { RequestOptions } from "../lib/sdks.js";
-import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
 import * as components from "../models/components/index.js";
 import {
@@ -27,21 +26,19 @@ import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * Get Server
+ * Get a server by ID
  *
  * @remarks
- * Retrieves detailed information about a specific server by its qualified name.
+ * Get a single server by its qualified name or ID
  */
 export function serversGet(
   client: SmitheryRegistryCore,
-  request: operations.GetServerRequest,
+  request: operations.GetServersByIdRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    components.ServerDetailResponse,
-    | errors.UnauthorizedError
-    | errors.NotFoundError
-    | errors.ServerError
+    components.Server,
+    | errors.ErrorT
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -61,15 +58,13 @@ export function serversGet(
 
 async function $do(
   client: SmitheryRegistryCore,
-  request: operations.GetServerRequest,
+  request: operations.GetServersByIdRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
-      components.ServerDetailResponse,
-      | errors.UnauthorizedError
-      | errors.NotFoundError
-      | errors.ServerError
+      components.Server,
+      | errors.ErrorT
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -84,7 +79,7 @@ async function $do(
 > {
   const parsed = safeParse(
     request,
-    (value) => operations.GetServerRequest$outboundSchema.parse(value),
+    (value) => operations.GetServersByIdRequest$outboundSchema.parse(value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -94,31 +89,27 @@ async function $do(
   const body = null;
 
   const pathParams = {
-    qualifiedName: encodeSimple("qualifiedName", payload.qualifiedName, {
+    id: encodeSimple("id", payload.id, {
       explode: false,
       charEncoding: "percent",
     }),
   };
 
-  const path = pathToFunc("/servers/{qualifiedName}")(pathParams);
+  const path = pathToFunc("/servers/{id}")(pathParams);
 
   const headers = new Headers(compactMap({
     Accept: "application/json",
   }));
 
-  const secConfig = await extractSecurity(client._options.bearerAuth);
-  const securityInput = secConfig == null ? {} : { bearerAuth: secConfig };
-  const requestSecurity = resolveGlobalSecurity(securityInput);
-
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "getServer",
-    oAuth2Scopes: [],
+    operationID: "getServersById",
+    oAuth2Scopes: null,
 
-    resolvedSecurity: requestSecurity,
+    resolvedSecurity: null,
 
-    securitySource: client._options.bearerAuth,
+    securitySource: null,
     retryConfig: options?.retries
       || client._options.retryConfig
       || {
@@ -136,7 +127,6 @@ async function $do(
   };
 
   const requestRes = client._createRequest(context, {
-    security: requestSecurity,
     method: "GET",
     baseURL: options?.serverURL,
     path: path,
@@ -152,7 +142,7 @@ async function $do(
 
   const doResult = await client._do(req, {
     context,
-    errorCodes: ["401", "404", "4XX", "500", "5XX"],
+    errorCodes: ["404", "4XX", "500", "5XX"],
     retryConfig: context.retryConfig,
     retryCodes: context.retryCodes,
   });
@@ -166,10 +156,8 @@ async function $do(
   };
 
   const [result] = await M.match<
-    components.ServerDetailResponse,
-    | errors.UnauthorizedError
-    | errors.NotFoundError
-    | errors.ServerError
+    components.Server,
+    | errors.ErrorT
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -179,10 +167,9 @@ async function $do(
     | UnexpectedClientError
     | SDKValidationError
   >(
-    M.json(200, components.ServerDetailResponse$inboundSchema),
-    M.jsonErr(401, errors.UnauthorizedError$inboundSchema),
-    M.jsonErr(404, errors.NotFoundError$inboundSchema),
-    M.jsonErr(500, errors.ServerError$inboundSchema),
+    M.json(200, components.Server$inboundSchema),
+    M.jsonErr(404, errors.ErrorT$inboundSchema),
+    M.jsonErr(500, errors.ErrorT$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

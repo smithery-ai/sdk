@@ -5,11 +5,13 @@
 ```typescript
 import { Security } from "@smithery/registry/models/components";
 
-let value: Security = {};
+let value: Security = {
+  scanPassed: true,
+};
 ```
 
 ## Fields
 
-| Field              | Type               | Required           | Description        |
-| ------------------ | ------------------ | ------------------ | ------------------ |
-| `bearerAuth`       | *string*           | :heavy_minus_sign: | N/A                |
+| Field              | Type               | Required           | Description        | Example            |
+| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| `scanPassed`       | *boolean*          | :heavy_check_mark: | N/A                | true               |
