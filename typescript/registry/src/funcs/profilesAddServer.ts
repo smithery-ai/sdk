@@ -8,7 +8,6 @@ import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
 import { RequestOptions } from "../lib/sdks.js";
-import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
 import {
   ConnectionError,
@@ -97,19 +96,15 @@ async function $do(
     Accept: "application/json",
   }));
 
-  const secConfig = await extractSecurity(client._options.bearerAuth);
-  const securityInput = secConfig == null ? {} : { bearerAuth: secConfig };
-  const requestSecurity = resolveGlobalSecurity(securityInput);
-
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
     operationID: "postProfilesBySlugServers",
     oAuth2Scopes: null,
 
-    resolvedSecurity: requestSecurity,
+    resolvedSecurity: null,
 
-    securitySource: client._options.bearerAuth,
+    securitySource: null,
     retryConfig: options?.retries
       || client._options.retryConfig
       || {
@@ -127,7 +122,6 @@ async function $do(
   };
 
   const requestRes = client._createRequest(context, {
-    security: requestSecurity,
     method: "POST",
     baseURL: options?.serverURL,
     path: path,

@@ -24,9 +24,7 @@ import { systemCheckHealth } from "@smithery/registry/funcs/systemCheckHealth.js
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await systemCheckHealth(smitheryRegistry);

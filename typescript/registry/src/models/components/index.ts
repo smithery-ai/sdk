@@ -11,7 +11,6 @@ export * from "./profileserversresponse.js";
 export * from "./profilesresponse.js";
 export * from "./saveuserconfigrequest.js";
 export * from "./saveuserconfigresponse.js";
-export * from "./security.js";
 export * from "./server.js";
 export * from "./serverslistresponse.js";
 export * from "./uplinktokenresponse.js";

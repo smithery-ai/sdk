@@ -21,9 +21,7 @@ Get a paginated list of all servers
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.servers.list({
@@ -51,9 +49,7 @@ import { serversList } from "@smithery/registry/funcs/serversList.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await serversList(smitheryRegistry, {
@@ -105,9 +101,7 @@ Get a single server by its qualified name or ID
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.servers.get({
@@ -130,9 +124,7 @@ import { serversGet } from "@smithery/registry/funcs/serversGet.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await serversGet(smitheryRegistry, {
@@ -180,9 +172,7 @@ Generate configuration for instantiating a server connection
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.servers.configure({
@@ -212,9 +202,7 @@ import { serversConfigure } from "@smithery/registry/funcs/serversConfigure.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await serversConfigure(smitheryRegistry, {

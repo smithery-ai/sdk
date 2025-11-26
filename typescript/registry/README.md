@@ -25,7 +25,6 @@ Smithery Registry API: Smithery API for managing servers, profiles, and configur
   * [SDK Installation](#sdk-installation)
   * [Requirements](#requirements)
   * [SDK Example Usage](#sdk-example-usage)
-  * [Authentication](#authentication)
   * [Available Resources and Operations](#available-resources-and-operations)
   * [Standalone functions](#standalone-functions)
   * [Pagination](#pagination)
@@ -87,9 +86,7 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.system.checkHealth();
@@ -101,36 +98,6 @@ run();
 
 ```
 <!-- End SDK Example Usage [usage] -->
-
-<!-- Start Authentication [security] -->
-## Authentication
-
-### Per-Client Security Schemes
-
-This SDK supports the following security scheme globally:
-
-| Name         | Type | Scheme      | Environment Variable   |
-| ------------ | ---- | ----------- | ---------------------- |
-| `bearerAuth` | http | HTTP Bearer | `SMITHERY_BEARER_AUTH` |
-
-To authenticate with the API the `bearerAuth` parameter must be set when initializing the SDK client instance. For example:
-```typescript
-import { SmitheryRegistry } from "@smithery/registry";
-
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
-
-async function run() {
-  const result = await smitheryRegistry.system.checkHealth();
-
-  console.log(result);
-}
-
-run();
-
-```
-<!-- End Authentication [security] -->
 
 <!-- Start Available Resources and Operations [operations] -->
 ## Available Resources and Operations
@@ -216,9 +183,7 @@ Here's an example of one such pagination call:
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.servers.list({
@@ -247,9 +212,7 @@ To change the default retry strategy for a single API call, simply provide a ret
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.system.checkHealth({
@@ -287,7 +250,6 @@ const smitheryRegistry = new SmitheryRegistry({
     },
     retryConnectionErrors: false,
   },
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -320,9 +282,7 @@ run();
 import { SmitheryRegistry } from "@smithery/registry";
 import * as errors from "@smithery/registry/models/errors";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   try {
@@ -393,7 +353,6 @@ import { SmitheryRegistry } from "@smithery/registry";
 
 const smitheryRegistry = new SmitheryRegistry({
   serverURL: "https://registry.smithery.ai",
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
