@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: 49b52a34a8abd87d5b36008ea5636ae2
+  docChecksum: f83b2b1c1c664edd2bb0f5002e4af1a0
   docVersion: 1.0.0
   speakeasyVersion: 1.650.0
   generationVersion: 2.743.2
-  releaseVersion: 0.7.0
-  configChecksum: e69424669a4ceb4f63120d50eb6d51b1
+  releaseVersion: 0.6.1
+  configChecksum: 60eb643ac0095104c11451207efd5341
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -20,7 +20,9 @@ features:
     devContainers: 2.90.1
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.1.2
+    globalSecurity: 2.82.14
     globalSecurityCallbacks: 0.1.0
+    globalSecurityFlattening: 0.1.0
     globalServerURLs: 2.83.0
     groups: 2.81.3
     nameOverrides: 2.81.2
@@ -62,6 +64,7 @@ generatedFiles:
   - docs/models/components/saveuserconfigresponse.md
   - docs/models/components/security.md
   - docs/models/components/server.md
+  - docs/models/components/serversecurity.md
   - docs/models/components/serverslistresponse.md
   - docs/models/components/serverslistresponsepagination.md
   - docs/models/components/serverslistresponseserver.md
@@ -143,6 +146,7 @@ generatedFiles:
   - src/models/components/profilesresponse.ts
   - src/models/components/saveuserconfigrequest.ts
   - src/models/components/saveuserconfigresponse.ts
+  - src/models/components/security.ts
   - src/models/components/server.ts
   - src/models/components/serverslistresponse.ts
   - src/models/components/uplinktokenresponse.ts
