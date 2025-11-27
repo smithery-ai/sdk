@@ -23,9 +23,7 @@ List user profiles
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.profiles.list({
@@ -49,9 +47,7 @@ import { profilesList } from "@smithery/registry/funcs/profilesList.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await profilesList(smitheryRegistry, {
@@ -98,9 +94,7 @@ List MCP servers for a profile
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.profiles.listServers({
@@ -125,9 +119,7 @@ import { profilesListServers } from "@smithery/registry/funcs/profilesListServer
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await profilesListServers(smitheryRegistry, {
@@ -175,9 +167,7 @@ Save a server to a profile
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.profiles.addServer({
@@ -200,9 +190,7 @@ import { profilesAddServer } from "@smithery/registry/funcs/profilesAddServer.js
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await profilesAddServer(smitheryRegistry, {
@@ -248,9 +236,7 @@ Get a profile server
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   const result = await smitheryRegistry.profiles.getServer({
@@ -274,9 +260,7 @@ import { profilesGetServer } from "@smithery/registry/funcs/profilesGetServer.js
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await profilesGetServer(smitheryRegistry, {
@@ -323,9 +307,7 @@ Delete a profile server
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function run() {
   await smitheryRegistry.profiles.deleteServer({
@@ -349,9 +331,7 @@ import { profilesDeleteServer } from "@smithery/registry/funcs/profilesDeleteSer
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistryCore();
 
 async function run() {
   const res = await profilesDeleteServer(smitheryRegistry, {

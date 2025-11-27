@@ -13,9 +13,7 @@ dotenv.config();
 
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry({
-  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
-});
+const smitheryRegistry = new SmitheryRegistry();
 
 async function main() {
   const result = await smitheryRegistry.system.checkHealth();

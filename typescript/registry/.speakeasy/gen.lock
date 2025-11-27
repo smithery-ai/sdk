@@ -5,8 +5,8 @@ management:
   docVersion: 1.0.0
   speakeasyVersion: 1.650.0
   generationVersion: 2.743.2
-  releaseVersion: 0.6.0
-  configChecksum: c124d05f4bfc9c14c655389bbe9689b8
+  releaseVersion: 0.6.1
+  configChecksum: 60eb643ac0095104c11451207efd5341
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
