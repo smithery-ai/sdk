@@ -19,7 +19,7 @@ export type ServersListResponseServer = {
   homepage: string;
 };
 
-export type ServersListResponsePagination = {
+export type Pagination = {
   currentPage: number;
   pageSize: number;
   totalPages: number;
@@ -28,7 +28,7 @@ export type ServersListResponsePagination = {
 
 export type ServersListResponse = {
   servers: Array<ServersListResponseServer>;
-  pagination: ServersListResponsePagination;
+  pagination: Pagination;
 };
 
 /** @internal */
@@ -59,8 +59,8 @@ export function serversListResponseServerFromJSON(
 }
 
 /** @internal */
-export const ServersListResponsePagination$inboundSchema: z.ZodType<
-  ServersListResponsePagination,
+export const Pagination$inboundSchema: z.ZodType<
+  Pagination,
   z.ZodTypeDef,
   unknown
 > = z.object({
@@ -70,13 +70,13 @@ export const ServersListResponsePagination$inboundSchema: z.ZodType<
   totalCount: z.number(),
 });
 
-export function serversListResponsePaginationFromJSON(
+export function paginationFromJSON(
   jsonString: string,
-): SafeParseResult<ServersListResponsePagination, SDKValidationError> {
+): SafeParseResult<Pagination, SDKValidationError> {
   return safeParse(
     jsonString,
-    (x) => ServersListResponsePagination$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'ServersListResponsePagination' from JSON`,
+    (x) => Pagination$inboundSchema.parse(JSON.parse(x)),
+    `Failed to parse 'Pagination' from JSON`,
   );
 }
 
@@ -87,7 +87,7 @@ export const ServersListResponse$inboundSchema: z.ZodType<
   unknown
 > = z.object({
   servers: z.array(z.lazy(() => ServersListResponseServer$inboundSchema)),
-  pagination: z.lazy(() => ServersListResponsePagination$inboundSchema),
+  pagination: z.lazy(() => Pagination$inboundSchema),
 });
 
 export function serversListResponseFromJSON(
