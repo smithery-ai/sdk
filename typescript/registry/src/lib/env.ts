@@ -6,10 +6,14 @@ import * as z from "zod/v3";
 import { dlv } from "./dlv.js";
 
 export interface Env {
+  SMITHERY_BEARER_AUTH?: string | undefined;
+
   SMITHERY_DEBUG?: boolean | undefined;
 }
 
 export const envSchema: z.ZodType<Env, z.ZodTypeDef, unknown> = z.object({
+  SMITHERY_BEARER_AUTH: z.string().optional(),
+
   SMITHERY_DEBUG: z.coerce.boolean().optional(),
 });
 
