@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: f83b2b1c1c664edd2bb0f5002e4af1a0
+  docChecksum: 74808b9c70ca98f5b86fb1e6729b50a1
   docVersion: 1.0.0
   speakeasyVersion: 1.650.0
   generationVersion: 2.743.2
-  releaseVersion: 0.6.1
-  configChecksum: 60eb643ac0095104c11451207efd5341
+  releaseVersion: 0.6.2
+  configChecksum: 1b1944f011bd06c9f41d9246f1a1e033
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -52,12 +52,7 @@ generatedFiles:
   - docs/models/components/getuserconfigresponse.md
   - docs/models/components/health.md
   - docs/models/components/inputschema.md
-  - docs/models/components/profile.md
-  - docs/models/components/profileserversresponse.md
-  - docs/models/components/profileserversresponsepagination.md
-  - docs/models/components/profileserversresponseserver.md
-  - docs/models/components/profilesresponse.md
-  - docs/models/components/profilesresponsepagination.md
+  - docs/models/components/pagination.md
   - docs/models/components/properties.md
   - docs/models/components/result.md
   - docs/models/components/saveuserconfigrequest.md
@@ -66,32 +61,19 @@ generatedFiles:
   - docs/models/components/server.md
   - docs/models/components/serversecurity.md
   - docs/models/components/serverslistresponse.md
-  - docs/models/components/serverslistresponsepagination.md
   - docs/models/components/serverslistresponseserver.md
   - docs/models/components/tool.md
   - docs/models/components/uplinktokenresponse.md
   - docs/models/errors/errort.md
   - docs/models/errors/uplinkerror.md
-  - docs/models/operations/client.md
-  - docs/models/operations/deleteprofilesbyslugserversbyconfigslugrequest.md
   - docs/models/operations/getconfigbyidrequest.md
   - docs/models/operations/getconfigstatusbyidrequest.md
-  - docs/models/operations/getprofilesbyslugserversbyconfigslugrequest.md
-  - docs/models/operations/getprofilesbyslugserversbyconfigslugresponse.md
-  - docs/models/operations/getprofilesbyslugserversrequest.md
-  - docs/models/operations/getprofilesrequest.md
   - docs/models/operations/getserversbyidrequest.md
   - docs/models/operations/getserversrequest.md
   - docs/models/operations/getserversresponse.md
-  - docs/models/operations/oauthdata.md
-  - docs/models/operations/postprofilesbyslugserversrequest.md
-  - docs/models/operations/postprofilesbyslugserversrequestbody.md
-  - docs/models/operations/postprofilesbyslugserversresponse.md
   - docs/models/operations/postserversbyidrequest.md
   - docs/models/operations/putconfigbyidrequest.md
-  - docs/models/operations/tokens.md
   - docs/sdks/config/README.md
-  - docs/sdks/profiles/README.md
   - docs/sdks/servers/README.md
   - docs/sdks/system/README.md
   - docs/sdks/uplink/README.md
@@ -106,11 +88,6 @@ generatedFiles:
   - src/funcs/configGet.ts
   - src/funcs/configGetStatus.ts
   - src/funcs/configUpdate.ts
-  - src/funcs/profilesAddServer.ts
-  - src/funcs/profilesDeleteServer.ts
-  - src/funcs/profilesGetServer.ts
-  - src/funcs/profilesList.ts
-  - src/funcs/profilesListServers.ts
   - src/funcs/serversConfigure.ts
   - src/funcs/serversGet.ts
   - src/funcs/serversList.ts
@@ -142,8 +119,6 @@ generatedFiles:
   - src/models/components/getuserconfigresponse.ts
   - src/models/components/health.ts
   - src/models/components/index.ts
-  - src/models/components/profileserversresponse.ts
-  - src/models/components/profilesresponse.ts
   - src/models/components/saveuserconfigrequest.ts
   - src/models/components/saveuserconfigresponse.ts
   - src/models/components/security.ts
@@ -158,21 +133,15 @@ generatedFiles:
   - src/models/errors/sdkvalidationerror.ts
   - src/models/errors/smitheryregistryerror.ts
   - src/models/errors/uplinkerror.ts
-  - src/models/operations/deleteprofilesbyslugserversbyconfigslug.ts
   - src/models/operations/getconfigbyid.ts
   - src/models/operations/getconfigstatusbyid.ts
-  - src/models/operations/getprofiles.ts
-  - src/models/operations/getprofilesbyslugservers.ts
-  - src/models/operations/getprofilesbyslugserversbyconfigslug.ts
   - src/models/operations/getservers.ts
   - src/models/operations/getserversbyid.ts
   - src/models/operations/index.ts
-  - src/models/operations/postprofilesbyslugservers.ts
   - src/models/operations/postserversbyid.ts
   - src/models/operations/putconfigbyid.ts
   - src/sdk/config.ts
   - src/sdk/index.ts
-  - src/sdk/profiles.ts
   - src/sdk/sdk.ts
   - src/sdk/servers.ts
   - src/sdk/system.ts
@@ -350,3 +319,10 @@ examples:
           configSlug: "<value>"
 examplesVersion: 1.0.2
 generatedTests: {}
+releaseNotes: |
+  ## Typescript SDK Changes Detected:
+  * `smitheryregistry.profiles.list()`: **Deleted** **Breaking** :warning:
+  * `smitheryregistry.profiles.listServers()`: **Deleted** **Breaking** :warning:
+  * `smitheryregistry.profiles.addServer()`: **Deleted** **Breaking** :warning:
+  * `smitheryregistry.profiles.getServer()`: **Deleted** **Breaking** :warning:
+  * `smitheryregistry.profiles.deleteServer()`: **Deleted** **Breaking** :warning:

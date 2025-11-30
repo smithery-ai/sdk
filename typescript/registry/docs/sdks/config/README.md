@@ -21,7 +21,9 @@ Check if user has all required configuration fields for a server without exposin
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry();
+const smitheryRegistry = new SmitheryRegistry({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const result = await smitheryRegistry.config.getStatus({
@@ -44,7 +46,9 @@ import { configGetStatus } from "@smithery/registry/funcs/configGetStatus.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore();
+const smitheryRegistry = new SmitheryRegistryCore({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const res = await configGetStatus(smitheryRegistry, {
@@ -91,7 +95,9 @@ Retrieve the saved user configuration for a specific server. Optionally specify 
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry();
+const smitheryRegistry = new SmitheryRegistry({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const result = await smitheryRegistry.config.get({
@@ -114,7 +120,9 @@ import { configGet } from "@smithery/registry/funcs/configGet.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore();
+const smitheryRegistry = new SmitheryRegistryCore({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const res = await configGet(smitheryRegistry, {
@@ -162,7 +170,9 @@ Save user configuration for a specific server to be used in future connections. 
 ```typescript
 import { SmitheryRegistry } from "@smithery/registry";
 
-const smitheryRegistry = new SmitheryRegistry();
+const smitheryRegistry = new SmitheryRegistry({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const result = await smitheryRegistry.config.update({
@@ -191,7 +201,9 @@ import { configUpdate } from "@smithery/registry/funcs/configUpdate.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const smitheryRegistry = new SmitheryRegistryCore();
+const smitheryRegistry = new SmitheryRegistryCore({
+  bearerAuth: process.env["SMITHERY_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const res = await configUpdate(smitheryRegistry, {
