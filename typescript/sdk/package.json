@@ -48,7 +48,7 @@
 		"zod-to-json-schema": "^3.24.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.0.6",
+		"@biomejs/biome": "2.2.6",
 		"@types/express": "^5.0.1",
 		"@types/json-schema": "^7.0.15",
 		"@types/lodash": "^4.17.17",

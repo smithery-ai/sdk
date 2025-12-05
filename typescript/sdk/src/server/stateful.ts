@@ -85,7 +85,6 @@ export function createStatefulServer<T = Record<string, unknown>>(
 
 		if (sessionId && sessionStore.get(sessionId)) {
 			// Reuse existing transport
-			// biome-ignore lint/style/noNonNullAssertion: Not possible
 			transport = sessionStore.get(sessionId)!
 		} else if (!sessionId && isInitializeRequest(req.body)) {
 			// New initialization request
@@ -206,7 +205,6 @@ export function createStatefulServer<T = Record<string, unknown>>(
 			return
 		}
 
-		// biome-ignore lint/style/noNonNullAssertion: Not possible
 		const transport = sessionStore.get(sessionId)!
 
 		await transport.handleRequest(req, res)
