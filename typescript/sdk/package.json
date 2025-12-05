@@ -16,21 +16,12 @@
 		"./server/stateless.js": "./dist/server/stateless.js",
 		"./server/logger.js": "./dist/server/logger.js",
 		"./server/session.js": "./dist/server/session.js",
-		"./server/widget.js": "./dist/server/widget.js",
 		"./server/auth/oauth.js": "./dist/server/auth/oauth.js",
 		"./server/auth/identity.js": "./dist/server/auth/identity.js",
 		"./shared/config.js": "./dist/shared/config.js",
 		"./shared/patch.js": "./dist/shared/patch.js",
 		"./helpers": "./dist/helpers/index.js",
-		"./helpers/tool.js": "./dist/helpers/tool.js",
-		"./helpers/widget.js": "./dist/helpers/widget.js",
-		"./react": "./dist/react/index.js",
-		"./react/hooks.js": "./dist/react/hooks.js",
-		"./react/types.js": "./dist/react/types.js",
-		"./react/ErrorBoundary.js": "./dist/react/ErrorBoundary.js",
-		"./react/WidgetRoot.js": "./dist/react/WidgetRoot.js",
-		"./openai": "./dist/openai/index.js",
-		"./openai/widget.js": "./dist/openai/widget.js"
+		"./helpers/tool.js": "./dist/helpers/tool.js"
 	},
 	"files": [
 		"dist"
@@ -53,7 +44,7 @@
 		"lodash": "^4.17.21",
 		"okay-error": "^1.0.3",
 		"uuid": "^11.0.3",
-		"zod": "^3.23.8",
+		"zod": ">=3.23.8 <4.0.0",
 		"zod-to-json-schema": "^3.24.1"
 	},
 	"devDependencies": {
@@ -62,7 +53,6 @@
 		"@types/json-schema": "^7.0.15",
 		"@types/lodash": "^4.17.17",
 		"@types/node": "^20.0.0",
-		"@types/react": "^18.3.12",
 		"@types/uuid": "^9.0.7",
 		"dotenv": "^16.4.7",
 		"tsx": "^4.19.2",
