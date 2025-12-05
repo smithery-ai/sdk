@@ -3,7 +3,7 @@ import { z } from "zod"
 
 // Optional: If you have user-level config, define it here
 export const configSchema = z.object({
-	debug: z.boolean().default(false).describe("Enable debug logging"),
+	debug: z.boolean().describe("Enable debug logging"),
 })
 
 export default function createServer({
