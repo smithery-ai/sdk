@@ -18,6 +18,6 @@
 		"zod": "^3.25.46"
 	},
 	"devDependencies": {
-		"@smithery/cli": "^1.6.4"
+		"@smithery/cli": "^1.6.6"
 	}
 }
