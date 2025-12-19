@@ -1,10 +1,9 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 import express from "express"
 import type { z } from "zod"
+import * as zod from "zod"
 import { parseAndValidateConfig } from "../shared/config.js"
-
-import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
-import { zodToJsonSchema } from "zod-to-json-schema"
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js"
 import type { OAuthMountOptions } from "./auth/oauth.js"
 import { type Logger, createLogger } from "./logger.js"
@@ -22,7 +21,7 @@ export interface CreateStatelessServerArg<T = Record<string, unknown>> {
 
 export type CreateStatelessServerFn<T = Record<string, unknown>> = (
 	arg: CreateStatelessServerArg<T>,
-) => Server
+) => McpServer["server"]
 
 /**
  * Configuration options for the stateless server
@@ -166,21 +165,17 @@ export function createStatelessServer<T = Record<string, unknown>>(
 		// Set proper content type for JSON Schema
 		res.set("Content-Type", "application/schema+json; charset=utf-8")
 
-		const baseSchema = options?.schema
-			? zodToJsonSchema(options.schema)
-			: {
-					type: "object",
-					properties: {},
-					required: [],
-				}
-
-		const configSchema = {
-			$schema: "https://json-schema.org/draft/2020-12/schema",
-			$id: `${req.protocol}://${req.get("host")}/.well-known/mcp-config`,
+		// Create schema with metadata using Zod's native .meta()
+		const schema = (options?.schema ?? zod.object({})).meta({
 			title: "MCP Session Configuration",
 			description: "Schema for the /mcp endpoint configuration",
 			"x-query-style": "dot+bracket",
-			...baseSchema,
+		})
+
+		const configSchema = {
+			...zod.toJSONSchema(schema, { target: "draft-2020-12" }),
+			// $id is dynamic based on request, so we add it manually
+			$id: `${req.protocol}://${req.get("host")}/.well-known/mcp-config`,
 		}
 
 		res.json(configSchema)
