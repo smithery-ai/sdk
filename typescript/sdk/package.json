@@ -29,13 +29,11 @@
 		"chalk": "^5.6.2",
 		"express": "^5.1.0",
 		"jose": "^6.1.0",
-		"json-schema": "^0.4.0",
 		"lodash": "^4.17.21",
-		"okay-error": "^1.0.3",
-		"uuid": "^11.0.3"
+		"okay-error": "^1.0.3"
 	},
 	"peerDependencies": {
-		"zod": ">=4.0.0"
+		"zod": "^4"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
