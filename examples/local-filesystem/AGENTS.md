@@ -471,7 +471,7 @@ node -e "import('./src/index.ts').then(m => console.log(JSON.stringify(m.configS
 - Ensure you're in the project root directory
 - Run `npm install` to install dependencies
 - Check that your TypeScript configuration is correct
-- Verify Node.js version is 18 or higher
+- Verify Node.js version is 20 or higher
 
 ### TypeScript Issues
 - Run `npx tsc --noEmit` to check for TypeScript errors

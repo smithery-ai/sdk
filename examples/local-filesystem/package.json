@@ -13,13 +13,13 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.20.0",
-		"@smithery/sdk": "^1.7.4",
+		"@modelcontextprotocol/sdk": "^1.25.1",
+		"@smithery/sdk": "^3.0.1",
 		"glob": "^11.0.0",
-		"zod": "^3.25.46"
+		"zod": "^4"
 	},
 	"devDependencies": {
-		"@smithery/cli": "^1.6.3"
+		"@smithery/cli": "^1.6.7"
 	}
 }
 
