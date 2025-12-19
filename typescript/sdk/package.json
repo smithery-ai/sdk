@@ -1,6 +1,6 @@
 {
 	"name": "@smithery/sdk",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "SDK to develop with Smithery",
 	"type": "module",
 	"repository": {
