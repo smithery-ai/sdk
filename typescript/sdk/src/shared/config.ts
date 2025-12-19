@@ -1,8 +1,7 @@
 import type { Request as ExpressRequest } from "express"
 import _ from "lodash"
 import { err, ok } from "okay-error"
-import type { z } from "zod"
-import { zodToJsonSchema } from "zod-to-json-schema"
+import * as z from "zod"
 
 export interface SmitheryUrlOptions {
 	// Smithery API key
@@ -95,14 +94,15 @@ export function parseAndValidateConfig<T = Record<string, unknown>>(
 	if (schema) {
 		const result = schema.safeParse(config)
 		if (!result.success) {
-			const jsonSchema = zodToJsonSchema(schema)
+			const jsonSchema = z.toJSONSchema(schema)
 
 			const errors = result.error.issues.map(issue => {
 				// Safely traverse the config object to get the received value
 				let received: unknown = config
 				for (const key of issue.path) {
-					if (received && typeof received === "object" && key in received) {
-						received = (received as Record<string, unknown>)[key]
+					const keyStr = String(key)
+					if (received && typeof received === "object" && keyStr in received) {
+						received = (received as Record<string, unknown>)[keyStr]
 					} else {
 						received = undefined
 						break

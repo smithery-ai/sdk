@@ -10,44 +10,30 @@
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
-		".": "./dist/index.js",
-		"./server": "./dist/server/index.js",
-		"./server/stateful.js": "./dist/server/stateful.js",
-		"./server/stateless.js": "./dist/server/stateless.js",
-		"./server/logger.js": "./dist/server/logger.js",
-		"./server/session.js": "./dist/server/session.js",
-		"./server/auth/oauth.js": "./dist/server/auth/oauth.js",
-		"./server/auth/identity.js": "./dist/server/auth/identity.js",
-		"./shared/config.js": "./dist/shared/config.js",
-		"./shared/patch.js": "./dist/shared/patch.js",
-		"./helpers": "./dist/helpers/index.js",
-		"./helpers/tool.js": "./dist/helpers/tool.js"
+		".": "./dist/index.js"
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
 		"build": "tsc",
-		"build:all": "npm run build -ws --include-workspace-root",
+		"build:all": "pnpm -r --filter './*' build",
 		"watch": "tsc --watch",
-		"check": "npx @biomejs/biome check --write --unsafe",
-		"prepare": "npm run build"
+		"check": "pnpm exec biome check --write --unsafe",
+		"prepare": "pnpm run build"
 	},
-	"packageManager": "npm@11.4.1",
+	"packageManager": "pnpm@9.0.0",
 	"license": "MIT",
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.20.0",
+		"@modelcontextprotocol/sdk": "^1.25.1",
 		"chalk": "^5.6.2",
 		"express": "^5.1.0",
 		"jose": "^6.1.0",
-		"json-schema": "^0.4.0",
 		"lodash": "^4.17.21",
-		"okay-error": "^1.0.3",
-		"uuid": "^11.0.3",
-		"zod-to-json-schema": "^3.24.1"
+		"okay-error": "^1.0.3"
 	},
 	"peerDependencies": {
-		"zod": ">=3.23.8 <4.0.0"
+		"zod": "^4"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
@@ -59,6 +45,6 @@
 		"dotenv": "^16.4.7",
 		"tsx": "^4.19.2",
 		"typescript": "^5.0.0",
-		"zod": ">=3.23.8 <4.0.0"
+		"zod": "^4"
 	}
 }
