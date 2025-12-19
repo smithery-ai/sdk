@@ -9,10 +9,12 @@ export * from "./shared/patch.js"
 // Stateful/stateless server patterns, session management, auth
 export {
 	createStatefulServer,
+	type CreateServerFn,
 	type StatefulServerOptions,
 } from "./server/stateful.js"
 export {
 	createStatelessServer,
+	type CreateStatelessServerFn,
 	type StatelessServerOptions,
 } from "./server/stateless.js"
 export * from "./server/logger.js"
