@@ -132,3 +132,13 @@ dist
 
 # test
 examples/test-agent.ts
+
+# Build output
+dist/
+
+# Generated runtime sources
+*.generated.ts
+*.generated.js
+*.generated.d.ts
+
+.turbo

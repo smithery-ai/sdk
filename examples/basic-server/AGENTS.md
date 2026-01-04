@@ -214,7 +214,9 @@ http://localhost:3000/mcp?weatherApiKey=abc123&temperatureUnit=fahrenheit
 
 3. **Use config in your server**:
 ```typescript
-export default function createServer({ config }: { config: z.infer<typeof configSchema> }) {
+import type { ServerContext } from "@smithery/sdk"
+
+export default function createServer({ config, env }: ServerContext<z.infer<typeof configSchema>>) {
   const server = new McpServer({ name: "Weather Server", version: "1.0.0" })
   
   server.registerTool("get-weather", { /* ... */ }, async ({ city }) => {
@@ -283,20 +285,25 @@ target: remote
 
 ### Stateful vs Stateless Servers
 
-The TypeScript SDK provides two server patterns. **Servers are stateful by default.** Choose based on your needs.
+The TypeScript SDK provides two server patterns. **Servers are stateless by default.** Choose based on your needs.
 
-#### Stateful Servers (Default)
+#### Stateful Servers
 
 Stateful servers maintain state between calls within a session:
 
 ```typescript
-export default function createServer({ sessionId, config }) {
+import type { StatefulServerContext } from "@smithery/sdk"
+
+// Explicitly mark as stateful (opt-in behavior)
+export const stateful = true
+
+export default function createServer({ config, session }: StatefulServerContext) {
   const server = new McpServer({ name: "My Stateful App", version: "1.0.0" })
   
-  console.log(`Session ${sessionId} started`)
+  console.log(`Session ${session.id} started`)
   
   // Store session-specific state
-  // Example: const sessionState = getOrCreateState(sessionId)
+  // Example: await session.set("key", "value")
   
   return server.server
 }
@@ -304,15 +311,14 @@ export default function createServer({ sessionId, config }) {
 
 **Use stateful for:** Chat conversations, multi-step workflows, game servers, session analytics, or any scenario requiring persistent state.
 
-#### Stateless Servers
+#### Stateless Servers (Default)
 
 Stateless servers create a fresh instance for each request—no session state is maintained:
 
 ```typescript
-// Explicitly mark as stateless (opt-in behavior)
-export const stateless = true
+import type { StatelessServerContext } from "@smithery/sdk"
 
-export default function createServer({ config }) {
+export default function createServer({ config }: StatelessServerContext) {
   const server = new McpServer({ name: "My App", version: "1.0.0" })
   // Add tools, resources, prompts...
   return server.server
@@ -336,11 +342,13 @@ export default function createServer({ config }) {
    }
    ```
 
-2. **Choose stateless or stateful:** See [Stateful vs Stateless Servers](#stateful-vs-stateless-servers) for details. Servers are stateful by default. For stateless, export `export const stateless = true`.
+2. **Choose stateless or stateful:** See [Stateful vs Stateless Servers](#stateful-vs-stateless-servers) for details. Servers are stateless by default. For stateful, export `export const stateful = true`.
 
 3. **Define your config schema (optional):**
    
    ```typescript
+   import type { ServerContext } from "@smithery/sdk"
+
    // With config schema
    export const configSchema = z.object({
      apiKey: z.string().describe("Your API key"),
@@ -349,9 +357,7 @@ export default function createServer({ config }) {
    
    export default function createServer({
      config,
-   }: {
-     config: z.infer<typeof configSchema>
-   }) {
+   }: ServerContext<z.infer<typeof configSchema>>) {
      const server = new McpServer({
        name: "Your Server Name",
        version: "1.0.0",

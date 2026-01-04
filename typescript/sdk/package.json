@@ -1,6 +1,6 @@
 {
 	"name": "@smithery/sdk",
-	"version": "3.0.0",
+	"version": "4.0.0",
 	"description": "SDK to develop with Smithery",
 	"type": "module",
 	"repository": {
@@ -10,40 +10,32 @@
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
-		".": "./dist/index.js"
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./bundle": {
+			"types": "./dist/bundle/index.d.ts",
+			"default": "./dist/bundle/index.js"
+		}
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "tsc",
-		"build:all": "pnpm -r --filter './*' build",
-		"watch": "tsc --watch",
+		"build": "rm -rf dist && tsc",
 		"check": "pnpm exec biome check --write --unsafe",
 		"prepare": "pnpm run build"
 	},
 	"packageManager": "pnpm@9.0.0",
 	"license": "MIT",
-	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.25.1",
-		"chalk": "^5.6.2",
-		"express": "^5.1.0",
-		"jose": "^6.1.0",
-		"lodash": "^4.17.21",
-		"okay-error": "^1.0.3"
-	},
 	"peerDependencies": {
+		"@modelcontextprotocol/sdk": "^1.25.1",
 		"zod": "^4"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
-		"@types/express": "^5.0.1",
-		"@types/json-schema": "^7.0.15",
-		"@types/lodash": "^4.17.17",
 		"@types/node": "^20.0.0",
-		"@types/uuid": "^9.0.7",
-		"dotenv": "^16.4.7",
-		"tsx": "^4.19.2",
 		"typescript": "^5.0.0",
 		"zod": "^4"
 	}
