@@ -2,22 +2,12 @@ overlay: 1.0.0
 x-speakeasy-jsonpath: rfc9535
 info:
   title: Speakeasy Modifications
-  version: 0.0.6
+  version: 0.0.7
   x-speakeasy-metadata:
     after: ""
     before: ""
     type: speakeasy-modifications
 actions:
-  - target: $["paths"]["/servers/{qualifiedName}"]["get"]
-    update:
-      x-speakeasy-group: servers
-      x-speakeasy-name-override: get
-    x-speakeasy-metadata:
-      after: sdk.servers.get()
-      before: sdk.<no_group>.getServer()
-      created_at: 1746911395462
-      reviewed_at: 1746911405498
-      type: method-name
   - target: $["paths"]["/servers"]["get"]
     update:
       x-speakeasy-group: servers
@@ -36,11 +26,11 @@ actions:
           - name: page
             in: parameters
             type: page
-          - name: limit
+          - name: pageSize
             in: parameters
             type: pageSize
         outputs:
-          results: $.data.resultArray
+          results: $.servers
     x-speakeasy-metadata:
       created_at: 1746911826521
       type: user-edit
@@ -69,38 +59,9 @@ actions:
       created_at: 1764062986651
       reviewed_at: 1764062991317
       type: method-name
-  - target: $["paths"]["/profiles/{slug}/servers/{configSlug}"]["get"]
-    update:
-      x-speakeasy-group: profiles
-      x-speakeasy-name-override: getServer
-    x-speakeasy-metadata:
-      after: sdk.profiles.getServer()
-      before: sdk.<no_group>.getProfilesBySlugServersByConfigSlug()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
-  - target: $["paths"]["/profiles/{slug}/servers"]["post"]
-    update:
-      x-speakeasy-group: profiles
-      x-speakeasy-name-override: addServer
-    x-speakeasy-metadata:
-      after: sdk.profiles.addServer()
-      before: sdk.<no_group>.postProfilesBySlugServers()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
-  - target: $["paths"]["/profiles"]["get"]
-    update:
-      x-speakeasy-group: profiles
-      x-speakeasy-name-override: list
-    x-speakeasy-metadata:
-      after: sdk.profiles.list()
-      before: sdk.<no_group>.getProfiles()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
   - target: $["paths"]["/servers/{id}"]["get"]
     update:
+      x-speakeasy-group: servers
       x-speakeasy-name-override: get
     x-speakeasy-metadata:
       after: sdk.servers.get()
@@ -108,17 +69,9 @@ actions:
       created_at: 1764062986652
       reviewed_at: 1764062991317
       type: method-name
-  - target: $["paths"]["/config/{id}"]["put"]
-    update:
-      x-speakeasy-name-override: update
-    x-speakeasy-metadata:
-      after: sdk.config.update()
-      before: sdk.config.putConfigById()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
   - target: $["paths"]["/servers/{id}"]["post"]
     update:
+      x-speakeasy-group: servers
       x-speakeasy-name-override: configure
     x-speakeasy-metadata:
       after: sdk.servers.configure()
@@ -126,50 +79,13 @@ actions:
       created_at: 1764062986652
       reviewed_at: 1764062991317
       type: method-name
-  - target: $["paths"]["/profiles/{slug}/servers/{configSlug}"]["delete"]
-    update:
-      x-speakeasy-group: profiles
-      x-speakeasy-name-override: deleteServer
-    x-speakeasy-metadata:
-      after: sdk.profiles.deleteServer()
-      before: sdk.<no_group>.deleteProfilesBySlugServersByConfigSlug()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
   - target: $["paths"]["/uplink/token"]["post"]
     update:
+      x-speakeasy-group: uplink
       x-speakeasy-name-override: createToken
     x-speakeasy-metadata:
       after: sdk.uplink.createToken()
       before: sdk.uplink.postUplinkToken()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
-  - target: $["paths"]["/config/status/{id}"]["get"]
-    update:
-      x-speakeasy-name-override: getStatus
-    x-speakeasy-metadata:
-      after: sdk.config.getStatus()
-      before: sdk.config.getConfigStatusById()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
-  - target: $["paths"]["/profiles/{slug}/servers"]["get"]
-    update:
-      x-speakeasy-group: profiles
-      x-speakeasy-name-override: listServers
-    x-speakeasy-metadata:
-      after: sdk.profiles.listServers()
-      before: sdk.<no_group>.getProfilesBySlugServers()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
-  - target: $["paths"]["/config/{id}"]["get"]
-    update:
-      x-speakeasy-name-override: get
-    x-speakeasy-metadata:
-      after: sdk.config.get()
-      before: sdk.config.getConfigById()
       created_at: 1764062986652
       reviewed_at: 1764062991317
       type: method-name
