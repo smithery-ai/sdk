@@ -83,10 +83,10 @@ run();
 
 ### Errors
 
-| Error Type       | Status Code      | Content Type     |
-| ---------------- | ---------------- | ---------------- |
-| errors.ErrorT    | 400              | application/json |
-| errors.APIError  | 4XX, 5XX         | \*/\*            |
+| Error Type             | Status Code            | Content Type           |
+| ---------------------- | ---------------------- | ---------------------- |
+| errors.DeploymentError | 400                    | application/json       |
+| errors.APIError        | 4XX, 5XX               | \*/\*                  |
 
 ## listDeployments
 
@@ -153,13 +153,14 @@ run();
 
 ### Response
 
-**Promise\<[any[]](../../models/.md)\>**
+**Promise\<[components.DeploymentList[]](../../models/.md)\>**
 
 ### Errors
 
-| Error Type      | Status Code     | Content Type    |
-| --------------- | --------------- | --------------- |
-| errors.APIError | 4XX, 5XX        | \*/\*           |
+| Error Type             | Status Code            | Content Type           |
+| ---------------------- | ---------------------- | ---------------------- |
+| errors.DeploymentError | 403, 404               | application/json       |
+| errors.APIError        | 4XX, 5XX               | \*/\*                  |
 
 ## getDeploymentStatus
 
@@ -327,6 +328,11 @@ const smitheryRegistry = new SmitheryRegistry({
 
 async function run() {
   const result = await smitheryRegistry.servers.getLogs({
+    numberRootComponentsSchemasLogsQuery: {
+      from: "2026-01-01T00:00:00Z",
+      to: "2026-01-01T01:00:00Z",
+      limit: 50,
+    },
     qualifiedName: "<value>",
   });
 
@@ -352,6 +358,11 @@ const smitheryRegistry = new SmitheryRegistryCore({
 
 async function run() {
   const res = await serversGetLogs(smitheryRegistry, {
+    numberRootComponentsSchemasLogsQuery: {
+      from: "2026-01-01T00:00:00Z",
+      to: "2026-01-01T01:00:00Z",
+      limit: 50,
+    },
     qualifiedName: "<value>",
   });
   if (res.ok) {
@@ -380,11 +391,11 @@ run();
 
 ### Errors
 
-| Error Type       | Status Code      | Content Type     |
-| ---------------- | ---------------- | ---------------- |
-| errors.ErrorT    | 403, 404         | application/json |
-| errors.ErrorT    | 500              | application/json |
-| errors.APIError  | 4XX, 5XX         | \*/\*            |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.RuntimeLogsError | 403, 404                | application/json        |
+| errors.RuntimeLogsError | 500                     | application/json        |
+| errors.APIError         | 4XX, 5XX                | \*/\*                   |
 
 ## getByQualifiedName
 
@@ -455,10 +466,10 @@ run();
 
 ### Errors
 
-| Error Type       | Status Code      | Content Type     |
-| ---------------- | ---------------- | ---------------- |
-| errors.ErrorT    | 404              | application/json |
-| errors.APIError  | 4XX, 5XX         | \*/\*            |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.RegistryError | 404                  | application/json     |
+| errors.APIError      | 4XX, 5XX             | \*/\*                |
 
 ## list
 
@@ -533,7 +544,7 @@ run();
 
 ### Errors
 
-| Error Type       | Status Code      | Content Type     |
-| ---------------- | ---------------- | ---------------- |
-| errors.ErrorT    | 400, 401, 422    | application/json |
-| errors.APIError  | 4XX, 5XX         | \*/\*            |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.RegistryError | 400, 401, 422        | application/json     |
+| errors.APIError      | 4XX, 5XX             | \*/\*                |

@@ -39,7 +39,7 @@ export function serversGetByQualifiedName(
 ): APIPromise<
   Result<
     components.Server,
-    | errors.ErrorT
+    | errors.RegistryError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -65,7 +65,7 @@ async function $do(
   [
     Result<
       components.Server,
-      | errors.ErrorT
+      | errors.RegistryError
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -164,7 +164,7 @@ async function $do(
 
   const [result] = await M.match<
     components.Server,
-    | errors.ErrorT
+    | errors.RegistryError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -175,7 +175,7 @@ async function $do(
     | SDKValidationError
   >(
     M.json(200, components.Server$inboundSchema),
-    M.jsonErr(404, errors.ErrorT$inboundSchema),
+    M.jsonErr(404, errors.RegistryError$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

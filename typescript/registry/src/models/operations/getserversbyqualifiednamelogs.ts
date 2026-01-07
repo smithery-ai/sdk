@@ -3,13 +3,17 @@
  */
 
 import * as z from "zod/v3";
+import { remap as remap$ } from "../../lib/primitives.js";
+import * as components from "../components/index.js";
 
 export type GetServersByQualifiedNameLogsRequest = {
+  numberRootComponentsSchemasLogsQuery?: components.LogsQuery | undefined;
   qualifiedName: string;
 };
 
 /** @internal */
 export type GetServersByQualifiedNameLogsRequest$Outbound = {
+  "#/components/schemas/LogsQuery"?: components.LogsQuery$Outbound | undefined;
   qualifiedName: string;
 };
 
@@ -19,7 +23,13 @@ export const GetServersByQualifiedNameLogsRequest$outboundSchema: z.ZodType<
   z.ZodTypeDef,
   GetServersByQualifiedNameLogsRequest
 > = z.object({
+  numberRootComponentsSchemasLogsQuery: components.LogsQuery$outboundSchema
+    .optional(),
   qualifiedName: z.string(),
+}).transform((v) => {
+  return remap$(v, {
+    numberRootComponentsSchemasLogsQuery: "#/components/schemas/LogsQuery",
+  });
 });
 
 export function getServersByQualifiedNameLogsRequestToJSON(

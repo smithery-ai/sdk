@@ -10,6 +10,9 @@ import * as components from "../components/index.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
 
 export type GetServersRequest = {
+  numberRootComponentsSchemasServersListQuery?:
+    | components.ServersListQuery
+    | undefined;
   /**
    * Page number
    */
@@ -30,6 +33,9 @@ export type GetServersResponse = {
 
 /** @internal */
 export type GetServersRequest$Outbound = {
+  "#/components/schemas/ServersListQuery"?:
+    | components.ServersListQuery$Outbound
+    | undefined;
   page: number;
   pageSize: number;
   q?: string | undefined;
@@ -41,9 +47,16 @@ export const GetServersRequest$outboundSchema: z.ZodType<
   z.ZodTypeDef,
   GetServersRequest
 > = z.object({
+  numberRootComponentsSchemasServersListQuery: components
+    .ServersListQuery$outboundSchema.optional(),
   page: z.number().int().default(1),
   pageSize: z.number().int().default(10),
   q: z.string().optional(),
+}).transform((v) => {
+  return remap$(v, {
+    numberRootComponentsSchemasServersListQuery:
+      "#/components/schemas/ServersListQuery",
+  });
 });
 
 export function getServersRequestToJSON(

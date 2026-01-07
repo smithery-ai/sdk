@@ -3,7 +3,7 @@
  */
 
 import { SmitheryRegistryCore } from "../core.js";
-import { encodeSimple } from "../lib/encodings.js";
+import { encodeFormQuery, encodeSimple } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
@@ -39,7 +39,7 @@ export function serversGetLogs(
 ): APIPromise<
   Result<
     components.RuntimeLogsResponse,
-    | errors.ErrorT
+    | errors.RuntimeLogsError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -65,7 +65,7 @@ async function $do(
   [
     Result<
       components.RuntimeLogsResponse,
-      | errors.ErrorT
+      | errors.RuntimeLogsError
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -100,6 +100,10 @@ async function $do(
   };
 
   const path = pathToFunc("/servers/{qualifiedName}/logs")(pathParams);
+
+  const query = encodeFormQuery({
+    "#/components/schemas/LogsQuery": payload["#/components/schemas/LogsQuery"],
+  });
 
   const headers = new Headers(compactMap({
     Accept: "application/json",
@@ -140,6 +144,7 @@ async function $do(
     baseURL: options?.serverURL,
     path: path,
     headers: headers,
+    query: query,
     body: body,
     userAgent: client._options.userAgent,
     timeoutMs: options?.timeoutMs || client._options.timeoutMs || -1,
@@ -166,7 +171,7 @@ async function $do(
 
   const [result] = await M.match<
     components.RuntimeLogsResponse,
-    | errors.ErrorT
+    | errors.RuntimeLogsError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -177,8 +182,8 @@ async function $do(
     | SDKValidationError
   >(
     M.json(200, components.RuntimeLogsResponse$inboundSchema),
-    M.jsonErr([403, 404], errors.ErrorT$inboundSchema),
-    M.jsonErr(500, errors.ErrorT$inboundSchema),
+    M.jsonErr([403, 404], errors.RuntimeLogsError$inboundSchema),
+    M.jsonErr(500, errors.RuntimeLogsError$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

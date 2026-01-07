@@ -39,7 +39,7 @@ export class Servers extends ClientSDK {
   async listDeployments(
     request: operations.GetServersByQualifiedNameDeploymentsRequest,
     options?: RequestOptions,
-  ): Promise<Array<any>> {
+  ): Promise<Array<components.DeploymentList>> {
     return unwrapAsync(serversListDeployments(
       this,
       request,

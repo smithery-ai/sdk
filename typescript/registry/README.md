@@ -309,9 +309,7 @@ const smitheryRegistry = new SmitheryRegistry({
 
 async function run() {
   try {
-    const result = await smitheryRegistry.servers.deploy({
-      qualifiedName: "<value>",
-    });
+    const result = await smitheryRegistry.service.healthCheck();
 
     console.log(result);
   } catch (error) {
@@ -323,7 +321,8 @@ async function run() {
       console.log(error.headers);
 
       // Depending on the method different errors may be thrown
-      if (error instanceof errors.ErrorT) {
+      if (error instanceof errors.HealthError) {
+        console.log(error.data$.error); // string
       }
     }
   }
@@ -337,7 +336,7 @@ run();
 **Primary error:**
 * [`SmitheryRegistryError`](./src/models/errors/smitheryregistryerror.ts): The base class for HTTP error responses.
 
-<details><summary>Less common errors (8)</summary>
+<details><summary>Less common errors (11)</summary>
 
 <br />
 
@@ -350,8 +349,11 @@ run();
 
 
 **Inherit from [`SmitheryRegistryError`](./src/models/errors/smitheryregistryerror.ts)**:
-* [`ErrorT`](./src/models/errors/errort.ts): Applicable to 4 of 9 methods.*
+* [`RegistryError`](./src/models/errors/registryerror.ts): Applicable to 2 of 9 methods.*
+* [`DeploymentError`](./src/models/errors/deploymenterror.ts): Applicable to 2 of 9 methods.*
 * [`UplinkError`](./src/models/errors/uplinkerror.ts): Unauthorized - Missing API key. Applicable to 1 of 9 methods.*
+* [`RuntimeLogsError`](./src/models/errors/runtimelogserror.ts): Forbidden. Applicable to 1 of 9 methods.*
+* [`HealthError`](./src/models/errors/healtherror.ts): Service unhealthy. Status code `500`. Applicable to 1 of 9 methods.*
 * [`ResponseValidationError`](./src/models/errors/responsevalidationerror.ts): Type mismatch between the data returned from the server and the structure expected by the SDK. See `error.rawValue` for the raw value and `error.pretty()` for a nicely formatted multi-line string.
 
 </details>

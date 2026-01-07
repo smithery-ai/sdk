@@ -7,14 +7,20 @@ import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
 
-export type UplinkTokenResponse = {};
+export type UplinkTokenResponse = {
+  authtoken: string;
+  domain: string;
+};
 
 /** @internal */
 export const UplinkTokenResponse$inboundSchema: z.ZodType<
   UplinkTokenResponse,
   z.ZodTypeDef,
   unknown
-> = z.object({});
+> = z.object({
+  authtoken: z.string(),
+  domain: z.string(),
+});
 
 export function uplinkTokenResponseFromJSON(
   jsonString: string,

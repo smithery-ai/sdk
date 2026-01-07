@@ -5,9 +5,13 @@
 import * as z from "zod/v3";
 import { SmitheryRegistryError } from "./smitheryregistryerror.js";
 
-export type UplinkErrorData = {};
+export type UplinkErrorData = {
+  error: string;
+};
 
 export class UplinkError extends SmitheryRegistryError {
+  error: string;
+
   /** The original data that was passed to this error instance. */
   data$: UplinkErrorData;
 
@@ -20,6 +24,7 @@ export class UplinkError extends SmitheryRegistryError {
       : `API error occurred: ${JSON.stringify(err)}`;
     super(message, httpMeta);
     this.data$ = err;
+    this.error = err.error;
 
     this.name = "UplinkError";
   }
@@ -31,12 +36,13 @@ export const UplinkError$inboundSchema: z.ZodType<
   z.ZodTypeDef,
   unknown
 > = z.object({
+  error: z.string(),
   request$: z.instanceof(Request),
   response$: z.instanceof(Response),
   body$: z.string(),
 })
   .transform((v) => {
-    return new UplinkError({}, {
+    return new UplinkError(v, {
       request: v.request$,
       response: v.response$,
       body: v.body$,

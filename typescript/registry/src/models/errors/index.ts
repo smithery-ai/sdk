@@ -3,9 +3,12 @@
  */
 
 export * from "./apierror.js";
-export * from "./error.js";
+export * from "./deploymenterror.js";
+export * from "./healtherror.js";
 export * from "./httpclienterrors.js";
+export * from "./registryerror.js";
 export * from "./responsevalidationerror.js";
+export * from "./runtimelogserror.js";
 export * from "./sdkvalidationerror.js";
 export * from "./smitheryregistryerror.js";
 export * from "./uplinkerror.js";

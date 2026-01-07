@@ -5,14 +5,18 @@
 import * as z from "zod/v3";
 import { SmitheryRegistryError } from "./smitheryregistryerror.js";
 
-export type ErrorTData = {};
+export type DeploymentErrorData = {
+  error: string;
+};
 
-export class ErrorT extends SmitheryRegistryError {
+export class DeploymentError extends SmitheryRegistryError {
+  error: string;
+
   /** The original data that was passed to this error instance. */
-  data$: ErrorTData;
+  data$: DeploymentErrorData;
 
   constructor(
-    err: ErrorTData,
+    err: DeploymentErrorData,
     httpMeta: { response: Response; request: Request; body: string },
   ) {
     const message = "message" in err && typeof err.message === "string"
@@ -20,20 +24,25 @@ export class ErrorT extends SmitheryRegistryError {
       : `API error occurred: ${JSON.stringify(err)}`;
     super(message, httpMeta);
     this.data$ = err;
+    this.error = err.error;
 
-    this.name = "ErrorT";
+    this.name = "DeploymentError";
   }
 }
 
 /** @internal */
-export const ErrorT$inboundSchema: z.ZodType<ErrorT, z.ZodTypeDef, unknown> = z
-  .object({
-    request$: z.instanceof(Request),
-    response$: z.instanceof(Response),
-    body$: z.string(),
-  })
+export const DeploymentError$inboundSchema: z.ZodType<
+  DeploymentError,
+  z.ZodTypeDef,
+  unknown
+> = z.object({
+  error: z.string(),
+  request$: z.instanceof(Request),
+  response$: z.instanceof(Response),
+  body$: z.string(),
+})
   .transform((v) => {
-    return new ErrorT({}, {
+    return new DeploymentError(v, {
       request: v.request$,
       response: v.response$,
       body: v.body$,

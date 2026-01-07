@@ -6,15 +6,33 @@ import * as z from "zod/v3";
 import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
+import {
+  DeploymentLogEntry,
+  DeploymentLogEntry$inboundSchema,
+} from "./deploymentlogentry.js";
 
-export type DeploymentInfo = {};
+export type DeploymentInfo = {
+  id: string;
+  status: string;
+  logs?: Array<DeploymentLogEntry> | undefined;
+  mcpUrl?: string | undefined;
+  createdAt: string;
+  updatedAt: string;
+};
 
 /** @internal */
 export const DeploymentInfo$inboundSchema: z.ZodType<
   DeploymentInfo,
   z.ZodTypeDef,
   unknown
-> = z.object({});
+> = z.object({
+  id: z.string(),
+  status: z.string(),
+  logs: z.array(DeploymentLogEntry$inboundSchema).optional(),
+  mcpUrl: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
 
 export function deploymentInfoFromJSON(
   jsonString: string,

@@ -46,7 +46,7 @@ export function serversList(
   PageIterator<
     Result<
       operations.GetServersResponse,
-      | errors.ErrorT
+      | errors.RegistryError
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -75,7 +75,7 @@ async function $do(
     PageIterator<
       Result<
         operations.GetServersResponse,
-        | errors.ErrorT
+        | errors.RegistryError
         | SmitheryRegistryError
         | ResponseValidationError
         | ConnectionError
@@ -104,6 +104,8 @@ async function $do(
   const path = pathToFunc("/servers")();
 
   const query = encodeFormQuery({
+    "#/components/schemas/ServersListQuery":
+      payload["#/components/schemas/ServersListQuery"],
     "page": payload.page,
     "pageSize": payload.pageSize,
     "q": payload.q,
@@ -175,7 +177,7 @@ async function $do(
 
   const [result, raw] = await M.match<
     operations.GetServersResponse,
-    | errors.ErrorT
+    | errors.RegistryError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -186,7 +188,7 @@ async function $do(
     | SDKValidationError
   >(
     M.json(200, operations.GetServersResponse$inboundSchema, { key: "Result" }),
-    M.jsonErr([400, 401, 422], errors.ErrorT$inboundSchema),
+    M.jsonErr([400, 401, 422], errors.RegistryError$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });
@@ -204,7 +206,7 @@ async function $do(
     next: Paginator<
       Result<
         operations.GetServersResponse,
-        | errors.ErrorT
+        | errors.RegistryError
         | SmitheryRegistryError
         | ResponseValidationError
         | ConnectionError

@@ -6,15 +6,23 @@ import * as z from "zod/v3";
 import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
+import { Pagination, Pagination$inboundSchema } from "./pagination.js";
+import { ServerSummary, ServerSummary$inboundSchema } from "./serversummary.js";
 
-export type ServersListResponse = {};
+export type ServersListResponse = {
+  servers: Array<ServerSummary>;
+  pagination: Pagination;
+};
 
 /** @internal */
 export const ServersListResponse$inboundSchema: z.ZodType<
   ServersListResponse,
   z.ZodTypeDef,
   unknown
-> = z.object({});
+> = z.object({
+  servers: z.array(ServerSummary$inboundSchema),
+  pagination: Pagination$inboundSchema,
+});
 
 export function serversListResponseFromJSON(
   jsonString: string,

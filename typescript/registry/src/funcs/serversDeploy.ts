@@ -39,7 +39,7 @@ export function serversDeploy(
 ): APIPromise<
   Result<
     components.DeployResponse,
-    | errors.ErrorT
+    | errors.DeploymentError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -65,7 +65,7 @@ async function $do(
   [
     Result<
       components.DeployResponse,
-      | errors.ErrorT
+      | errors.DeploymentError
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -165,7 +165,7 @@ async function $do(
 
   const [result] = await M.match<
     components.DeployResponse,
-    | errors.ErrorT
+    | errors.DeploymentError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -176,7 +176,7 @@ async function $do(
     | SDKValidationError
   >(
     M.json(202, components.DeployResponse$inboundSchema),
-    M.jsonErr(400, errors.ErrorT$inboundSchema),
+    M.jsonErr(400, errors.DeploymentError$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

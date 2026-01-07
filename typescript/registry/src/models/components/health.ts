@@ -7,11 +7,17 @@ import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
 
-export type Health = {};
+export type Health = {
+  status: string;
+  timestamp: string;
+};
 
 /** @internal */
 export const Health$inboundSchema: z.ZodType<Health, z.ZodTypeDef, unknown> = z
-  .object({});
+  .object({
+    status: z.string(),
+    timestamp: z.string(),
+  });
 
 export function healthFromJSON(
   jsonString: string,

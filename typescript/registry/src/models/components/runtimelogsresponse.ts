@@ -6,15 +6,25 @@ import * as z from "zod/v3";
 import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
+import { Invocation, Invocation$inboundSchema } from "./invocation.js";
 
-export type RuntimeLogsResponse = {};
+export type RuntimeLogsResponse = {
+  invocations: Array<Invocation>;
+  /**
+   * Total invocations matching query
+   */
+  total: number;
+};
 
 /** @internal */
 export const RuntimeLogsResponse$inboundSchema: z.ZodType<
   RuntimeLogsResponse,
   z.ZodTypeDef,
   unknown
-> = z.object({});
+> = z.object({
+  invocations: z.array(Invocation$inboundSchema),
+  total: z.number(),
+});
 
 export function runtimeLogsResponseFromJSON(
   jsonString: string,

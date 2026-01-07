@@ -7,14 +7,24 @@ import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
 
-export type DeployResponse = {};
+export type DeployResponse = {
+  deploymentId: string;
+  status: string;
+  mcpUrl: string;
+  warnings?: Array<string> | undefined;
+};
 
 /** @internal */
 export const DeployResponse$inboundSchema: z.ZodType<
   DeployResponse,
   z.ZodTypeDef,
   unknown
-> = z.object({});
+> = z.object({
+  deploymentId: z.string(),
+  status: z.string(),
+  mcpUrl: z.string(),
+  warnings: z.array(z.string()).optional(),
+});
 
 export function deployResponseFromJSON(
   jsonString: string,

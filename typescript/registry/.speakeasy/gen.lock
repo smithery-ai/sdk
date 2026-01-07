@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: 000ae5170f9f7b09110b7aa90aa95891
+  docChecksum: 9651a7d4a24b31494695983c1fe58139
   docVersion: 1.0.0
   speakeasyVersion: 1.682.0
   generationVersion: 2.791.1
-  releaseVersion: 0.10.1
-  configChecksum: 2dadd168b94966fe1108fdd016c3e433
+  releaseVersion: 0.7.2
+  configChecksum: 1f73fb7c18a4df41472600972ffa6da0
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -18,6 +18,7 @@ features:
     core: 3.26.17
     defaultEnabledRetries: 0.1.0
     devContainers: 2.90.1
+    enumUnions: 0.1.0
     envVarSecurityUsage: 0.1.2
     globalSecurity: 2.82.14
     globalSecurityCallbacks: 0.1.0
@@ -25,10 +26,12 @@ features:
     globalServerURLs: 2.83.0
     groups: 2.81.3
     nameOverrides: 2.81.2
+    nullables: 0.1.1
     pagination: 2.83.0
     responseFormat: 0.2.3
     retries: 2.83.0
     sdkHooks: 0.4.0
+    unions: 2.86.3
 trackedFiles:
   .devcontainer/README.md:
     last_write_checksum: sha1:28d85b3f3452837c4ad725ad12bd858fd8bf07c0
@@ -48,46 +51,92 @@ trackedFiles:
     last_write_checksum: sha1:b62667b52aaba2b2d266e09d937156c663b561d8
   docs/lib/utils/retryconfig.md:
     last_write_checksum: sha1:bc4454e196fcd219f5a78da690375a884f5ed07b
+  docs/models/components/connection.md:
+    last_write_checksum: sha1:d73fd39ff27143484aa4f4be3e5c674fba3bb679
   docs/models/components/deploymentinfo.md:
-    last_write_checksum: sha1:52e693ebe64b1042e8c926c1d481022126735b67
+    last_write_checksum: sha1:0e53c7d26fce1f218c809946b0eda6c61075a123
+  docs/models/components/deploymentlist.md:
+    last_write_checksum: sha1:8f7633e793b2058ac95865bfde5db28d8be2bae7
+  docs/models/components/deploymentlogentry.md:
+    last_write_checksum: sha1:e4ceccf6b79f07a4e03600a00b7d5b7c07071771
+  docs/models/components/deploymentlogentryerror.md:
+    last_write_checksum: sha1:09eded67fcf9e6eadb923060dc9425cf3f3798c3
   docs/models/components/deployresponse.md:
-    last_write_checksum: sha1:17dd61c4b2a1cc45f692d2cd8b420f09e84b798a
+    last_write_checksum: sha1:d5e48403171b1dcf0a314684f35d9bc9072fb223
+  docs/models/components/exceptionentry.md:
+    last_write_checksum: sha1:900de0a06e5807faaa6fb85d370e7ca210372170
   docs/models/components/health.md:
-    last_write_checksum: sha1:8e13ceeb0c49cd20335c73ef4f21825d80e4d722
+    last_write_checksum: sha1:7b54d28cc2e6e6922ee336965cd3885d9f89e628
+  docs/models/components/httpconnection.md:
+    last_write_checksum: sha1:f2cd0556d24880628d032bbc0e5d92e474fe9144
+  docs/models/components/invocation.md:
+    last_write_checksum: sha1:283068c2d2fbfb275447d3d3077a8e4eac955950
+  docs/models/components/invocationduration.md:
+    last_write_checksum: sha1:071520cde6bd006c205dbeaddf338841418f6a94
+  docs/models/components/invocationrequest.md:
+    last_write_checksum: sha1:2e48541b6b6fee2a55622bfe77d6b310f70b55ad
+  docs/models/components/invocationresponse.md:
+    last_write_checksum: sha1:778a7959d6ba0040764d83e29067c40ae70287f7
+  docs/models/components/logsquery.md:
+    last_write_checksum: sha1:54f42140d11b846e7048325b8cbe0285c8a7a64f
+  docs/models/components/pagination.md:
+    last_write_checksum: sha1:d6409b7498ede367669a21179259262a265ef6ef
+  docs/models/components/runtimelogentry.md:
+    last_write_checksum: sha1:631207730997c3ebdbce9dcab3ca52229ea1dfe4
   docs/models/components/runtimelogsresponse.md:
-    last_write_checksum: sha1:0366fa450d0736f649bf4ef156f60271d234878d
+    last_write_checksum: sha1:7773750816e3ea7656e63726779b7c31d298598d
   docs/models/components/security.md:
     last_write_checksum: sha1:04ebf34e0d7c1daff704eabedc4174fbe6981c0e
   docs/models/components/server.md:
-    last_write_checksum: sha1:9da8e42cd197b4567fc7fa008b0695d1f053095b
+    last_write_checksum: sha1:080bbac7334b4f6c0c90bed54ccedebceae8c902
+  docs/models/components/serversecurity.md:
+    last_write_checksum: sha1:0768fae886cbbfce917c98dd2953604681f0a4f6
+  docs/models/components/serverslistquery.md:
+    last_write_checksum: sha1:8bfdf593e360aa4434e0306553bb435670365fca
   docs/models/components/serverslistresponse.md:
-    last_write_checksum: sha1:b1068b60d8ff48a455dc56d158ee8d77fb114e95
+    last_write_checksum: sha1:1eb050b332ca7aa67605d04022a8cb13d682e452
+  docs/models/components/serversummary.md:
+    last_write_checksum: sha1:3ad64816d7a94d64267d98113951c0077b4521cf
+  docs/models/components/servertool.md:
+    last_write_checksum: sha1:be8a33e63db24cdce2b7a5ec70e108205c0f291e
+  docs/models/components/stage.md:
+    last_write_checksum: sha1:82154f27867f5f72ab1f97927af6ee0c11a7fc2c
+  docs/models/components/stdioconnection.md:
+    last_write_checksum: sha1:280b5814355bf53ab6acb6fa2e693673e0a1af1a
+  docs/models/components/toolinputschema.md:
+    last_write_checksum: sha1:b5dbcaf1930653823d15b28af4aa84f89fee7336
   docs/models/components/uplinktokenresponse.md:
-    last_write_checksum: sha1:d671536606df2eecfcdcec747ea76b3aa6ba101b
-  docs/models/errors/errort.md:
-    last_write_checksum: sha1:22c6d29168d0306d900ac6dca373472f4d6e2d7c
+    last_write_checksum: sha1:843961ad98f444e44f53488d7f93704d2c0de9b0
+  docs/models/errors/deploymenterror.md:
+    last_write_checksum: sha1:9978bb2f0b98da3bf37a4b524c04791141e80869
+  docs/models/errors/healtherror.md:
+    last_write_checksum: sha1:b398b3441703424857612d435301c2c2bc103505
+  docs/models/errors/registryerror.md:
+    last_write_checksum: sha1:908a0b762f9b2611e5e7b521c234afdef90e08f6
+  docs/models/errors/runtimelogserror.md:
+    last_write_checksum: sha1:bf2c6bb9af3e35275280ebde6beaa8103d0e95f9
   docs/models/errors/uplinkerror.md:
-    last_write_checksum: sha1:893cd0380e3d4bbac32d8f6e3968eccc367171bf
+    last_write_checksum: sha1:b643ecb5ed9488a1036b44657882509f747481a7
   docs/models/operations/getserversbyqualifiednamedeploymentsbyidrequest.md:
     last_write_checksum: sha1:7426a868bed32f212a139545c59a612edfbee708
   docs/models/operations/getserversbyqualifiednamedeploymentsrequest.md:
     last_write_checksum: sha1:e8c041563ddec8271bd188628982642be62c10dc
   docs/models/operations/getserversbyqualifiednamelogsrequest.md:
-    last_write_checksum: sha1:6f5cee4cb5374fb2a5802b7b9ac572588b0c4ab8
+    last_write_checksum: sha1:b8336b9701daedfa64b5540bd5109badb5e68216
   docs/models/operations/getserversbyqualifiednamerequest.md:
     last_write_checksum: sha1:fcc8036c3c67b7a4c26015680b2e03150e590e2e
   docs/models/operations/getserversrequest.md:
-    last_write_checksum: sha1:596b0b8e512c35069f230f7789c1c7fa8d6ba0e0
+    last_write_checksum: sha1:ea3b600261edef3f26a0b14024500963624c55ad
   docs/models/operations/getserversresponse.md:
-    last_write_checksum: sha1:65a6cffea2ac7d5f2964bd0f6ff3fdd9a54df40d
+    last_write_checksum: sha1:9db1aafeb6dfda45078c3e72303b13b7b5460433
   docs/models/operations/postserversbyqualifiednamedeploymentsbyidresumerequest.md:
     last_write_checksum: sha1:658df8d425590a3a5f38842ec9efa89404d71fe1
   docs/models/operations/putserversbyqualifiednamedeploymentsrequest.md:
     last_write_checksum: sha1:f56228e8630388ad35d26ee04f8fd3e607eef7a1
   docs/sdks/servers/README.md:
-    last_write_checksum: sha1:33ece85de9d3255eab6c37abb6b7897ac8da5248
+    last_write_checksum: sha1:4255b5e876c2c3aba408ddb8284a27ef3f771381
   docs/sdks/service/README.md:
-    last_write_checksum: sha1:3c5c370387607efdcf65b658cbe9a79cc3ec93e1
+    last_write_checksum: sha1:d7d017f8e44f9e96c4a03f0f06dc0c0ef7cfcdb9
   docs/sdks/uplink/README.md:
     last_write_checksum: sha1:1e22544f9cd041f21444ab538aea1b30523b74ea
   eslint.config.mjs:
@@ -101,27 +150,27 @@ trackedFiles:
   examples/serviceHealthCheck.example.ts:
     last_write_checksum: sha1:b69fc3ef6569046d67e8fd53544e16b15bb45806
   jsr.json:
-    last_write_checksum: sha1:2999ed6d58d9f0b38947cdeddaf1ce1d4d44fdf1
+    last_write_checksum: sha1:4c10c6d7310984b4c546d015dac382b655fc14de
   package.json:
-    last_write_checksum: sha1:d31cacf1e942739f5c207c0ba64efce8ad2fdca1
+    last_write_checksum: sha1:88f492c23d5660fc3e2de281a204ba1f83b7d799
   src/core.ts:
     last_write_checksum: sha1:5e8b3ab1fb1d7c16fee8682d25e9a9be90fceabf
   src/funcs/serversDeploy.ts:
-    last_write_checksum: sha1:177a6a29f3353e21f49c9f8b5cae4b0d71437cf8
+    last_write_checksum: sha1:7b363d6f9e4759449e61648c280356cf96df3ab8
   src/funcs/serversGetByQualifiedName.ts:
-    last_write_checksum: sha1:5432ef1737264d0488a694a1f775ed02fb5dd867
+    last_write_checksum: sha1:44113408aec5171b09cdff80ebfdd81a2e884372
   src/funcs/serversGetDeploymentStatus.ts:
     last_write_checksum: sha1:b63525117f545cdefbae74aa0d1ee4e21607500f
   src/funcs/serversGetLogs.ts:
-    last_write_checksum: sha1:1461a367cabeed924d2d03ba6c6fcefc9bac8d5f
+    last_write_checksum: sha1:cf15894641238f56617cd06554b6c6f226b48425
   src/funcs/serversList.ts:
-    last_write_checksum: sha1:feffdf40d44d50292eba9efe6c9c817db8a98fe8
+    last_write_checksum: sha1:2f530bcf986f503fbae792d33f510f975a44a429
   src/funcs/serversListDeployments.ts:
-    last_write_checksum: sha1:71da256d85040a99620ded79d44016c7ea928634
+    last_write_checksum: sha1:fbda5f42d90e50451f20c0c6e6a564a6f3794d99
   src/funcs/serversResumeDeployment.ts:
     last_write_checksum: sha1:caa00e5d348e07b84298984b77ee7f75c5462d95
   src/funcs/serviceHealthCheck.ts:
-    last_write_checksum: sha1:a2747ccb946433cdb0f7c87567a0e07180973842
+    last_write_checksum: sha1:a08788cedc9136f07adc1ac5897490f9ce86891f
   src/funcs/uplinkCreateToken.ts:
     last_write_checksum: sha1:326c55ee6481b3eea4364a64a3c66c42a5dfe3bf
   src/hooks/hooks.ts:
@@ -135,7 +184,7 @@ trackedFiles:
   src/lib/base64.ts:
     last_write_checksum: sha1:b0b12ddbd8625efb47c0e955a18641aeb10c6532
   src/lib/config.ts:
-    last_write_checksum: sha1:9c7e2a60de1c2a7f6f20d6bb16bae5072f81014f
+    last_write_checksum: sha1:73ee071fe0768a6e3695058d63c40198108b36de
   src/lib/dlv.ts:
     last_write_checksum: sha1:1dd3e3fbb4550c4bf31f5ef997faff355d6f3250
   src/lib/encodings.ts:
@@ -165,41 +214,83 @@ trackedFiles:
   src/lib/url.ts:
     last_write_checksum: sha1:d124050c7e755c0cce233b9e029afb584ff65201
   src/models/components/deploymentinfo.ts:
-    last_write_checksum: sha1:458dfc5c9c7fd5eb7271063b0918325ce5e91d78
+    last_write_checksum: sha1:7803253bc445a1da223bd01b299d12860871c232
+  src/models/components/deploymentlist.ts:
+    last_write_checksum: sha1:cbc7a662d8895081435895ac0525f1b53af60997
+  src/models/components/deploymentlogentry.ts:
+    last_write_checksum: sha1:40a164f1fa9568eb57e34e34f17920cf01ff063a
+  src/models/components/deploymentlogentryerror.ts:
+    last_write_checksum: sha1:dece9028cd7d23417bb724dabc3602696f28091f
   src/models/components/deployresponse.ts:
-    last_write_checksum: sha1:d17420c5d64522bc664bd706ab9681198bc942c6
+    last_write_checksum: sha1:0ae36d9aefe392be68a58f6e6b67f55c50932e3e
+  src/models/components/exceptionentry.ts:
+    last_write_checksum: sha1:fc715db00dfb369ec6c6cc613193ad34576996a8
   src/models/components/health.ts:
-    last_write_checksum: sha1:08504d9b5dc560db1a050da6abad1c01e5608893
+    last_write_checksum: sha1:452f08f55ac42f003c60de7c3b8865df8482c86d
+  src/models/components/httpconnection.ts:
+    last_write_checksum: sha1:d634d164b0e02de8278212b2586835923fd8a28f
   src/models/components/index.ts:
-    last_write_checksum: sha1:ac694cfc55d17bd2cfe6a4b33d3af1929696530f
+    last_write_checksum: sha1:6af2ee7fc9e6687ec24005eb74944892c5579ef8
+  src/models/components/invocation.ts:
+    last_write_checksum: sha1:5c17db0af4e47841dd057ac1e502edeef1db0de7
+  src/models/components/invocationduration.ts:
+    last_write_checksum: sha1:5841fa73d7052b2e4be229c57f9d7e5a5c261faa
+  src/models/components/invocationrequest.ts:
+    last_write_checksum: sha1:527d743a3afd53b8d1f01534baf18d36bf9cccaa
+  src/models/components/invocationresponse.ts:
+    last_write_checksum: sha1:99fe270f0e520f52ae3ccdcd405d263c677e5b4c
+  src/models/components/logsquery.ts:
+    last_write_checksum: sha1:fa0d2eb6c7e157c7e10eabb7a610479fb2f50aeb
+  src/models/components/pagination.ts:
+    last_write_checksum: sha1:5c6fead110700b767a3ec0fe659a9d8543183a0b
+  src/models/components/runtimelogentry.ts:
+    last_write_checksum: sha1:bbb87bfffe65561dd2b2f373d0399d1cd435c20e
   src/models/components/runtimelogsresponse.ts:
-    last_write_checksum: sha1:e94e7122df13b1d18674faf0a6e96531163822cc
+    last_write_checksum: sha1:2f92ecd0dd2efca266cdee4a07cccf75db802cc4
   src/models/components/security.ts:
     last_write_checksum: sha1:14f08712e7ae6c9786e015c415b290acda66bcef
   src/models/components/server.ts:
-    last_write_checksum: sha1:e6e481bbd7437ff9254c93feaa2b316c00ee581c
+    last_write_checksum: sha1:c78f4485a34f351b16ae4a194e085d0f653f01d9
+  src/models/components/serversecurity.ts:
+    last_write_checksum: sha1:ca9e1bd2238ae9a468543dfeb0e78fcc57fe2da0
+  src/models/components/serverslistquery.ts:
+    last_write_checksum: sha1:fd46a5d469f0731cfdb43e53f39ed598a078886c
   src/models/components/serverslistresponse.ts:
-    last_write_checksum: sha1:faccfd876795425226b32ecd36da3fcbac1299ac
+    last_write_checksum: sha1:f0410f8b8487527e1623f149ff6e7488cf9fa1c2
+  src/models/components/serversummary.ts:
+    last_write_checksum: sha1:26c3ace4ed1c642d39b9814cb9ccca0e26c55332
+  src/models/components/servertool.ts:
+    last_write_checksum: sha1:7bd68d86fb013fb43e01e2796ce28df8a90c1e1d
+  src/models/components/stdioconnection.ts:
+    last_write_checksum: sha1:8c6d8823ea639113302684c69e5020d7018b13aa
+  src/models/components/toolinputschema.ts:
+    last_write_checksum: sha1:e12c3117572f135b7ad4c47c5b4b6c8512664ad7
   src/models/components/uplinktokenresponse.ts:
-    last_write_checksum: sha1:2a21d4f1fd16bdbc187b24e8b291726255ccbad1
+    last_write_checksum: sha1:182356a41e893b2b9e3c1e32ab4fb4874cf7f0ec
   src/models/errors/apierror.ts:
     last_write_checksum: sha1:637cd6ef06e5dd36a4500276afeff85dc0db9b03
-  src/models/errors/error.ts:
-    last_write_checksum: sha1:9dd60533636245bde38aa9bcecbed64ba8ba8c94
+  src/models/errors/deploymenterror.ts:
+    last_write_checksum: sha1:0506c0fa373d8f495f5e9769a7c17b48877c4fe2
+  src/models/errors/healtherror.ts:
+    last_write_checksum: sha1:18c512f3336539c8d321ca103afd550067937486
   src/models/errors/httpclienterrors.ts:
     last_write_checksum: sha1:994ced121c54fecd0af038ccfb7855fbfd3868ec
   src/models/errors/index.ts:
-    last_write_checksum: sha1:0f73317e2046c5d4039131d0eb7541bd03fe8acc
+    last_write_checksum: sha1:dc4a6898057cd4019a66490c2326808b22a087bc
+  src/models/errors/registryerror.ts:
+    last_write_checksum: sha1:dcb0f65d076e57a4af9bd40e2891d29f705d9823
   src/models/errors/responsevalidationerror.ts:
     last_write_checksum: sha1:fc5c930be7550ef59e026a0eaddd7586309b49b2
+  src/models/errors/runtimelogserror.ts:
+    last_write_checksum: sha1:deea8df1286f95c2012016ee72d0cd9717e16b75
   src/models/errors/sdkvalidationerror.ts:
     last_write_checksum: sha1:a69da17627bcc32b820544608f3400423ea53f26
   src/models/errors/smitheryregistryerror.ts:
     last_write_checksum: sha1:1dce403e56da3cd2a3b51f3f04c9ce0786de4de8
   src/models/errors/uplinkerror.ts:
-    last_write_checksum: sha1:6daa9231489d17fe5bc863283d6b2bc2b7123811
+    last_write_checksum: sha1:97ded496c73cf7d2ccd02062360ad5b15a4354f9
   src/models/operations/getservers.ts:
-    last_write_checksum: sha1:d6e6d1d6290cd80605b6dc19f72a7f4d6f509a16
+    last_write_checksum: sha1:0bf687829e0df26e6f7ca111bb0d81a65d4b624d
   src/models/operations/getserversbyqualifiedname.ts:
     last_write_checksum: sha1:2931b1c7deb8a0449cb92696fde46e9e99b7c7ee
   src/models/operations/getserversbyqualifiednamedeployments.ts:
@@ -207,7 +298,7 @@ trackedFiles:
   src/models/operations/getserversbyqualifiednamedeploymentsbyid.ts:
     last_write_checksum: sha1:aae4b7cf72a41e96b893ff55996632a98deeded5
   src/models/operations/getserversbyqualifiednamelogs.ts:
-    last_write_checksum: sha1:408013a318cd39a086a1f78cb08e6c3615b86c52
+    last_write_checksum: sha1:66478d13d65f146228eaf825d6f85dc48a5f25ce
   src/models/operations/index.ts:
     last_write_checksum: sha1:a9d0c4960fe6c4b799fc3d27ac247d1212b01131
   src/models/operations/postserversbyqualifiednamedeploymentsbyidresume.ts:
@@ -219,7 +310,7 @@ trackedFiles:
   src/sdk/sdk.ts:
     last_write_checksum: sha1:5915fa6d33898564de27b93cbf50695f58990fad
   src/sdk/servers.ts:
-    last_write_checksum: sha1:610c2cbac945ca6aaebd2ab5b2e3af55bf4ef365
+    last_write_checksum: sha1:852cd50e6c20a2825b5a2a4cc1c11bcccf8757dc
   src/sdk/service.ts:
     last_write_checksum: sha1:dc0b43a975cbe1603ee52ad246e76483b9dd7b82
   src/sdk/uplink.ts:
@@ -279,7 +370,9 @@ examples:
     speakeasy-default-get-health:
       responses:
         "200":
-          application/json: {}
+          application/json: {"status": "<value>", "timestamp": "<value>"}
+        "500":
+          application/json: {"error": "Service unhealthy"}
   getServers:
     speakeasy-default-get-servers:
       parameters:
@@ -290,9 +383,9 @@ examples:
           profile: "my-profile"
       responses:
         "200":
-          application/json: {}
+          application/json: {"servers": [{"qualifiedName": "smithery/hello-world", "displayName": "Hello World", "description": "A simple hello world server", "iconUrl": "https://example.com/icon.png", "verified": true, "useCount": 42, "remote": true, "isDeployed": true, "createdAt": "1709973305456", "homepage": "https://smithery.ai/server/smithery/hello-world"}], "pagination": {"currentPage": 1, "pageSize": 10, "totalPages": 5, "totalCount": 42}}
         "400":
-          application/json: {}
+          application/json: {"error": "Server not found"}
   getServersById:
     speakeasy-default-get-servers-by-id:
       parameters:
@@ -359,11 +452,11 @@ examples:
     speakeasy-default-post-uplink-token:
       responses:
         "200":
-          application/json: {}
+          application/json: {"authtoken": "2abcdefg_1a2b3c4d5e6f7g8h9i0j", "domain": "ngrok.smithery.ai"}
         "401":
-          application/json: {}
+          application/json: {"error": "Failed to create tunnel token"}
         "500":
-          application/json: {}
+          application/json: {"error": "Failed to create tunnel token"}
   getProfiles:
     speakeasy-default-get-profiles:
       parameters:
@@ -414,9 +507,9 @@ examples:
           qualifiedName: "<value>"
       responses:
         "202":
-          application/json: {}
+          application/json: {"deploymentId": "123e4567-e89b-12d3-a456-426614174000", "status": "WORKING", "mcpUrl": "https://server.smithery.ai/@org/name"}
         "400":
-          application/json: {}
+          application/json: {"error": "Server not found"}
   getServersByQualifiedNameDeployments:
     speakeasy-default-get-servers-by-qualified-name-deployments:
       parameters:
@@ -424,7 +517,9 @@ examples:
           qualifiedName: "<value>"
       responses:
         "200":
-          application/json: ["<value 1>"]
+          application/json: [{"id": "12396f27-d19f-4654-a3d9-bb58b34bb1fc", "status": "<value>", "createdAt": "1711102684403", "updatedAt": "1735657031621"}]
+        "403":
+          application/json: {"error": "Server not found"}
   getServersByQualifiedNameDeploymentsById:
     speakeasy-default-get-servers-by-qualified-name-deployments-by-id:
       parameters:
@@ -433,7 +528,7 @@ examples:
           id: "<id>"
       responses:
         "200":
-          application/json: {}
+          application/json: {"id": "f0bafba5-0dc6-4c6d-955d-b83f6db3f09e", "status": "<value>", "createdAt": "1728877704456", "updatedAt": "1735610601727"}
   postServersByQualifiedNameDeploymentsByIdResume:
     speakeasy-default-post-servers-by-qualified-name-deployments-by-id-resume:
       parameters:
@@ -445,13 +540,15 @@ examples:
       parameters:
         path:
           qualifiedName: "<value>"
+        query:
+          '#/components/schemas/LogsQuery': {"from": "2026-01-01T00:00:00Z", "to": "2026-01-01T01:00:00Z", "limit": 50}
       responses:
         "200":
-          application/json: {}
+          application/json: {"invocations": [{"id": "625f9ce6-f179-4f23-b3e3-4de28b52b39d", "timestamp": "2026-01-04 10:53:39", "request": {"method": "POST", "url": "https://gateway.smithery.ai/@smithery/unicorn"}, "response": {"status": 200, "outcome": "ok"}, "duration": {"cpuMs": 5, "wallMs": 743}, "logs": [{"timestamp": "2026-01-04 10:53:39", "level": "info", "message": "Processing request..."}], "exceptions": []}], "total": 2900.11}
         "403":
-          application/json: {}
+          application/json: {"error": "Server not found"}
         "500":
-          application/json: {}
+          application/json: {"error": "Server not found"}
   getServersByQualifiedName:
     speakeasy-default-get-servers-by-qualified-name:
       parameters:
@@ -459,9 +556,9 @@ examples:
           qualifiedName: "<value>"
       responses:
         "200":
-          application/json: {}
+          application/json: {"qualifiedName": "smithery/hello-world", "displayName": "Hello World", "description": "A simple hello world server", "iconUrl": "https://example.com/icon.png", "remote": true, "deploymentUrl": "https://api.example.com", "connections": [], "security": null, "tools": [{"name": "get_weather", "description": "Get current weather", "inputSchema": {"type": "object"}}]}
         "404":
-          application/json: {}
+          application/json: {"error": "Server not found"}
 examplesVersion: 1.0.2
 generatedTests: {}
 generatedFiles:
