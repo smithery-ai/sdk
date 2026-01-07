@@ -2,14 +2,41 @@ overlay: 1.0.0
 x-speakeasy-jsonpath: rfc9535
 info:
   title: Speakeasy Modifications
-  version: 0.0.9
+  version: 0.0.12
   x-speakeasy-metadata:
     after: ""
     before: ""
     type: speakeasy-modifications
 actions:
+  # Global retry configuration
+  - target: $
+    update:
+      x-speakeasy-retries:
+        strategy: backoff
+        backoff:
+          initialInterval: 500
+          maxInterval: 60000
+          maxElapsedTime: 3600000
+          exponent: 1.5
+        statusCodes:
+          - 5XX
+        retryConnectionErrors: true
+
+  # Service endpoints
+  - target: $["paths"]["/health"]["get"]
+    update:
+      x-speakeasy-group: service
+      x-speakeasy-name-override: healthCheck
+
+  # Uplink endpoints
+  - target: $["paths"]["/uplink/token"]["post"]
+    update:
+      x-speakeasy-name-override: createToken
+
+  # Servers list endpoint with pagination
   - target: $["paths"]["/servers"]["get"]
     update:
+      x-speakeasy-name-override: list
       parameters:
         - name: page
           in: query
@@ -46,103 +73,102 @@ actions:
         outputs:
           results: $.servers
           numPages: $.pagination.totalPages
-    x-speakeasy-metadata:
-      created_at: 1746911395462
-      type: user-edit
-  - target: $
+
+  # ============================================
+  # HIDE single-segment /{name} routes from SDK
+  # These are kept in API for backward compatibility
+  # but SDK users should use /{namespace}/{name}
+  # ============================================
+  - target: $["paths"]["/servers/{name}"]
     update:
-      x-speakeasy-retries:
-        strategy: backoff
-        backoff:
-          initialInterval: 500
-          maxInterval: 60000
-          maxElapsedTime: 3600000
-          exponent: 1.5
-        statusCodes:
-          - 5XX
-        retryConnectionErrors: true
-    x-speakeasy-metadata:
-      created_at: 1746911858635
-      type: user-edit
-  - target: $["paths"]["/servers/{qualifiedName}/deployments/{id}"]["get"]
+      x-speakeasy-ignore: true
+
+  - target: $["paths"]["/servers/{name}/deployments"]
     update:
-      x-speakeasy-name-override: getDeploymentStatus
-    x-speakeasy-metadata:
-      after: sdk.servers.getDeploymentStatus()
-      before: sdk.servers.getServersByQualifiedNameDeploymentsById()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
-  - target: $["paths"]["/servers/{qualifiedName}/deployments"]["put"]
+      x-speakeasy-ignore: true
+
+  - target: $["paths"]["/servers/{name}/deployments/{id}"]
+    update:
+      x-speakeasy-ignore: true
+
+  - target: $["paths"]["/servers/{name}/deployments/{id}/resume"]
+    update:
+      x-speakeasy-ignore: true
+
+  - target: $["paths"]["/servers/{name}/logs"]
+    update:
+      x-speakeasy-ignore: true
+
+  # ============================================
+  # Rename /{namespace}/{name} routes to clean names
+  # These are the only routes exposed in the SDK
+  # ============================================
+  - target: $["paths"]["/servers/{namespace}/{name}"]["get"]
+    update:
+      x-speakeasy-name-override: get
+
+  - target: $["paths"]["/servers/{namespace}/{name}/deployments"]["put"]
     update:
       x-speakeasy-name-override: deploy
-    x-speakeasy-metadata:
-      after: sdk.servers.deploy()
-      before: sdk.servers.putServersByQualifiedNameDeployments()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
-  - target: $["paths"]["/uplink/token"]["post"]
-    update:
-      x-speakeasy-name-override: createToken
-    x-speakeasy-metadata:
-      after: sdk.uplink.createToken()
-      before: sdk.uplink.postUplinkToken()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
-  - target: $["paths"]["/servers/{qualifiedName}"]["get"]
-    update:
-      x-speakeasy-name-override: getByQualifiedName
-    x-speakeasy-metadata:
-      after: sdk.servers.getByQualifiedName()
-      before: sdk.servers.getServersByQualifiedName()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
-  - target: $["paths"]["/servers/{qualifiedName}/deployments"]["get"]
+
+  - target: $["paths"]["/servers/{namespace}/{name}/deployments"]["get"]
     update:
       x-speakeasy-name-override: listDeployments
-    x-speakeasy-metadata:
-      after: sdk.servers.listDeployments()
-      before: sdk.servers.getServersByQualifiedNameDeployments()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
-  - target: $["paths"]["/servers/{qualifiedName}/logs"]["get"]
+
+  - target: $["paths"]["/servers/{namespace}/{name}/deployments/{id}"]["get"]
     update:
-      x-speakeasy-name-override: getLogs
-    x-speakeasy-metadata:
-      after: sdk.servers.getLogs()
-      before: sdk.servers.getServersByQualifiedNameLogs()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
-  - target: $["paths"]["/health"]["get"]
-    update:
-      x-speakeasy-group: service
-      x-speakeasy-name-override: healthCheck
-    x-speakeasy-metadata:
-      after: sdk.service.healthCheck()
-      before: sdk.<no_group>.getHealth()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
-  - target: $["paths"]["/servers/{qualifiedName}/deployments/{id}/resume"]["post"]
+      x-speakeasy-name-override: getDeploymentStatus
+
+  - target: $["paths"]["/servers/{namespace}/{name}/deployments/{id}/resume"]["post"]
     update:
       x-speakeasy-name-override: resumeDeployment
-    x-speakeasy-metadata:
-      after: sdk.servers.resumeDeployment()
-      before: sdk.servers.postServersByQualifiedNameDeploymentsByIdResume()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
-  - target: $["paths"]["/servers"]["get"]
+
+  - target: $["paths"]["/servers/{namespace}/{name}/logs"]["get"]
     update:
-      x-speakeasy-name-override: list
-    x-speakeasy-metadata:
-      after: sdk.servers.list()
-      before: sdk.servers.getServers()
-      created_at: 1767778763418
-      reviewed_at: 1767778793520
-      type: method-name
+      x-speakeasy-name-override: getLogs
+
+  # ============================================
+  # Make namespace parameter optional with empty default
+  # This allows SDK users to omit namespace for single-segment QNs
+  # ============================================
+  - target: $["paths"]["/servers/{namespace}/{name}"]["get"]["parameters"][?(@.name=="namespace")]
+    update:
+      schema:
+        type: string
+        default: ""
+      description: "Server namespace (optional, leave empty for unnamespaced servers)"
+
+  - target: $["paths"]["/servers/{namespace}/{name}/deployments"]["put"]["parameters"][?(@.name=="namespace")]
+    update:
+      schema:
+        type: string
+        default: ""
+      description: "Server namespace (optional, leave empty for unnamespaced servers)"
+
+  - target: $["paths"]["/servers/{namespace}/{name}/deployments"]["get"]["parameters"][?(@.name=="namespace")]
+    update:
+      schema:
+        type: string
+        default: ""
+      description: "Server namespace (optional, leave empty for unnamespaced servers)"
+
+  - target: $["paths"]["/servers/{namespace}/{name}/deployments/{id}"]["get"]["parameters"][?(@.name=="namespace")]
+    update:
+      schema:
+        type: string
+        default: ""
+      description: "Server namespace (optional, leave empty for unnamespaced servers)"
+
+  - target: $["paths"]["/servers/{namespace}/{name}/deployments/{id}/resume"]["post"]["parameters"][?(@.name=="namespace")]
+    update:
+      schema:
+        type: string
+        default: ""
+      description: "Server namespace (optional, leave empty for unnamespaced servers)"
+
+  - target: $["paths"]["/servers/{namespace}/{name}/logs"]["get"]["parameters"][?(@.name=="namespace")]
+    update:
+      schema:
+        type: string
+        default: ""
+      description: "Server namespace (optional, leave empty for unnamespaced servers)"

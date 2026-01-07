@@ -3,7 +3,7 @@
  */
 
 import { SmitheryRegistryCore } from "../core.js";
-import { encodeSimple } from "../lib/encodings.js";
+import { appendForm, encodeSimple } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
@@ -34,7 +34,7 @@ import { Result } from "../types/fp.js";
  */
 export function serversDeploy(
   client: SmitheryRegistryCore,
-  request: operations.PutServersByQualifiedNameDeploymentsRequest,
+  request: operations.PutServersByNamespaceByNameDeploymentsRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -59,7 +59,7 @@ export function serversDeploy(
 
 async function $do(
   client: SmitheryRegistryCore,
-  request: operations.PutServersByQualifiedNameDeploymentsRequest,
+  request: operations.PutServersByNamespaceByNameDeploymentsRequest,
   options?: RequestOptions,
 ): Promise<
   [
@@ -81,7 +81,7 @@ async function $do(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.PutServersByQualifiedNameDeploymentsRequest$outboundSchema
+      operations.PutServersByNamespaceByNameDeploymentsRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -89,16 +89,31 @@ async function $do(
     return [parsed, { status: "invalid" }];
   }
   const payload = parsed.value;
-  const body = null;
+  const body = new FormData();
+  if (payload.DeployRequest != null) {
+    appendForm(body, "payload", payload.DeployRequest.payload);
+    if (payload.DeployRequest.module !== undefined) {
+      appendForm(body, "module", payload.DeployRequest.module);
+    }
+    if (payload.DeployRequest.sourcemap !== undefined) {
+      appendForm(body, "sourcemap", payload.DeployRequest.sourcemap);
+    }
+  }
 
   const pathParams = {
-    qualifiedName: encodeSimple("qualifiedName", payload.qualifiedName, {
+    name: encodeSimple("name", payload.name, {
+      explode: false,
+      charEncoding: "percent",
+    }),
+    namespace: encodeSimple("namespace", payload.namespace, {
       explode: false,
       charEncoding: "percent",
     }),
   };
 
-  const path = pathToFunc("/servers/{qualifiedName}/deployments")(pathParams);
+  const path = pathToFunc("/servers/{namespace}/{name}/deployments")(
+    pathParams,
+  );
 
   const headers = new Headers(compactMap({
     Accept: "application/json",
@@ -111,7 +126,7 @@ async function $do(
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "putServersByQualifiedNameDeployments",
+    operationID: "putServersByNamespaceByNameDeployments",
     oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,

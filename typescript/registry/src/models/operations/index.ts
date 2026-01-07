@@ -3,9 +3,9 @@
  */
 
 export * from "./getservers.js";
-export * from "./getserversbyqualifiedname.js";
-export * from "./getserversbyqualifiednamedeployments.js";
-export * from "./getserversbyqualifiednamedeploymentsbyid.js";
-export * from "./getserversbyqualifiednamelogs.js";
-export * from "./postserversbyqualifiednamedeploymentsbyidresume.js";
-export * from "./putserversbyqualifiednamedeployments.js";
+export * from "./getserversbynamespacebyname.js";
+export * from "./getserversbynamespacebynamedeployments.js";
+export * from "./getserversbynamespacebynamedeploymentsbyid.js";
+export * from "./getserversbynamespacebynamelogs.js";
+export * from "./postserversbynamespacebynamedeploymentsbyidresume.js";
+export * from "./putserversbynamespacebynamedeployments.js";

@@ -34,7 +34,7 @@ import { Result } from "../types/fp.js";
  */
 export function serversGetLogs(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByQualifiedNameLogsRequest,
+  request: operations.GetServersByNamespaceByNameLogsRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -59,7 +59,7 @@ export function serversGetLogs(
 
 async function $do(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByQualifiedNameLogsRequest,
+  request: operations.GetServersByNamespaceByNameLogsRequest,
   options?: RequestOptions,
 ): Promise<
   [
@@ -81,7 +81,7 @@ async function $do(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.GetServersByQualifiedNameLogsRequest$outboundSchema.parse(
+      operations.GetServersByNamespaceByNameLogsRequest$outboundSchema.parse(
         value,
       ),
     "Input validation failed",
@@ -93,13 +93,17 @@ async function $do(
   const body = null;
 
   const pathParams = {
-    qualifiedName: encodeSimple("qualifiedName", payload.qualifiedName, {
+    name: encodeSimple("name", payload.name, {
+      explode: false,
+      charEncoding: "percent",
+    }),
+    namespace: encodeSimple("namespace", payload.namespace, {
       explode: false,
       charEncoding: "percent",
     }),
   };
 
-  const path = pathToFunc("/servers/{qualifiedName}/logs")(pathParams);
+  const path = pathToFunc("/servers/{namespace}/{name}/logs")(pathParams);
 
   const query = encodeFormQuery({
     "#/components/schemas/LogsQuery": payload["#/components/schemas/LogsQuery"],
@@ -116,7 +120,7 @@ async function $do(
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "getServersByQualifiedNameLogs",
+    operationID: "getServersByNamespaceByNameLogs",
     oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,

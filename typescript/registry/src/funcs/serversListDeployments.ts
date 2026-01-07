@@ -32,7 +32,7 @@ import { Result } from "../types/fp.js";
  */
 export function serversListDeployments(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByQualifiedNameDeploymentsRequest,
+  request: operations.GetServersByNamespaceByNameDeploymentsRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -57,7 +57,7 @@ export function serversListDeployments(
 
 async function $do(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByQualifiedNameDeploymentsRequest,
+  request: operations.GetServersByNamespaceByNameDeploymentsRequest,
   options?: RequestOptions,
 ): Promise<
   [
@@ -79,7 +79,7 @@ async function $do(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.GetServersByQualifiedNameDeploymentsRequest$outboundSchema
+      operations.GetServersByNamespaceByNameDeploymentsRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -90,13 +90,19 @@ async function $do(
   const body = null;
 
   const pathParams = {
-    qualifiedName: encodeSimple("qualifiedName", payload.qualifiedName, {
+    name: encodeSimple("name", payload.name, {
+      explode: false,
+      charEncoding: "percent",
+    }),
+    namespace: encodeSimple("namespace", payload.namespace, {
       explode: false,
       charEncoding: "percent",
     }),
   };
 
-  const path = pathToFunc("/servers/{qualifiedName}/deployments")(pathParams);
+  const path = pathToFunc("/servers/{namespace}/{name}/deployments")(
+    pathParams,
+  );
 
   const headers = new Headers(compactMap({
     Accept: "application/json",
@@ -109,7 +115,7 @@ async function $do(
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "getServersByQualifiedNameDeployments",
+    operationID: "getServersByNamespaceByNameDeployments",
     oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,

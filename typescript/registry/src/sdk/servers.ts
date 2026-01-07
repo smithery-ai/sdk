@@ -3,7 +3,7 @@
  */
 
 import { serversDeploy } from "../funcs/serversDeploy.js";
-import { serversGetByQualifiedName } from "../funcs/serversGetByQualifiedName.js";
+import { serversGet } from "../funcs/serversGet.js";
 import { serversGetDeploymentStatus } from "../funcs/serversGetDeploymentStatus.js";
 import { serversGetLogs } from "../funcs/serversGetLogs.js";
 import { serversList } from "../funcs/serversList.js";
@@ -23,7 +23,7 @@ export class Servers extends ClientSDK {
    * Upload and deploy an MCP server (hosted or external)
    */
   async deploy(
-    request: operations.PutServersByQualifiedNameDeploymentsRequest,
+    request: operations.PutServersByNamespaceByNameDeploymentsRequest,
     options?: RequestOptions,
   ): Promise<components.DeployResponse> {
     return unwrapAsync(serversDeploy(
@@ -37,7 +37,7 @@ export class Servers extends ClientSDK {
    * List deployments for a server
    */
   async listDeployments(
-    request: operations.GetServersByQualifiedNameDeploymentsRequest,
+    request: operations.GetServersByNamespaceByNameDeploymentsRequest,
     options?: RequestOptions,
   ): Promise<Array<components.DeploymentList>> {
     return unwrapAsync(serversListDeployments(
@@ -51,7 +51,7 @@ export class Servers extends ClientSDK {
    * Get deployment status
    */
   async getDeploymentStatus(
-    request: operations.GetServersByQualifiedNameDeploymentsByIdRequest,
+    request: operations.GetServersByNamespaceByNameDeploymentsByIdRequest,
     options?: RequestOptions,
   ): Promise<components.DeploymentInfo> {
     return unwrapAsync(serversGetDeploymentStatus(
@@ -68,9 +68,10 @@ export class Servers extends ClientSDK {
    * Use id='latest' to resume the most recent deployment
    */
   async resumeDeployment(
-    request: operations.PostServersByQualifiedNameDeploymentsByIdResumeRequest,
+    request:
+      operations.PostServersByNamespaceByNameDeploymentsByIdResumeRequest,
     options?: RequestOptions,
-  ): Promise<void> {
+  ): Promise<components.ResumeResponse> {
     return unwrapAsync(serversResumeDeployment(
       this,
       request,
@@ -85,7 +86,7 @@ export class Servers extends ClientSDK {
    * Fetch recent runtime logs for the server's deployed Worker, grouped by invocation (requires ownership).
    */
   async getLogs(
-    request: operations.GetServersByQualifiedNameLogsRequest,
+    request: operations.GetServersByNamespaceByNameLogsRequest,
     options?: RequestOptions,
   ): Promise<components.RuntimeLogsResponse> {
     return unwrapAsync(serversGetLogs(
@@ -101,11 +102,11 @@ export class Servers extends ClientSDK {
    * @remarks
    * Get a single server by its qualified name. The qualified name can be either 'name' (unnamespaced) or 'namespace/name' (namespaced).
    */
-  async getByQualifiedName(
-    request: operations.GetServersByQualifiedNameRequest,
+  async get(
+    request: operations.GetServersByNamespaceByNameRequest,
     options?: RequestOptions,
   ): Promise<components.Server> {
-    return unwrapAsync(serversGetByQualifiedName(
+    return unwrapAsync(serversGet(
       this,
       request,
       options,

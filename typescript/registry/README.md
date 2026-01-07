@@ -145,7 +145,7 @@ run();
 * [getDeploymentStatus](docs/sdks/servers/README.md#getdeploymentstatus) - Get deployment status
 * [resumeDeployment](docs/sdks/servers/README.md#resumedeployment) - Resume a paused deployment workflow (e.g., after OAuth authorization)
 * [getLogs](docs/sdks/servers/README.md#getlogs) - Get runtime logs for a server
-* [getByQualifiedName](docs/sdks/servers/README.md#getbyqualifiedname) - Get a server by qualified name
+* [get](docs/sdks/servers/README.md#get) - Get a server by qualified name
 * [list](docs/sdks/servers/README.md#list) - List all servers
 
 ### [Service](docs/sdks/service/README.md)
@@ -175,7 +175,7 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 <summary>Available standalone functions</summary>
 
 - [`serversDeploy`](docs/sdks/servers/README.md#deploy) - Deploy an MCP server
-- [`serversGetByQualifiedName`](docs/sdks/servers/README.md#getbyqualifiedname) - Get a server by qualified name
+- [`serversGet`](docs/sdks/servers/README.md#get) - Get a server by qualified name
 - [`serversGetDeploymentStatus`](docs/sdks/servers/README.md#getdeploymentstatus) - Get deployment status
 - [`serversGetLogs`](docs/sdks/servers/README.md#getlogs) - Get runtime logs for a server
 - [`serversList`](docs/sdks/servers/README.md#list) - List all servers
@@ -336,7 +336,7 @@ run();
 **Primary error:**
 * [`SmitheryRegistryError`](./src/models/errors/smitheryregistryerror.ts): The base class for HTTP error responses.
 
-<details><summary>Less common errors (11)</summary>
+<details><summary>Less common errors (12)</summary>
 
 <br />
 
@@ -349,10 +349,11 @@ run();
 
 
 **Inherit from [`SmitheryRegistryError`](./src/models/errors/smitheryregistryerror.ts)**:
-* [`RegistryError`](./src/models/errors/registryerror.ts): Applicable to 2 of 9 methods.*
-* [`DeploymentError`](./src/models/errors/deploymenterror.ts): Applicable to 2 of 9 methods.*
+* [`DeploymentError`](./src/models/errors/deploymenterror.ts): Applicable to 4 of 9 methods.*
+* [`ServersListError`](./src/models/errors/serverslisterror.ts): Bad request. Applicable to 1 of 9 methods.*
 * [`UplinkError`](./src/models/errors/uplinkerror.ts): Unauthorized - Missing API key. Applicable to 1 of 9 methods.*
 * [`RuntimeLogsError`](./src/models/errors/runtimelogserror.ts): Forbidden. Applicable to 1 of 9 methods.*
+* [`RegistryError`](./src/models/errors/registryerror.ts): Server not found. Status code `404`. Applicable to 1 of 9 methods.*
 * [`HealthError`](./src/models/errors/healtherror.ts): Service unhealthy. Status code `500`. Applicable to 1 of 9 methods.*
 * [`ResponseValidationError`](./src/models/errors/responsevalidationerror.ts): Type mismatch between the data returned from the server and the structure expected by the SDK. See `error.rawValue` for the raw value and `error.pretty()` for a nicely formatted multi-line string.
 

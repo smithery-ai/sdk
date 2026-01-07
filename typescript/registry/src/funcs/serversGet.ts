@@ -32,9 +32,9 @@ import { Result } from "../types/fp.js";
  * @remarks
  * Get a single server by its qualified name. The qualified name can be either 'name' (unnamespaced) or 'namespace/name' (namespaced).
  */
-export function serversGetByQualifiedName(
+export function serversGet(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByQualifiedNameRequest,
+  request: operations.GetServersByNamespaceByNameRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -59,7 +59,7 @@ export function serversGetByQualifiedName(
 
 async function $do(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByQualifiedNameRequest,
+  request: operations.GetServersByNamespaceByNameRequest,
   options?: RequestOptions,
 ): Promise<
   [
@@ -81,7 +81,7 @@ async function $do(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.GetServersByQualifiedNameRequest$outboundSchema.parse(value),
+      operations.GetServersByNamespaceByNameRequest$outboundSchema.parse(value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -91,13 +91,17 @@ async function $do(
   const body = null;
 
   const pathParams = {
-    qualifiedName: encodeSimple("qualifiedName", payload.qualifiedName, {
+    name: encodeSimple("name", payload.name, {
+      explode: false,
+      charEncoding: "percent",
+    }),
+    namespace: encodeSimple("namespace", payload.namespace, {
       explode: false,
       charEncoding: "percent",
     }),
   };
 
-  const path = pathToFunc("/servers/{qualifiedName}")(pathParams);
+  const path = pathToFunc("/servers/{namespace}/{name}")(pathParams);
 
   const headers = new Headers(compactMap({
     Accept: "application/json",
@@ -110,7 +114,7 @@ async function $do(
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "getServersByQualifiedName",
+    operationID: "getServersByNamespaceByName",
     oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,

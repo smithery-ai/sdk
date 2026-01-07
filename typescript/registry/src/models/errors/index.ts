@@ -10,5 +10,6 @@ export * from "./registryerror.js";
 export * from "./responsevalidationerror.js";
 export * from "./runtimelogserror.js";
 export * from "./sdkvalidationerror.js";
+export * from "./serverslisterror.js";
 export * from "./smitheryregistryerror.js";
 export * from "./uplinkerror.js";

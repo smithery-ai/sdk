@@ -1,7 +1,7 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: 9651a7d4a24b31494695983c1fe58139
+  docChecksum: ba49e114eced6b5086593240f6f52f5f
   docVersion: 1.0.0
   speakeasyVersion: 1.682.0
   generationVersion: 2.791.1
@@ -25,6 +25,7 @@ features:
     globalSecurityFlattening: 0.1.0
     globalServerURLs: 2.83.0
     groups: 2.81.3
+    ignores: 2.81.1
     nameOverrides: 2.81.2
     nullables: 0.1.1
     pagination: 2.83.0
@@ -61,6 +62,8 @@ trackedFiles:
     last_write_checksum: sha1:e4ceccf6b79f07a4e03600a00b7d5b7c07071771
   docs/models/components/deploymentlogentryerror.md:
     last_write_checksum: sha1:09eded67fcf9e6eadb923060dc9425cf3f3798c3
+  docs/models/components/deployrequest.md:
+    last_write_checksum: sha1:2d391e80dd44dfea90f7b8fbdb95dc43dce20124
   docs/models/components/deployresponse.md:
     last_write_checksum: sha1:d5e48403171b1dcf0a314684f35d9bc9072fb223
   docs/models/components/exceptionentry.md:
@@ -81,6 +84,8 @@ trackedFiles:
     last_write_checksum: sha1:54f42140d11b846e7048325b8cbe0285c8a7a64f
   docs/models/components/pagination.md:
     last_write_checksum: sha1:d6409b7498ede367669a21179259262a265ef6ef
+  docs/models/components/resumeresponse.md:
+    last_write_checksum: sha1:e6a671fd16fae2ed618cc1deeae673dafc0fb809
   docs/models/components/runtimelogentry.md:
     last_write_checksum: sha1:631207730997c3ebdbce9dcab3ca52229ea1dfe4
   docs/models/components/runtimelogsresponse.md:
@@ -115,26 +120,28 @@ trackedFiles:
     last_write_checksum: sha1:908a0b762f9b2611e5e7b521c234afdef90e08f6
   docs/models/errors/runtimelogserror.md:
     last_write_checksum: sha1:bf2c6bb9af3e35275280ebde6beaa8103d0e95f9
+  docs/models/errors/serverslisterror.md:
+    last_write_checksum: sha1:0ab3a121cc90acf5b039c5dc49e4f0deabb4d022
   docs/models/errors/uplinkerror.md:
     last_write_checksum: sha1:b643ecb5ed9488a1036b44657882509f747481a7
-  docs/models/operations/getserversbyqualifiednamedeploymentsbyidrequest.md:
-    last_write_checksum: sha1:7426a868bed32f212a139545c59a612edfbee708
-  docs/models/operations/getserversbyqualifiednamedeploymentsrequest.md:
-    last_write_checksum: sha1:e8c041563ddec8271bd188628982642be62c10dc
-  docs/models/operations/getserversbyqualifiednamelogsrequest.md:
-    last_write_checksum: sha1:b8336b9701daedfa64b5540bd5109badb5e68216
-  docs/models/operations/getserversbyqualifiednamerequest.md:
-    last_write_checksum: sha1:fcc8036c3c67b7a4c26015680b2e03150e590e2e
+  docs/models/operations/getserversbynamespacebynamedeploymentsbyidrequest.md:
+    last_write_checksum: sha1:82ac4f90a23658895bf4768d5520526496e23807
+  docs/models/operations/getserversbynamespacebynamedeploymentsrequest.md:
+    last_write_checksum: sha1:417ea30c8f40003901d98d7dd17f594b0cd7839f
+  docs/models/operations/getserversbynamespacebynamelogsrequest.md:
+    last_write_checksum: sha1:e4d03fca9bd0c27d811c6d85a3270aaf87439b4f
+  docs/models/operations/getserversbynamespacebynamerequest.md:
+    last_write_checksum: sha1:781df1ed19942775843a705368152e4995dd7a8c
   docs/models/operations/getserversrequest.md:
     last_write_checksum: sha1:ea3b600261edef3f26a0b14024500963624c55ad
   docs/models/operations/getserversresponse.md:
     last_write_checksum: sha1:9db1aafeb6dfda45078c3e72303b13b7b5460433
-  docs/models/operations/postserversbyqualifiednamedeploymentsbyidresumerequest.md:
-    last_write_checksum: sha1:658df8d425590a3a5f38842ec9efa89404d71fe1
-  docs/models/operations/putserversbyqualifiednamedeploymentsrequest.md:
-    last_write_checksum: sha1:f56228e8630388ad35d26ee04f8fd3e607eef7a1
+  docs/models/operations/postserversbynamespacebynamedeploymentsbyidresumerequest.md:
+    last_write_checksum: sha1:169098c43753fdfe3ad423b38359e28ef9f36013
+  docs/models/operations/putserversbynamespacebynamedeploymentsrequest.md:
+    last_write_checksum: sha1:ee731c6380f06083eb91290269d4773faac25d45
   docs/sdks/servers/README.md:
-    last_write_checksum: sha1:4255b5e876c2c3aba408ddb8284a27ef3f771381
+    last_write_checksum: sha1:f255bcdae43a1cd49b86af894c6af468dbe0127d
   docs/sdks/service/README.md:
     last_write_checksum: sha1:d7d017f8e44f9e96c4a03f0f06dc0c0ef7cfcdb9
   docs/sdks/uplink/README.md:
@@ -156,19 +163,19 @@ trackedFiles:
   src/core.ts:
     last_write_checksum: sha1:5e8b3ab1fb1d7c16fee8682d25e9a9be90fceabf
   src/funcs/serversDeploy.ts:
-    last_write_checksum: sha1:7b363d6f9e4759449e61648c280356cf96df3ab8
-  src/funcs/serversGetByQualifiedName.ts:
-    last_write_checksum: sha1:44113408aec5171b09cdff80ebfdd81a2e884372
+    last_write_checksum: sha1:0ac7a666111f49d7fec3a93a52207c5ade25d52c
+  src/funcs/serversGet.ts:
+    last_write_checksum: sha1:64e323ddbeaf846fd640f5bca38ba07cc189c5a2
   src/funcs/serversGetDeploymentStatus.ts:
-    last_write_checksum: sha1:b63525117f545cdefbae74aa0d1ee4e21607500f
+    last_write_checksum: sha1:6ba9fd7aae6a7ea050436be466d73de3994ecbb1
   src/funcs/serversGetLogs.ts:
-    last_write_checksum: sha1:cf15894641238f56617cd06554b6c6f226b48425
+    last_write_checksum: sha1:7da612662e70220cb895801cd18eb6e355223aa7
   src/funcs/serversList.ts:
-    last_write_checksum: sha1:2f530bcf986f503fbae792d33f510f975a44a429
+    last_write_checksum: sha1:70d5f325dc35f24a8afb6b39b378cdc90b101c5e
   src/funcs/serversListDeployments.ts:
-    last_write_checksum: sha1:fbda5f42d90e50451f20c0c6e6a564a6f3794d99
+    last_write_checksum: sha1:8ba49feb6ba4fc1e9928b889397840a66c17b053
   src/funcs/serversResumeDeployment.ts:
-    last_write_checksum: sha1:caa00e5d348e07b84298984b77ee7f75c5462d95
+    last_write_checksum: sha1:f5c9598ea4b02a510145699b767f4fbb733ec613
   src/funcs/serviceHealthCheck.ts:
     last_write_checksum: sha1:a08788cedc9136f07adc1ac5897490f9ce86891f
   src/funcs/uplinkCreateToken.ts:
@@ -221,6 +228,8 @@ trackedFiles:
     last_write_checksum: sha1:40a164f1fa9568eb57e34e34f17920cf01ff063a
   src/models/components/deploymentlogentryerror.ts:
     last_write_checksum: sha1:dece9028cd7d23417bb724dabc3602696f28091f
+  src/models/components/deployrequest.ts:
+    last_write_checksum: sha1:25a1225079d309ce76aa8e6f224853bd43f03c29
   src/models/components/deployresponse.ts:
     last_write_checksum: sha1:0ae36d9aefe392be68a58f6e6b67f55c50932e3e
   src/models/components/exceptionentry.ts:
@@ -230,7 +239,7 @@ trackedFiles:
   src/models/components/httpconnection.ts:
     last_write_checksum: sha1:d634d164b0e02de8278212b2586835923fd8a28f
   src/models/components/index.ts:
-    last_write_checksum: sha1:6af2ee7fc9e6687ec24005eb74944892c5579ef8
+    last_write_checksum: sha1:0cc17f09fa67250ab9cf193e78dce2a4c377eeab
   src/models/components/invocation.ts:
     last_write_checksum: sha1:5c17db0af4e47841dd057ac1e502edeef1db0de7
   src/models/components/invocationduration.ts:
@@ -243,6 +252,8 @@ trackedFiles:
     last_write_checksum: sha1:fa0d2eb6c7e157c7e10eabb7a610479fb2f50aeb
   src/models/components/pagination.ts:
     last_write_checksum: sha1:5c6fead110700b767a3ec0fe659a9d8543183a0b
+  src/models/components/resumeresponse.ts:
+    last_write_checksum: sha1:6695c22d0582b32b8ca20986c77e203b09d27321
   src/models/components/runtimelogentry.ts:
     last_write_checksum: sha1:bbb87bfffe65561dd2b2f373d0399d1cd435c20e
   src/models/components/runtimelogsresponse.ts:
@@ -276,7 +287,7 @@ trackedFiles:
   src/models/errors/httpclienterrors.ts:
     last_write_checksum: sha1:994ced121c54fecd0af038ccfb7855fbfd3868ec
   src/models/errors/index.ts:
-    last_write_checksum: sha1:dc4a6898057cd4019a66490c2326808b22a087bc
+    last_write_checksum: sha1:2a172ff54492e57161c1fcea0dff782cd325e4e2
   src/models/errors/registryerror.ts:
     last_write_checksum: sha1:dcb0f65d076e57a4af9bd40e2891d29f705d9823
   src/models/errors/responsevalidationerror.ts:
@@ -285,32 +296,34 @@ trackedFiles:
     last_write_checksum: sha1:deea8df1286f95c2012016ee72d0cd9717e16b75
   src/models/errors/sdkvalidationerror.ts:
     last_write_checksum: sha1:a69da17627bcc32b820544608f3400423ea53f26
+  src/models/errors/serverslisterror.ts:
+    last_write_checksum: sha1:489fcb7e471f6f5122e17631240a63632ec90999
   src/models/errors/smitheryregistryerror.ts:
     last_write_checksum: sha1:1dce403e56da3cd2a3b51f3f04c9ce0786de4de8
   src/models/errors/uplinkerror.ts:
     last_write_checksum: sha1:97ded496c73cf7d2ccd02062360ad5b15a4354f9
   src/models/operations/getservers.ts:
     last_write_checksum: sha1:0bf687829e0df26e6f7ca111bb0d81a65d4b624d
-  src/models/operations/getserversbyqualifiedname.ts:
-    last_write_checksum: sha1:2931b1c7deb8a0449cb92696fde46e9e99b7c7ee
-  src/models/operations/getserversbyqualifiednamedeployments.ts:
-    last_write_checksum: sha1:343baaa798a8b167bf31b61bff6856cd750f9253
-  src/models/operations/getserversbyqualifiednamedeploymentsbyid.ts:
-    last_write_checksum: sha1:aae4b7cf72a41e96b893ff55996632a98deeded5
-  src/models/operations/getserversbyqualifiednamelogs.ts:
-    last_write_checksum: sha1:66478d13d65f146228eaf825d6f85dc48a5f25ce
+  src/models/operations/getserversbynamespacebyname.ts:
+    last_write_checksum: sha1:87d4bf6ea1c07157879e09326db9f8f9c2f8b9da
+  src/models/operations/getserversbynamespacebynamedeployments.ts:
+    last_write_checksum: sha1:072c1df22a2edf70c7fb34357c325840f8627aba
+  src/models/operations/getserversbynamespacebynamedeploymentsbyid.ts:
+    last_write_checksum: sha1:1d6ed5e44d50a61b1963e10384344133b2629131
+  src/models/operations/getserversbynamespacebynamelogs.ts:
+    last_write_checksum: sha1:e1841667ba98baf0ffbb72cba7de4572c9c831fa
   src/models/operations/index.ts:
-    last_write_checksum: sha1:a9d0c4960fe6c4b799fc3d27ac247d1212b01131
-  src/models/operations/postserversbyqualifiednamedeploymentsbyidresume.ts:
-    last_write_checksum: sha1:c6ebddcff99162da39a9801cc87915f8508a2374
-  src/models/operations/putserversbyqualifiednamedeployments.ts:
-    last_write_checksum: sha1:b16997ebd92e17d9a7d7c3a5438ff5511ecbd0fa
+    last_write_checksum: sha1:39668f0188eefde992070d847c58cd0dda901e85
+  src/models/operations/postserversbynamespacebynamedeploymentsbyidresume.ts:
+    last_write_checksum: sha1:e35fa993fbcaff37346fb0e6e5b3ca470cf57ff9
+  src/models/operations/putserversbynamespacebynamedeployments.ts:
+    last_write_checksum: sha1:0e8b60b503c14190635faff346c34bf4498245ef
   src/sdk/index.ts:
     last_write_checksum: sha1:ed6d64f2a6135349aa8498b8d8cff9ba85c7fb8f
   src/sdk/sdk.ts:
     last_write_checksum: sha1:5915fa6d33898564de27b93cbf50695f58990fad
   src/sdk/servers.ts:
-    last_write_checksum: sha1:852cd50e6c20a2825b5a2a4cc1c11bcccf8757dc
+    last_write_checksum: sha1:ac0931c2f56b1e04af37f9c4201f9585e78e86cd
   src/sdk/service.ts:
     last_write_checksum: sha1:dc0b43a975cbe1603ee52ad246e76483b9dd7b82
   src/sdk/uplink.ts:
@@ -505,6 +518,8 @@ examples:
       parameters:
         path:
           qualifiedName: "<value>"
+      requestBody:
+        multipart/form-data: {"payload": "<value>"}
       responses:
         "202":
           application/json: {"deploymentId": "123e4567-e89b-12d3-a456-426614174000", "status": "WORKING", "mcpUrl": "https://server.smithery.ai/@org/name"}
@@ -529,12 +544,19 @@ examples:
       responses:
         "200":
           application/json: {"id": "f0bafba5-0dc6-4c6d-955d-b83f6db3f09e", "status": "<value>", "createdAt": "1728877704456", "updatedAt": "1735610601727"}
+        "403":
+          application/json: {"error": "Server not found"}
   postServersByQualifiedNameDeploymentsByIdResume:
     speakeasy-default-post-servers-by-qualified-name-deployments-by-id-resume:
       parameters:
         path:
           qualifiedName: "<value>"
           id: "<id>"
+      responses:
+        "202":
+          application/json: {"status": "WORKING", "deploymentId": "46daa36b-bed8-4f7b-8916-87ea79df8aea"}
+        "400":
+          application/json: {"error": "Server not found"}
   getServersByQualifiedNameLogs:
     speakeasy-default-get-servers-by-qualified-name-logs:
       parameters:
@@ -557,6 +579,144 @@ examples:
       responses:
         "200":
           application/json: {"qualifiedName": "smithery/hello-world", "displayName": "Hello World", "description": "A simple hello world server", "iconUrl": "https://example.com/icon.png", "remote": true, "deploymentUrl": "https://api.example.com", "connections": [], "security": null, "tools": [{"name": "get_weather", "description": "Get current weather", "inputSchema": {"type": "object"}}]}
+        "404":
+          application/json: {"error": "Server not found"}
+  putServersByNameDeployments:
+    speakeasy-default-put-servers-by-name-deployments:
+      parameters:
+        path:
+          name: "<value>"
+      responses:
+        "202":
+          application/json: {"deploymentId": "123e4567-e89b-12d3-a456-426614174000", "status": "WORKING", "mcpUrl": "https://server.smithery.ai/@org/name"}
+        "400":
+          application/json: {"error": "Server not found"}
+  getServersByNameDeployments:
+    speakeasy-default-get-servers-by-name-deployments:
+      parameters:
+        path:
+          name: "<value>"
+      responses:
+        "200":
+          application/json: [{"id": "2d61c147-94e2-4d3a-b65c-636bc72e25c5", "status": "<value>", "createdAt": "1734486829914", "updatedAt": "1735689071725"}]
+        "403":
+          application/json: {"error": "Server not found"}
+  getServersByNameDeploymentsById:
+    speakeasy-default-get-servers-by-name-deployments-by-id:
+      parameters:
+        path:
+          name: "<value>"
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"id": "1b7f58af-7dee-4f12-b9b1-21dd04ed217e", "status": "<value>", "createdAt": "1712519617371", "updatedAt": "1735615549018"}
+        "403":
+          application/json: {"error": "Server not found"}
+  postServersByNameDeploymentsByIdResume:
+    speakeasy-default-post-servers-by-name-deployments-by-id-resume:
+      parameters:
+        path:
+          name: "<value>"
+          id: "<id>"
+      responses:
+        "202":
+          application/json: {"status": "WORKING", "deploymentId": "ccfdb4ae-161e-482c-b837-90fd61459429"}
+        "400":
+          application/json: {"error": "Server not found"}
+  getServersByNameLogs:
+    speakeasy-default-get-servers-by-name-logs:
+      parameters:
+        path:
+          name: "<value>"
+        query:
+          '#/components/schemas/LogsQuery': {"from": "2026-01-01T00:00:00Z", "to": "2026-01-01T01:00:00Z", "limit": 50}
+      responses:
+        "200":
+          application/json: {"invocations": [{"id": "625f9ce6-f179-4f23-b3e3-4de28b52b39d", "timestamp": "2026-01-04 10:53:39", "request": {"method": "POST", "url": "https://gateway.smithery.ai/@smithery/unicorn"}, "response": {"status": 200, "outcome": "ok"}, "duration": {"cpuMs": 5, "wallMs": 743}, "logs": [], "exceptions": [{"timestamp": "2026-01-04 10:53:39", "name": "TypeError", "message": "Cannot read property 'x' of undefined", "stack": "at handler (main.js:42:15)"}]}], "total": 8645.38}
+        "403":
+          application/json: {"error": "Server not found"}
+        "500":
+          application/json: {"error": "Server not found"}
+  getServersByName:
+    speakeasy-default-get-servers-by-name:
+      parameters:
+        path:
+          name: "<value>"
+      responses:
+        "200":
+          application/json: {"qualifiedName": "smithery/hello-world", "displayName": "Hello World", "description": "A simple hello world server", "iconUrl": "https://example.com/icon.png", "remote": true, "deploymentUrl": "https://api.example.com", "connections": [], "security": {"scanPassed": true}, "tools": [{"name": "get_weather", "description": "Get current weather", "inputSchema": {"type": "object"}}]}
+        "404":
+          application/json: {"error": "Server not found"}
+  putServersByNamespaceByNameDeployments:
+    speakeasy-default-put-servers-by-namespace-by-name-deployments:
+      parameters:
+        path:
+          namespace: ""
+          name: "<value>"
+      responses:
+        "202":
+          application/json: {"deploymentId": "123e4567-e89b-12d3-a456-426614174000", "status": "WORKING", "mcpUrl": "https://server.smithery.ai/@org/name"}
+        "400":
+          application/json: {"error": "Server not found"}
+  getServersByNamespaceByNameDeployments:
+    speakeasy-default-get-servers-by-namespace-by-name-deployments:
+      parameters:
+        path:
+          namespace: ""
+          name: "<value>"
+      responses:
+        "200":
+          application/json: [{"id": "dd3809d2-ccc9-40f7-ad26-dcfa487211f2", "status": "<value>", "createdAt": "1713353421896", "updatedAt": "1735677967335"}]
+        "403":
+          application/json: {"error": "Server not found"}
+  getServersByNamespaceByNameDeploymentsById:
+    speakeasy-default-get-servers-by-namespace-by-name-deployments-by-id:
+      parameters:
+        path:
+          namespace: ""
+          name: "<value>"
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"id": "764229cf-6d76-43f7-966b-11d19b5095d4", "status": "<value>", "createdAt": "1706317080695", "updatedAt": "1735675001873"}
+        "403":
+          application/json: {"error": "Server not found"}
+  postServersByNamespaceByNameDeploymentsByIdResume:
+    speakeasy-default-post-servers-by-namespace-by-name-deployments-by-id-resume:
+      parameters:
+        path:
+          namespace: ""
+          name: "<value>"
+          id: "<id>"
+      responses:
+        "202":
+          application/json: {"status": "WORKING", "deploymentId": "725548db-02db-49f7-b771-e5870b36e390"}
+        "400":
+          application/json: {"error": "Server not found"}
+  getServersByNamespaceByNameLogs:
+    speakeasy-default-get-servers-by-namespace-by-name-logs:
+      parameters:
+        path:
+          namespace: ""
+          name: "<value>"
+        query:
+          '#/components/schemas/LogsQuery': {"from": "2026-01-01T00:00:00Z", "to": "2026-01-01T01:00:00Z", "limit": 50}
+      responses:
+        "200":
+          application/json: {"invocations": [], "total": 3107.88}
+        "403":
+          application/json: {"error": "Server not found"}
+        "500":
+          application/json: {"error": "Server not found"}
+  getServersByNamespaceByName:
+    speakeasy-default-get-servers-by-namespace-by-name:
+      parameters:
+        path:
+          namespace: ""
+          name: "<value>"
+      responses:
+        "200":
+          application/json: {"qualifiedName": "smithery/hello-world", "displayName": "Hello World", "description": "A simple hello world server", "iconUrl": "https://example.com/icon.png", "remote": true, "deploymentUrl": "https://api.example.com", "connections": [], "security": {"scanPassed": true}, "tools": [{"name": "get_weather", "description": "Get current weather", "inputSchema": {"type": "object"}}]}
         "404":
           application/json: {"error": "Server not found"}
 examplesVersion: 1.0.2

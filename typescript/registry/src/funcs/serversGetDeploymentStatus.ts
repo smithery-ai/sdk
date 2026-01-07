@@ -18,6 +18,7 @@ import {
   RequestTimeoutError,
   UnexpectedClientError,
 } from "../models/errors/httpclienterrors.js";
+import * as errors from "../models/errors/index.js";
 import { ResponseValidationError } from "../models/errors/responsevalidationerror.js";
 import { SDKValidationError } from "../models/errors/sdkvalidationerror.js";
 import { SmitheryRegistryError } from "../models/errors/smitheryregistryerror.js";
@@ -30,11 +31,12 @@ import { Result } from "../types/fp.js";
  */
 export function serversGetDeploymentStatus(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByQualifiedNameDeploymentsByIdRequest,
+  request: operations.GetServersByNamespaceByNameDeploymentsByIdRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
     components.DeploymentInfo,
+    | errors.DeploymentError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -54,12 +56,13 @@ export function serversGetDeploymentStatus(
 
 async function $do(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByQualifiedNameDeploymentsByIdRequest,
+  request: operations.GetServersByNamespaceByNameDeploymentsByIdRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
       components.DeploymentInfo,
+      | errors.DeploymentError
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -75,8 +78,10 @@ async function $do(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.GetServersByQualifiedNameDeploymentsByIdRequest$outboundSchema
-        .parse(value),
+      operations
+        .GetServersByNamespaceByNameDeploymentsByIdRequest$outboundSchema.parse(
+          value,
+        ),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -90,13 +95,17 @@ async function $do(
       explode: false,
       charEncoding: "percent",
     }),
-    qualifiedName: encodeSimple("qualifiedName", payload.qualifiedName, {
+    name: encodeSimple("name", payload.name, {
+      explode: false,
+      charEncoding: "percent",
+    }),
+    namespace: encodeSimple("namespace", payload.namespace, {
       explode: false,
       charEncoding: "percent",
     }),
   };
 
-  const path = pathToFunc("/servers/{qualifiedName}/deployments/{id}")(
+  const path = pathToFunc("/servers/{namespace}/{name}/deployments/{id}")(
     pathParams,
   );
 
@@ -111,7 +120,7 @@ async function $do(
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "getServersByQualifiedNameDeploymentsById",
+    operationID: "getServersByNamespaceByNameDeploymentsById",
     oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,
@@ -159,8 +168,13 @@ async function $do(
   }
   const response = doResult.value;
 
+  const responseFields = {
+    HttpMeta: { Response: response, Request: req },
+  };
+
   const [result] = await M.match<
     components.DeploymentInfo,
+    | errors.DeploymentError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -171,9 +185,10 @@ async function $do(
     | SDKValidationError
   >(
     M.json(200, components.DeploymentInfo$inboundSchema),
-    M.fail([403, 404, "4XX"]),
+    M.jsonErr([403, 404], errors.DeploymentError$inboundSchema),
+    M.fail("4XX"),
     M.fail("5XX"),
-  )(response, req);
+  )(response, req, { extraFields: responseFields });
   if (!result.ok) {
     return [result, { status: "complete", request: req, response }];
   }
