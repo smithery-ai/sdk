@@ -5,19 +5,13 @@
 ```typescript
 import { GetServersRequest } from "@smithery/registry/models/operations";
 
-let value: GetServersRequest = {
-  page: 1,
-  pageSize: 10,
-  q: "search term",
-  profile: "my-profile",
-};
+let value: GetServersRequest = {};
 ```
 
 ## Fields
 
-| Field              | Type               | Required           | Description        | Example            |
-| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| `page`             | *number*           | :heavy_minus_sign: | N/A                | 1                  |
-| `pageSize`         | *number*           | :heavy_minus_sign: | N/A                | 10                 |
-| `q`                | *string*           | :heavy_minus_sign: | N/A                | search term        |
-| `profile`          | *string*           | :heavy_minus_sign: | N/A                | my-profile         |
+| Field                    | Type                     | Required                 | Description              |
+| ------------------------ | ------------------------ | ------------------------ | ------------------------ |
+| `page`                   | *number*                 | :heavy_minus_sign:       | Page number              |
+| `pageSize`               | *number*                 | :heavy_minus_sign:       | Number of items per page |
+| `q`                      | *string*                 | :heavy_minus_sign:       | Search query             |

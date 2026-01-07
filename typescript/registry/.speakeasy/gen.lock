@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 54f57182-fe20-43ea-9003-64b97c2b41be
 management:
-  docChecksum: 74808b9c70ca98f5b86fb1e6729b50a1
+  docChecksum: 000ae5170f9f7b09110b7aa90aa95891
   docVersion: 1.0.0
-  speakeasyVersion: 1.650.0
-  generationVersion: 2.743.2
-  releaseVersion: 0.6.2
-  configChecksum: 1b1944f011bd06c9f41d9246f1a1e033
+  speakeasyVersion: 1.682.0
+  generationVersion: 2.791.1
+  releaseVersion: 0.10.1
+  configChecksum: 2dadd168b94966fe1108fdd016c3e433
   repoURL: https://github.com/smithery-ai/sdk.git
   repoSubDirectory: typescript/registry
   installationURL: https://gitpkg.now.sh/smithery-ai/sdk/typescript/registry
@@ -15,10 +15,9 @@ features:
   typescript:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.1.12
-    core: 3.26.3
+    core: 3.26.17
     defaultEnabledRetries: 0.1.0
     devContainers: 2.90.1
-    enumUnions: 0.1.0
     envVarSecurityUsage: 0.1.2
     globalSecurity: 2.82.14
     globalSecurityCallbacks: 0.1.0
@@ -26,136 +25,227 @@ features:
     globalServerURLs: 2.83.0
     groups: 2.81.3
     nameOverrides: 2.81.2
-    nullables: 0.1.1
     pagination: 2.83.0
     responseFormat: 0.2.3
     retries: 2.83.0
-    sdkHooks: 0.3.0
-    unions: 2.86.0
-generatedFiles:
-  - .devcontainer/README.md
-  - .devcontainer/devcontainer.json
-  - .devcontainer/setup.sh
-  - .gitattributes
-  - .npmignore
-  - FUNCTIONS.md
-  - RUNTIMES.md
-  - USAGE.md
-  - docs/lib/utils/retryconfig.md
-  - docs/models/components/configrequest.md
-  - docs/models/components/configresponse.md
-  - docs/models/components/configvalidationresponse.md
-  - docs/models/components/connection.md
-  - docs/models/components/connectionhttp.md
-  - docs/models/components/connectionstdio.md
-  - docs/models/components/connectiontype.md
-  - docs/models/components/getuserconfigresponse.md
-  - docs/models/components/health.md
-  - docs/models/components/inputschema.md
-  - docs/models/components/pagination.md
-  - docs/models/components/properties.md
-  - docs/models/components/result.md
-  - docs/models/components/saveuserconfigrequest.md
-  - docs/models/components/saveuserconfigresponse.md
-  - docs/models/components/security.md
-  - docs/models/components/server.md
-  - docs/models/components/serversecurity.md
-  - docs/models/components/serverslistresponse.md
-  - docs/models/components/serverslistresponseserver.md
-  - docs/models/components/tool.md
-  - docs/models/components/uplinktokenresponse.md
-  - docs/models/errors/errort.md
-  - docs/models/errors/uplinkerror.md
-  - docs/models/operations/getconfigbyidrequest.md
-  - docs/models/operations/getconfigstatusbyidrequest.md
-  - docs/models/operations/getserversbyidrequest.md
-  - docs/models/operations/getserversrequest.md
-  - docs/models/operations/getserversresponse.md
-  - docs/models/operations/postserversbyidrequest.md
-  - docs/models/operations/putconfigbyidrequest.md
-  - docs/sdks/config/README.md
-  - docs/sdks/servers/README.md
-  - docs/sdks/system/README.md
-  - docs/sdks/uplink/README.md
-  - eslint.config.mjs
-  - examples/.env.template
-  - examples/README.md
-  - examples/package.json
-  - examples/systemCheckHealth.example.ts
-  - jsr.json
-  - package.json
-  - src/core.ts
-  - src/funcs/configGet.ts
-  - src/funcs/configGetStatus.ts
-  - src/funcs/configUpdate.ts
-  - src/funcs/serversConfigure.ts
-  - src/funcs/serversGet.ts
-  - src/funcs/serversList.ts
-  - src/funcs/systemCheckHealth.ts
-  - src/funcs/uplinkCreateToken.ts
-  - src/hooks/hooks.ts
-  - src/hooks/index.ts
-  - src/hooks/types.ts
-  - src/index.ts
-  - src/lib/base64.ts
-  - src/lib/config.ts
-  - src/lib/dlv.ts
-  - src/lib/encodings.ts
-  - src/lib/env.ts
-  - src/lib/files.ts
-  - src/lib/http.ts
-  - src/lib/is-plain-object.ts
-  - src/lib/logger.ts
-  - src/lib/matchers.ts
-  - src/lib/primitives.ts
-  - src/lib/retries.ts
-  - src/lib/schemas.ts
-  - src/lib/sdks.ts
-  - src/lib/security.ts
-  - src/lib/url.ts
-  - src/models/components/configrequest.ts
-  - src/models/components/configresponse.ts
-  - src/models/components/configvalidationresponse.ts
-  - src/models/components/getuserconfigresponse.ts
-  - src/models/components/health.ts
-  - src/models/components/index.ts
-  - src/models/components/saveuserconfigrequest.ts
-  - src/models/components/saveuserconfigresponse.ts
-  - src/models/components/security.ts
-  - src/models/components/server.ts
-  - src/models/components/serverslistresponse.ts
-  - src/models/components/uplinktokenresponse.ts
-  - src/models/errors/apierror.ts
-  - src/models/errors/error.ts
-  - src/models/errors/httpclienterrors.ts
-  - src/models/errors/index.ts
-  - src/models/errors/responsevalidationerror.ts
-  - src/models/errors/sdkvalidationerror.ts
-  - src/models/errors/smitheryregistryerror.ts
-  - src/models/errors/uplinkerror.ts
-  - src/models/operations/getconfigbyid.ts
-  - src/models/operations/getconfigstatusbyid.ts
-  - src/models/operations/getservers.ts
-  - src/models/operations/getserversbyid.ts
-  - src/models/operations/index.ts
-  - src/models/operations/postserversbyid.ts
-  - src/models/operations/putconfigbyid.ts
-  - src/sdk/config.ts
-  - src/sdk/index.ts
-  - src/sdk/sdk.ts
-  - src/sdk/servers.ts
-  - src/sdk/system.ts
-  - src/sdk/uplink.ts
-  - src/types/async.ts
-  - src/types/blobs.ts
-  - src/types/constdatetime.ts
-  - src/types/enums.ts
-  - src/types/fp.ts
-  - src/types/index.ts
-  - src/types/operations.ts
-  - src/types/rfcdate.ts
-  - src/types/streams.ts
-  - tsconfig.json
+    sdkHooks: 0.4.0
+trackedFiles:
+  .devcontainer/README.md:
+    last_write_checksum: sha1:28d85b3f3452837c4ad725ad12bd858fd8bf07c0
+  .devcontainer/devcontainer.json:
+    last_write_checksum: sha1:d0b15193202c961e7d1875864ddb15f9d17c84dd
+  .devcontainer/setup.sh:
+    last_write_checksum: sha1:4f81a339675464090a9ee39d0be8dc966f58e8d5
+  .gitattributes:
+    last_write_checksum: sha1:26d16d8297b104945139da8c25bd38feeaad3e25
+  .npmignore:
+    last_write_checksum: sha1:3d5eb92f81539175db1ff0280e0aefbdd701f200
+  FUNCTIONS.md:
+    last_write_checksum: sha1:b5b73333e61ff93e21c1410641932690d4b4be0b
+  RUNTIMES.md:
+    last_write_checksum: sha1:e45b854f02c357cbcfdb8c3663000e8339e16505
+  USAGE.md:
+    last_write_checksum: sha1:b62667b52aaba2b2d266e09d937156c663b561d8
+  docs/lib/utils/retryconfig.md:
+    last_write_checksum: sha1:bc4454e196fcd219f5a78da690375a884f5ed07b
+  docs/models/components/deploymentinfo.md:
+    last_write_checksum: sha1:52e693ebe64b1042e8c926c1d481022126735b67
+  docs/models/components/deployresponse.md:
+    last_write_checksum: sha1:17dd61c4b2a1cc45f692d2cd8b420f09e84b798a
+  docs/models/components/health.md:
+    last_write_checksum: sha1:8e13ceeb0c49cd20335c73ef4f21825d80e4d722
+  docs/models/components/runtimelogsresponse.md:
+    last_write_checksum: sha1:0366fa450d0736f649bf4ef156f60271d234878d
+  docs/models/components/security.md:
+    last_write_checksum: sha1:04ebf34e0d7c1daff704eabedc4174fbe6981c0e
+  docs/models/components/server.md:
+    last_write_checksum: sha1:9da8e42cd197b4567fc7fa008b0695d1f053095b
+  docs/models/components/serverslistresponse.md:
+    last_write_checksum: sha1:b1068b60d8ff48a455dc56d158ee8d77fb114e95
+  docs/models/components/uplinktokenresponse.md:
+    last_write_checksum: sha1:d671536606df2eecfcdcec747ea76b3aa6ba101b
+  docs/models/errors/errort.md:
+    last_write_checksum: sha1:22c6d29168d0306d900ac6dca373472f4d6e2d7c
+  docs/models/errors/uplinkerror.md:
+    last_write_checksum: sha1:893cd0380e3d4bbac32d8f6e3968eccc367171bf
+  docs/models/operations/getserversbyqualifiednamedeploymentsbyidrequest.md:
+    last_write_checksum: sha1:7426a868bed32f212a139545c59a612edfbee708
+  docs/models/operations/getserversbyqualifiednamedeploymentsrequest.md:
+    last_write_checksum: sha1:e8c041563ddec8271bd188628982642be62c10dc
+  docs/models/operations/getserversbyqualifiednamelogsrequest.md:
+    last_write_checksum: sha1:6f5cee4cb5374fb2a5802b7b9ac572588b0c4ab8
+  docs/models/operations/getserversbyqualifiednamerequest.md:
+    last_write_checksum: sha1:fcc8036c3c67b7a4c26015680b2e03150e590e2e
+  docs/models/operations/getserversrequest.md:
+    last_write_checksum: sha1:596b0b8e512c35069f230f7789c1c7fa8d6ba0e0
+  docs/models/operations/getserversresponse.md:
+    last_write_checksum: sha1:65a6cffea2ac7d5f2964bd0f6ff3fdd9a54df40d
+  docs/models/operations/postserversbyqualifiednamedeploymentsbyidresumerequest.md:
+    last_write_checksum: sha1:658df8d425590a3a5f38842ec9efa89404d71fe1
+  docs/models/operations/putserversbyqualifiednamedeploymentsrequest.md:
+    last_write_checksum: sha1:f56228e8630388ad35d26ee04f8fd3e607eef7a1
+  docs/sdks/servers/README.md:
+    last_write_checksum: sha1:33ece85de9d3255eab6c37abb6b7897ac8da5248
+  docs/sdks/service/README.md:
+    last_write_checksum: sha1:3c5c370387607efdcf65b658cbe9a79cc3ec93e1
+  docs/sdks/uplink/README.md:
+    last_write_checksum: sha1:1e22544f9cd041f21444ab538aea1b30523b74ea
+  eslint.config.mjs:
+    last_write_checksum: sha1:9398f326377fe47f67af2df6eb6370750c0790b4
+  examples/.env.template:
+    last_write_checksum: sha1:d23519403f2bbf1697826091d5afa6a79b93a56b
+  examples/README.md:
+    last_write_checksum: sha1:f100d6b3c6739fd575d646e18d3726a2ec0e967f
+  examples/package.json:
+    last_write_checksum: sha1:16c12c85577d37ca127e36aef2b62c4b87177c41
+  examples/serviceHealthCheck.example.ts:
+    last_write_checksum: sha1:b69fc3ef6569046d67e8fd53544e16b15bb45806
+  jsr.json:
+    last_write_checksum: sha1:2999ed6d58d9f0b38947cdeddaf1ce1d4d44fdf1
+  package.json:
+    last_write_checksum: sha1:d31cacf1e942739f5c207c0ba64efce8ad2fdca1
+  src/core.ts:
+    last_write_checksum: sha1:5e8b3ab1fb1d7c16fee8682d25e9a9be90fceabf
+  src/funcs/serversDeploy.ts:
+    last_write_checksum: sha1:177a6a29f3353e21f49c9f8b5cae4b0d71437cf8
+  src/funcs/serversGetByQualifiedName.ts:
+    last_write_checksum: sha1:5432ef1737264d0488a694a1f775ed02fb5dd867
+  src/funcs/serversGetDeploymentStatus.ts:
+    last_write_checksum: sha1:b63525117f545cdefbae74aa0d1ee4e21607500f
+  src/funcs/serversGetLogs.ts:
+    last_write_checksum: sha1:1461a367cabeed924d2d03ba6c6fcefc9bac8d5f
+  src/funcs/serversList.ts:
+    last_write_checksum: sha1:feffdf40d44d50292eba9efe6c9c817db8a98fe8
+  src/funcs/serversListDeployments.ts:
+    last_write_checksum: sha1:71da256d85040a99620ded79d44016c7ea928634
+  src/funcs/serversResumeDeployment.ts:
+    last_write_checksum: sha1:caa00e5d348e07b84298984b77ee7f75c5462d95
+  src/funcs/serviceHealthCheck.ts:
+    last_write_checksum: sha1:a2747ccb946433cdb0f7c87567a0e07180973842
+  src/funcs/uplinkCreateToken.ts:
+    last_write_checksum: sha1:326c55ee6481b3eea4364a64a3c66c42a5dfe3bf
+  src/hooks/hooks.ts:
+    last_write_checksum: sha1:646c1538dbffb2552af9d7516de64c339b5e96c2
+  src/hooks/index.ts:
+    last_write_checksum: sha1:1a11c073a6cd792932218e1d4ed36b8567bad8ef
+  src/hooks/types.ts:
+    last_write_checksum: sha1:29372122898cc523fa47576f3f6608a28ec6080e
+  src/index.ts:
+    last_write_checksum: sha1:35c9cde3ae14b18b3f893a1afe8b6c44f8760f24
+  src/lib/base64.ts:
+    last_write_checksum: sha1:b0b12ddbd8625efb47c0e955a18641aeb10c6532
+  src/lib/config.ts:
+    last_write_checksum: sha1:9c7e2a60de1c2a7f6f20d6bb16bae5072f81014f
+  src/lib/dlv.ts:
+    last_write_checksum: sha1:1dd3e3fbb4550c4bf31f5ef997faff355d6f3250
+  src/lib/encodings.ts:
+    last_write_checksum: sha1:d20c131976ab8ac68b22bdde2b7ed84b5b873922
+  src/lib/env.ts:
+    last_write_checksum: sha1:76a4eb36a587bc4c6aa50540f68034f94d2dd6b5
+  src/lib/files.ts:
+    last_write_checksum: sha1:d0f325f445b8d22e7d73baf052c585ec2dd24841
+  src/lib/http.ts:
+    last_write_checksum: sha1:797cbf16d3c7c4d62d3ba0eedb08617524938457
+  src/lib/is-plain-object.ts:
+    last_write_checksum: sha1:df687f25a9590b6fd95d39df41a652ae3fd4e517
+  src/lib/logger.ts:
+    last_write_checksum: sha1:0ec9d3a2a34c362746b767e4f9a746c055d57a7b
+  src/lib/matchers.ts:
+    last_write_checksum: sha1:e7587f40d36710d499f8a7e6b610610e55a2cb40
+  src/lib/primitives.ts:
+    last_write_checksum: sha1:987869fc54790b9c22e9182099103d6aa7c67016
+  src/lib/retries.ts:
+    last_write_checksum: sha1:f3da74dffcbe2756c69393f8600205aa1dc06e68
+  src/lib/schemas.ts:
+    last_write_checksum: sha1:209cfaabfa7fc1c1310f97453215cb0755619c6e
+  src/lib/sdks.ts:
+    last_write_checksum: sha1:3420ab27ef8b91e14452b4ff5971d7533f71ec87
+  src/lib/security.ts:
+    last_write_checksum: sha1:690c1113d4f8d6e7f0d82651d647f611e08e73ea
+  src/lib/url.ts:
+    last_write_checksum: sha1:d124050c7e755c0cce233b9e029afb584ff65201
+  src/models/components/deploymentinfo.ts:
+    last_write_checksum: sha1:458dfc5c9c7fd5eb7271063b0918325ce5e91d78
+  src/models/components/deployresponse.ts:
+    last_write_checksum: sha1:d17420c5d64522bc664bd706ab9681198bc942c6
+  src/models/components/health.ts:
+    last_write_checksum: sha1:08504d9b5dc560db1a050da6abad1c01e5608893
+  src/models/components/index.ts:
+    last_write_checksum: sha1:ac694cfc55d17bd2cfe6a4b33d3af1929696530f
+  src/models/components/runtimelogsresponse.ts:
+    last_write_checksum: sha1:e94e7122df13b1d18674faf0a6e96531163822cc
+  src/models/components/security.ts:
+    last_write_checksum: sha1:14f08712e7ae6c9786e015c415b290acda66bcef
+  src/models/components/server.ts:
+    last_write_checksum: sha1:e6e481bbd7437ff9254c93feaa2b316c00ee581c
+  src/models/components/serverslistresponse.ts:
+    last_write_checksum: sha1:faccfd876795425226b32ecd36da3fcbac1299ac
+  src/models/components/uplinktokenresponse.ts:
+    last_write_checksum: sha1:2a21d4f1fd16bdbc187b24e8b291726255ccbad1
+  src/models/errors/apierror.ts:
+    last_write_checksum: sha1:637cd6ef06e5dd36a4500276afeff85dc0db9b03
+  src/models/errors/error.ts:
+    last_write_checksum: sha1:9dd60533636245bde38aa9bcecbed64ba8ba8c94
+  src/models/errors/httpclienterrors.ts:
+    last_write_checksum: sha1:994ced121c54fecd0af038ccfb7855fbfd3868ec
+  src/models/errors/index.ts:
+    last_write_checksum: sha1:0f73317e2046c5d4039131d0eb7541bd03fe8acc
+  src/models/errors/responsevalidationerror.ts:
+    last_write_checksum: sha1:fc5c930be7550ef59e026a0eaddd7586309b49b2
+  src/models/errors/sdkvalidationerror.ts:
+    last_write_checksum: sha1:a69da17627bcc32b820544608f3400423ea53f26
+  src/models/errors/smitheryregistryerror.ts:
+    last_write_checksum: sha1:1dce403e56da3cd2a3b51f3f04c9ce0786de4de8
+  src/models/errors/uplinkerror.ts:
+    last_write_checksum: sha1:6daa9231489d17fe5bc863283d6b2bc2b7123811
+  src/models/operations/getservers.ts:
+    last_write_checksum: sha1:d6e6d1d6290cd80605b6dc19f72a7f4d6f509a16
+  src/models/operations/getserversbyqualifiedname.ts:
+    last_write_checksum: sha1:2931b1c7deb8a0449cb92696fde46e9e99b7c7ee
+  src/models/operations/getserversbyqualifiednamedeployments.ts:
+    last_write_checksum: sha1:343baaa798a8b167bf31b61bff6856cd750f9253
+  src/models/operations/getserversbyqualifiednamedeploymentsbyid.ts:
+    last_write_checksum: sha1:aae4b7cf72a41e96b893ff55996632a98deeded5
+  src/models/operations/getserversbyqualifiednamelogs.ts:
+    last_write_checksum: sha1:408013a318cd39a086a1f78cb08e6c3615b86c52
+  src/models/operations/index.ts:
+    last_write_checksum: sha1:a9d0c4960fe6c4b799fc3d27ac247d1212b01131
+  src/models/operations/postserversbyqualifiednamedeploymentsbyidresume.ts:
+    last_write_checksum: sha1:c6ebddcff99162da39a9801cc87915f8508a2374
+  src/models/operations/putserversbyqualifiednamedeployments.ts:
+    last_write_checksum: sha1:b16997ebd92e17d9a7d7c3a5438ff5511ecbd0fa
+  src/sdk/index.ts:
+    last_write_checksum: sha1:ed6d64f2a6135349aa8498b8d8cff9ba85c7fb8f
+  src/sdk/sdk.ts:
+    last_write_checksum: sha1:5915fa6d33898564de27b93cbf50695f58990fad
+  src/sdk/servers.ts:
+    last_write_checksum: sha1:610c2cbac945ca6aaebd2ab5b2e3af55bf4ef365
+  src/sdk/service.ts:
+    last_write_checksum: sha1:dc0b43a975cbe1603ee52ad246e76483b9dd7b82
+  src/sdk/uplink.ts:
+    last_write_checksum: sha1:e40617884316897d9d5f255709365535db756b9c
+  src/types/async.ts:
+    last_write_checksum: sha1:3ff07b3feaf390ec1aeb18ff938e139c6c4a9585
+  src/types/blobs.ts:
+    last_write_checksum: sha1:cf45d78916671cb6345a11c97c633c64402bc27c
+  src/types/constdatetime.ts:
+    last_write_checksum: sha1:dfaaf9adfaf49808bd4c9dea0039f21b7088d9c0
+  src/types/enums.ts:
+    last_write_checksum: sha1:ee590453d2c87e33e89c633d37ee46907eca0e58
+  src/types/fp.ts:
+    last_write_checksum: sha1:d24994d58f37a1ca106847fcc6d2e976c6f1c093
+  src/types/index.ts:
+    last_write_checksum: sha1:bf43b3dccb960ca9ae9c5ab940da4786255881cd
+  src/types/operations.ts:
+    last_write_checksum: sha1:c49e724cfb1259296381cb57bc0fcdd2eae45865
+  src/types/rfcdate.ts:
+    last_write_checksum: sha1:8e5f382e02fe21c2f2e24deb1b7bbf8cddd3dd16
+  src/types/streams.ts:
+    last_write_checksum: sha1:cc9ced2dd34a76c3a1bd7784ccda1cc3b37ab9a9
+  src/types/unrecognized.ts:
+    last_write_checksum: sha1:d33ac686528492f4cdc0dbf81ed343b4afe020fe
+  tsconfig.json:
+    last_write_checksum: sha1:c3ec7996536cdb9a54319e7d1eb3b199b733d34c
 examples:
   listServers:
     speakeasy-default-list-servers:
@@ -189,7 +279,7 @@ examples:
     speakeasy-default-get-health:
       responses:
         "200":
-          application/json: {"status": "<value>", "timestamp": "<value>"}
+          application/json: {}
   getServers:
     speakeasy-default-get-servers:
       parameters:
@@ -200,9 +290,9 @@ examples:
           profile: "my-profile"
       responses:
         "200":
-          application/json: {"servers": [{"qualifiedName": "smithery/hello-world", "displayName": "Hello World", "description": "A simple hello world server", "iconUrl": "https://example.com/icon.png", "verified": true, "useCount": 42, "remote": true, "createdAt": "1709973305456", "homepage": "https://smithery.ai/server/smithery/hello-world"}], "pagination": {"currentPage": 1, "pageSize": 10, "totalPages": 5, "totalCount": 42}}
+          application/json: {}
         "400":
-          application/json: {"error": "Server not found"}
+          application/json: {}
   getServersById:
     speakeasy-default-get-servers-by-id:
       parameters:
@@ -269,11 +359,11 @@ examples:
     speakeasy-default-post-uplink-token:
       responses:
         "200":
-          application/json: {"authtoken": "2abcdefg_1a2b3c4d5e6f7g8h9i0j", "domain": "ngrok.smithery.ai"}
+          application/json: {}
         "401":
-          application/json: {"error": "Failed to create tunnel token"}
+          application/json: {}
         "500":
-          application/json: {"error": "Failed to create tunnel token"}
+          application/json: {}
   getProfiles:
     speakeasy-default-get-profiles:
       parameters:
@@ -317,12 +407,166 @@ examples:
         path:
           slug: "<value>"
           configSlug: "<value>"
+  putServersByQualifiedNameDeployments:
+    speakeasy-default-put-servers-by-qualified-name-deployments:
+      parameters:
+        path:
+          qualifiedName: "<value>"
+      responses:
+        "202":
+          application/json: {}
+        "400":
+          application/json: {}
+  getServersByQualifiedNameDeployments:
+    speakeasy-default-get-servers-by-qualified-name-deployments:
+      parameters:
+        path:
+          qualifiedName: "<value>"
+      responses:
+        "200":
+          application/json: ["<value 1>"]
+  getServersByQualifiedNameDeploymentsById:
+    speakeasy-default-get-servers-by-qualified-name-deployments-by-id:
+      parameters:
+        path:
+          qualifiedName: "<value>"
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {}
+  postServersByQualifiedNameDeploymentsByIdResume:
+    speakeasy-default-post-servers-by-qualified-name-deployments-by-id-resume:
+      parameters:
+        path:
+          qualifiedName: "<value>"
+          id: "<id>"
+  getServersByQualifiedNameLogs:
+    speakeasy-default-get-servers-by-qualified-name-logs:
+      parameters:
+        path:
+          qualifiedName: "<value>"
+      responses:
+        "200":
+          application/json: {}
+        "403":
+          application/json: {}
+        "500":
+          application/json: {}
+  getServersByQualifiedName:
+    speakeasy-default-get-servers-by-qualified-name:
+      parameters:
+        path:
+          qualifiedName: "<value>"
+      responses:
+        "200":
+          application/json: {}
+        "404":
+          application/json: {}
 examplesVersion: 1.0.2
 generatedTests: {}
-releaseNotes: |
-  ## Typescript SDK Changes Detected:
-  * `smitheryregistry.profiles.list()`: **Deleted** **Breaking** :warning:
-  * `smitheryregistry.profiles.listServers()`: **Deleted** **Breaking** :warning:
-  * `smitheryregistry.profiles.addServer()`: **Deleted** **Breaking** :warning:
-  * `smitheryregistry.profiles.getServer()`: **Deleted** **Breaking** :warning:
-  * `smitheryregistry.profiles.deleteServer()`: **Deleted** **Breaking** :warning:
+generatedFiles:
+  - .devcontainer/README.md
+  - .devcontainer/devcontainer.json
+  - .devcontainer/setup.sh
+  - .gitattributes
+  - .npmignore
+  - FUNCTIONS.md
+  - RUNTIMES.md
+  - USAGE.md
+  - docs/lib/utils/retryconfig.md
+  - docs/models/components/deploymentinfo.md
+  - docs/models/components/deployresponse.md
+  - docs/models/components/health.md
+  - docs/models/components/runtimelogsresponse.md
+  - docs/models/components/security.md
+  - docs/models/components/serverslistresponse.md
+  - docs/models/components/uplinktokenresponse.md
+  - docs/models/errors/errort.md
+  - docs/models/errors/uplinkerror.md
+  - docs/models/operations/getserversbyqualifiednamedeploymentsbyidrequest.md
+  - docs/models/operations/getserversbyqualifiednamedeploymentsrequest.md
+  - docs/models/operations/getserversbyqualifiednamelogsrequest.md
+  - docs/models/operations/getserversbyqualifiednamerequest.md
+  - docs/models/operations/getserversrequest.md
+  - docs/models/operations/getserversresponse.md
+  - docs/models/operations/postserversbyqualifiednamedeploymentsbyidresumerequest.md
+  - docs/models/operations/putserversbyqualifiednamedeploymentsrequest.md
+  - docs/sdks/servers/README.md
+  - docs/sdks/system/README.md
+  - docs/sdks/uplink/README.md
+  - eslint.config.mjs
+  - examples/.env.template
+  - examples/README.md
+  - examples/package.json
+  - examples/systemCheckHealth.example.ts
+  - jsr.json
+  - package.json
+  - src/core.ts
+  - src/funcs/serversGetServersByQualifiedName.ts
+  - src/funcs/serversGetServersByQualifiedNameDeployments.ts
+  - src/funcs/serversGetServersByQualifiedNameDeploymentsById.ts
+  - src/funcs/serversGetServersByQualifiedNameLogs.ts
+  - src/funcs/serversList.ts
+  - src/funcs/serversPostServersByQualifiedNameDeploymentsByIdResume.ts
+  - src/funcs/serversPutServersByQualifiedNameDeployments.ts
+  - src/funcs/systemCheckHealth.ts
+  - src/funcs/uplinkCreateToken.ts
+  - src/hooks/hooks.ts
+  - src/hooks/index.ts
+  - src/hooks/types.ts
+  - src/index.ts
+  - src/lib/base64.ts
+  - src/lib/config.ts
+  - src/lib/dlv.ts
+  - src/lib/encodings.ts
+  - src/lib/env.ts
+  - src/lib/files.ts
+  - src/lib/http.ts
+  - src/lib/is-plain-object.ts
+  - src/lib/logger.ts
+  - src/lib/matchers.ts
+  - src/lib/primitives.ts
+  - src/lib/retries.ts
+  - src/lib/schemas.ts
+  - src/lib/sdks.ts
+  - src/lib/security.ts
+  - src/lib/url.ts
+  - src/models/components/deploymentinfo.ts
+  - src/models/components/deployresponse.ts
+  - src/models/components/health.ts
+  - src/models/components/index.ts
+  - src/models/components/runtimelogsresponse.ts
+  - src/models/components/security.ts
+  - src/models/components/serverslistresponse.ts
+  - src/models/components/uplinktokenresponse.ts
+  - src/models/errors/apierror.ts
+  - src/models/errors/error.ts
+  - src/models/errors/httpclienterrors.ts
+  - src/models/errors/index.ts
+  - src/models/errors/responsevalidationerror.ts
+  - src/models/errors/sdkvalidationerror.ts
+  - src/models/errors/smitheryregistryerror.ts
+  - src/models/errors/uplinkerror.ts
+  - src/models/operations/getservers.ts
+  - src/models/operations/getserversbyqualifiedname.ts
+  - src/models/operations/getserversbyqualifiednamedeployments.ts
+  - src/models/operations/getserversbyqualifiednamedeploymentsbyid.ts
+  - src/models/operations/getserversbyqualifiednamelogs.ts
+  - src/models/operations/index.ts
+  - src/models/operations/postserversbyqualifiednamedeploymentsbyidresume.ts
+  - src/models/operations/putserversbyqualifiednamedeployments.ts
+  - src/sdk/index.ts
+  - src/sdk/sdk.ts
+  - src/sdk/servers.ts
+  - src/sdk/system.ts
+  - src/sdk/uplink.ts
+  - src/types/async.ts
+  - src/types/blobs.ts
+  - src/types/constdatetime.ts
+  - src/types/enums.ts
+  - src/types/fp.ts
+  - src/types/index.ts
+  - src/types/operations.ts
+  - src/types/rfcdate.ts
+  - src/types/streams.ts
+  - tsconfig.json

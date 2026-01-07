@@ -5,15 +5,10 @@
 ```typescript
 import { Health } from "@smithery/registry/models/components";
 
-let value: Health = {
-  status: "<value>",
-  timestamp: "<value>",
-};
+let value: Health = {};
 ```
 
 ## Fields
 
-| Field              | Type               | Required           | Description        |
-| ------------------ | ------------------ | ------------------ | ------------------ |
-| `status`           | *string*           | :heavy_check_mark: | N/A                |
-| `timestamp`        | *string*           | :heavy_check_mark: | N/A                |
+| Field       | Type        | Required    | Description |
+| ----------- | ----------- | ----------- | ----------- |

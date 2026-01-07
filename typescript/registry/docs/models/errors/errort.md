@@ -10,6 +10,5 @@ import { ErrorT } from "@smithery/registry/models/errors";
 
 ## Fields
 
-| Field              | Type               | Required           | Description        | Example            |
-| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| `error`            | *string*           | :heavy_check_mark: | N/A                | Server not found   |
+| Field       | Type        | Required    | Description |
+| ----------- | ----------- | ----------- | ----------- |

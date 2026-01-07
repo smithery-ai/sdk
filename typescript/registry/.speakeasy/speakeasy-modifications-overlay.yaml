@@ -2,7 +2,7 @@ overlay: 1.0.0
 x-speakeasy-jsonpath: rfc9535
 info:
   title: Speakeasy Modifications
-  version: 0.0.7
+  version: 0.0.9
   x-speakeasy-metadata:
     after: ""
     before: ""
@@ -10,16 +10,30 @@ info:
 actions:
   - target: $["paths"]["/servers"]["get"]
     update:
-      x-speakeasy-group: servers
-      x-speakeasy-name-override: list
-    x-speakeasy-metadata:
-      after: sdk.servers.list()
-      before: sdk.<no_group>.listServers()
-      created_at: 1746911395462
-      reviewed_at: 1746911405498
-      type: method-name
-  - target: $["paths"]["/servers"]["get"]
-    update:
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: Number of items per page
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query
       x-speakeasy-pagination:
         type: offsetLimit
         inputs:
@@ -28,11 +42,12 @@ actions:
             type: page
           - name: pageSize
             in: parameters
-            type: pageSize
+            type: limit
         outputs:
           results: $.servers
+          numPages: $.pagination.totalPages
     x-speakeasy-metadata:
-      created_at: 1746911826521
+      created_at: 1746911395462
       type: user-edit
   - target: $
     update:
@@ -49,43 +64,85 @@ actions:
     x-speakeasy-metadata:
       created_at: 1746911858635
       type: user-edit
-  - target: $["paths"]["/health"]["get"]
+  - target: $["paths"]["/servers/{qualifiedName}/deployments/{id}"]["get"]
     update:
-      x-speakeasy-group: system
-      x-speakeasy-name-override: checkHealth
+      x-speakeasy-name-override: getDeploymentStatus
     x-speakeasy-metadata:
-      after: sdk.system.checkHealth()
-      before: sdk.<no_group>.getHealth()
-      created_at: 1764062986651
-      reviewed_at: 1764062991317
+      after: sdk.servers.getDeploymentStatus()
+      before: sdk.servers.getServersByQualifiedNameDeploymentsById()
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
       type: method-name
-  - target: $["paths"]["/servers/{id}"]["get"]
+  - target: $["paths"]["/servers/{qualifiedName}/deployments"]["put"]
     update:
-      x-speakeasy-group: servers
-      x-speakeasy-name-override: get
+      x-speakeasy-name-override: deploy
     x-speakeasy-metadata:
-      after: sdk.servers.get()
-      before: sdk.servers.getServersById()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
-      type: method-name
-  - target: $["paths"]["/servers/{id}"]["post"]
-    update:
-      x-speakeasy-group: servers
-      x-speakeasy-name-override: configure
-    x-speakeasy-metadata:
-      after: sdk.servers.configure()
-      before: sdk.servers.postServersById()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
+      after: sdk.servers.deploy()
+      before: sdk.servers.putServersByQualifiedNameDeployments()
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
       type: method-name
   - target: $["paths"]["/uplink/token"]["post"]
     update:
-      x-speakeasy-group: uplink
       x-speakeasy-name-override: createToken
     x-speakeasy-metadata:
       after: sdk.uplink.createToken()
       before: sdk.uplink.postUplinkToken()
-      created_at: 1764062986652
-      reviewed_at: 1764062991317
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
+      type: method-name
+  - target: $["paths"]["/servers/{qualifiedName}"]["get"]
+    update:
+      x-speakeasy-name-override: getByQualifiedName
+    x-speakeasy-metadata:
+      after: sdk.servers.getByQualifiedName()
+      before: sdk.servers.getServersByQualifiedName()
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
+      type: method-name
+  - target: $["paths"]["/servers/{qualifiedName}/deployments"]["get"]
+    update:
+      x-speakeasy-name-override: listDeployments
+    x-speakeasy-metadata:
+      after: sdk.servers.listDeployments()
+      before: sdk.servers.getServersByQualifiedNameDeployments()
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
+      type: method-name
+  - target: $["paths"]["/servers/{qualifiedName}/logs"]["get"]
+    update:
+      x-speakeasy-name-override: getLogs
+    x-speakeasy-metadata:
+      after: sdk.servers.getLogs()
+      before: sdk.servers.getServersByQualifiedNameLogs()
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
+      type: method-name
+  - target: $["paths"]["/health"]["get"]
+    update:
+      x-speakeasy-group: service
+      x-speakeasy-name-override: healthCheck
+    x-speakeasy-metadata:
+      after: sdk.service.healthCheck()
+      before: sdk.<no_group>.getHealth()
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
+      type: method-name
+  - target: $["paths"]["/servers/{qualifiedName}/deployments/{id}/resume"]["post"]
+    update:
+      x-speakeasy-name-override: resumeDeployment
+    x-speakeasy-metadata:
+      after: sdk.servers.resumeDeployment()
+      before: sdk.servers.postServersByQualifiedNameDeploymentsByIdResume()
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
+      type: method-name
+  - target: $["paths"]["/servers"]["get"]
+    update:
+      x-speakeasy-name-override: list
+    x-speakeasy-metadata:
+      after: sdk.servers.list()
+      before: sdk.servers.getServers()
+      created_at: 1767778763418
+      reviewed_at: 1767778793520
       type: method-name

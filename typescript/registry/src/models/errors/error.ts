@@ -5,13 +5,9 @@
 import * as z from "zod/v3";
 import { SmitheryRegistryError } from "./smitheryregistryerror.js";
 
-export type ErrorTData = {
-  error: string;
-};
+export type ErrorTData = {};
 
 export class ErrorT extends SmitheryRegistryError {
-  error: string;
-
   /** The original data that was passed to this error instance. */
   data$: ErrorTData;
 
@@ -24,7 +20,6 @@ export class ErrorT extends SmitheryRegistryError {
       : `API error occurred: ${JSON.stringify(err)}`;
     super(message, httpMeta);
     this.data$ = err;
-    this.error = err.error;
 
     this.name = "ErrorT";
   }
@@ -33,13 +28,12 @@ export class ErrorT extends SmitheryRegistryError {
 /** @internal */
 export const ErrorT$inboundSchema: z.ZodType<ErrorT, z.ZodTypeDef, unknown> = z
   .object({
-    error: z.string(),
     request$: z.instanceof(Request),
     response$: z.instanceof(Response),
     body$: z.string(),
   })
   .transform((v) => {
-    return new ErrorT(v, {
+    return new ErrorT({}, {
       request: v.request$,
       response: v.response$,
       body: v.body$,

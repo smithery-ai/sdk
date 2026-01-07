@@ -10,6 +10,5 @@ import { UplinkError } from "@smithery/registry/models/errors";
 
 ## Fields
 
-| Field                         | Type                          | Required                      | Description                   | Example                       |
-| ----------------------------- | ----------------------------- | ----------------------------- | ----------------------------- | ----------------------------- |
-| `error`                       | *string*                      | :heavy_check_mark:            | N/A                           | Failed to create tunnel token |
+| Field       | Type        | Required    | Description |
+| ----------- | ----------- | ----------- | ----------- |

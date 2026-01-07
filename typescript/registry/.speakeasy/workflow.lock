@@ -1,28 +1,27 @@
-speakeasyVersion: 1.650.0
+speakeasyVersion: 1.682.0
 sources:
     Smithery Registry API:
         sourceNamespace: smithery-registry-api
-        sourceRevisionDigest: sha256:18632928989be027ed4ce5690f1974a4fdebbfe0ec0041a8eb6510d0ef7550b6
-        sourceBlobDigest: sha256:3553d59c0927c020e6fa1e7d4c76ca0a67a04aa3731d7552fe3933a84c8b96ff
+        sourceRevisionDigest: sha256:eccc810c313ed3f2f3c7ee37fc8d4c3da8f718ea18c25b7114b4b3859fc30209
+        sourceBlobDigest: sha256:0cc6e37800d07d10871e193de5c807a748d4276d65513465e919e1f8a0cf59d7
         tags:
             - latest
-            - speakeasy-sdk-regen-1764461509
             - 1.0.0
 targets:
     smithery-registry:
         source: Smithery Registry API
         sourceNamespace: smithery-registry-api
-        sourceRevisionDigest: sha256:18632928989be027ed4ce5690f1974a4fdebbfe0ec0041a8eb6510d0ef7550b6
-        sourceBlobDigest: sha256:3553d59c0927c020e6fa1e7d4c76ca0a67a04aa3731d7552fe3933a84c8b96ff
+        sourceRevisionDigest: sha256:eccc810c313ed3f2f3c7ee37fc8d4c3da8f718ea18c25b7114b4b3859fc30209
+        sourceBlobDigest: sha256:0cc6e37800d07d10871e193de5c807a748d4276d65513465e919e1f8a0cf59d7
         codeSamplesNamespace: smithery-registry-api-typescript-code-samples
-        codeSamplesRevisionDigest: sha256:078ef069dd83877783177c1ffd91056c3cdf3cb1a3842b421b77d17b1d6dba5e
+        codeSamplesRevisionDigest: sha256:54414f02e657c9cff1254b1079bd2a1a6721a4ef4f122d19965c754f8c8cc608
 workflow:
     workflowVersion: 1.0.0
-    speakeasyVersion: v1.650.0
+    speakeasyVersion: latest
     sources:
         Smithery Registry API:
             inputs:
-                - location: https://registry.smithery.ai/openapi
+                - location: http://localhost:9090/openapi
             overlays:
                 - location: .speakeasy/speakeasy-modifications-overlay.yaml
             registry:

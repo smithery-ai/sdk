@@ -106,7 +106,6 @@ async function $do(
   const query = encodeFormQuery({
     "page": payload.page,
     "pageSize": payload.pageSize,
-    "profile": payload.profile,
     "q": payload.q,
   });
 
@@ -220,12 +219,20 @@ async function $do(
   } => {
     const page = request?.page ?? 1;
     const nextPage = page + 1;
+    const numPages = dlv(responseData, "pagination.totalPages");
+    if (typeof numPages !== "number" || numPages <= page) {
+      return { next: () => null };
+    }
 
     if (!responseData) {
       return { next: () => null };
     }
-    const results = dlv(responseData, "data.resultArray");
+    const results = dlv(responseData, "servers");
     if (!Array.isArray(results) || !results.length) {
+      return { next: () => null };
+    }
+    const limit = request?.pageSize ?? 10;
+    if (results.length < limit) {
       return { next: () => null };
     }
 

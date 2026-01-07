@@ -7,7 +7,7 @@ const smitheryRegistry = new SmitheryRegistry({
 });
 
 async function run() {
-  const result = await smitheryRegistry.system.checkHealth();
+  const result = await smitheryRegistry.service.healthCheck();
 
   console.log(result);
 }

@@ -11,9 +11,6 @@ import { Params, pathToFunc } from "./url.js";
  * Contains the list of servers available to the SDK
  */
 export const ServerList = [
-  /**
-   * Production API
-   */
   "https://registry.smithery.ai",
 ] as const;
 
@@ -61,7 +58,7 @@ export function serverURLFromOptions(options: SDKOptions): URL | null {
 export const SDK_METADATA = {
   language: "typescript",
   openapiDocVersion: "1.0.0",
-  sdkVersion: "0.6.2",
-  genVersion: "2.743.2",
-  userAgent: "speakeasy-sdk/typescript 0.6.2 2.743.2 1.0.0 @smithery/registry",
+  sdkVersion: "0.10.1",
+  genVersion: "2.791.1",
+  userAgent: "speakeasy-sdk/typescript 0.10.1 2.791.1 1.0.0 @smithery/registry",
 } as const;
