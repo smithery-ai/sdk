@@ -20,7 +20,7 @@ specific category of applications.
 
 ```typescript
 import { SmitheryRegistryCore } from "@smithery/registry/core.js";
-import { systemCheckHealth } from "@smithery/registry/funcs/systemCheckHealth.js";
+import { serviceHealthCheck } from "@smithery/registry/funcs/serviceHealthCheck.js";
 
 // Use `SmitheryRegistryCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
@@ -29,12 +29,12 @@ const smitheryRegistry = new SmitheryRegistryCore({
 });
 
 async function run() {
-  const res = await systemCheckHealth(smitheryRegistry);
+  const res = await serviceHealthCheck(smitheryRegistry);
   if (res.ok) {
     const { value: result } = res;
     console.log(result);
   } else {
-    console.log("systemCheckHealth failed:", res.error);
+    console.log("serviceHealthCheck failed:", res.error);
   }
 }
 

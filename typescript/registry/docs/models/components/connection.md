@@ -3,17 +3,28 @@
 
 ## Supported Types
 
-### `components.ConnectionStdio`
+### `components.StdioConnection`
 
 ```typescript
-const value: components.ConnectionStdio = {};
+const value: components.StdioConnection = {
+  type: "stdio",
+  configSchema: {
+    "key": "<value>",
+  },
+};
 ```
 
-### `components.ConnectionHTTP`
+### `components.HttpConnection`
 
 ```typescript
-const value: components.ConnectionHTTP = {
-  deploymentUrl: "https://muddy-presume.biz/",
+const value: components.HttpConnection = {
+  type: "http",
+  deploymentUrl: "https://vivacious-divine.name/",
+  configSchema: {
+    "key": "<value>",
+    "key1": "<value>",
+    "key2": "<value>",
+  },
 };
 ```
 

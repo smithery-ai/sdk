@@ -15,7 +15,7 @@ Developer-friendly & type-safe Typescript SDK specifically catered to leverage *
 <!-- Start Summary [summary] -->
 ## Summary
 
-Smithery Registry API: Smithery API for managing servers, profiles, and configurations
+Smithery Platform API: Smithery API for managing servers and deployments.
 <!-- End Summary [summary] -->
 
 <!-- Start Table of Contents [toc] -->
@@ -92,7 +92,7 @@ const smitheryRegistry = new SmitheryRegistry({
 });
 
 async function run() {
-  const result = await smitheryRegistry.system.checkHealth();
+  const result = await smitheryRegistry.service.healthCheck();
 
   console.log(result);
 }
@@ -122,7 +122,7 @@ const smitheryRegistry = new SmitheryRegistry({
 });
 
 async function run() {
-  const result = await smitheryRegistry.system.checkHealth();
+  const result = await smitheryRegistry.service.healthCheck();
 
   console.log(result);
 }
@@ -138,23 +138,21 @@ run();
 <details open>
 <summary>Available methods</summary>
 
-### [config](docs/sdks/config/README.md)
+### [Servers](docs/sdks/servers/README.md)
 
-* [getStatus](docs/sdks/config/README.md#getstatus) - Get configuration status
-* [get](docs/sdks/config/README.md#get) - Get saved user configuration for a server
-* [update](docs/sdks/config/README.md#update) - Save user configuration for a server
-
-### [servers](docs/sdks/servers/README.md)
-
+* [deploy](docs/sdks/servers/README.md#deploy) - Deploy an MCP server
+* [listDeployments](docs/sdks/servers/README.md#listdeployments) - List deployments for a server
+* [getDeploymentStatus](docs/sdks/servers/README.md#getdeploymentstatus) - Get deployment status
+* [resumeDeployment](docs/sdks/servers/README.md#resumedeployment) - Resume a paused deployment workflow (e.g., after OAuth authorization)
+* [getLogs](docs/sdks/servers/README.md#getlogs) - Get runtime logs for a server
+* [get](docs/sdks/servers/README.md#get) - Get a server by qualified name
 * [list](docs/sdks/servers/README.md#list) - List all servers
-* [get](docs/sdks/servers/README.md#get) - Get a server by ID
-* [configure](docs/sdks/servers/README.md#configure) - Generate server configuration
 
-### [system](docs/sdks/system/README.md)
+### [Service](docs/sdks/service/README.md)
 
-* [checkHealth](docs/sdks/system/README.md#checkhealth) - Health check
+* [healthCheck](docs/sdks/service/README.md#healthcheck) - Health check
 
-### [uplink](docs/sdks/uplink/README.md)
+### [Uplink](docs/sdks/uplink/README.md)
 
 * [createToken](docs/sdks/uplink/README.md#createtoken) - Create uplink token
 
@@ -176,13 +174,14 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [`configGet`](docs/sdks/config/README.md#get) - Get saved user configuration for a server
-- [`configGetStatus`](docs/sdks/config/README.md#getstatus) - Get configuration status
-- [`configUpdate`](docs/sdks/config/README.md#update) - Save user configuration for a server
-- [`serversConfigure`](docs/sdks/servers/README.md#configure) - Generate server configuration
-- [`serversGet`](docs/sdks/servers/README.md#get) - Get a server by ID
+- [`serversDeploy`](docs/sdks/servers/README.md#deploy) - Deploy an MCP server
+- [`serversGet`](docs/sdks/servers/README.md#get) - Get a server by qualified name
+- [`serversGetDeploymentStatus`](docs/sdks/servers/README.md#getdeploymentstatus) - Get deployment status
+- [`serversGetLogs`](docs/sdks/servers/README.md#getlogs) - Get runtime logs for a server
 - [`serversList`](docs/sdks/servers/README.md#list) - List all servers
-- [`systemCheckHealth`](docs/sdks/system/README.md#checkhealth) - Health check
+- [`serversListDeployments`](docs/sdks/servers/README.md#listdeployments) - List deployments for a server
+- [`serversResumeDeployment`](docs/sdks/servers/README.md#resumedeployment) - Resume a paused deployment workflow (e.g., after OAuth authorization)
+- [`serviceHealthCheck`](docs/sdks/service/README.md#healthcheck) - Health check
 - [`uplinkCreateToken`](docs/sdks/uplink/README.md#createtoken) - Create uplink token
 
 </details>
@@ -209,10 +208,7 @@ const smitheryRegistry = new SmitheryRegistry({
 
 async function run() {
   const result = await smitheryRegistry.servers.list({
-    page: 1,
-    pageSize: 10,
     q: "search term",
-    profile: "my-profile",
   });
 
   for await (const page of result) {
@@ -239,7 +235,7 @@ const smitheryRegistry = new SmitheryRegistry({
 });
 
 async function run() {
-  const result = await smitheryRegistry.system.checkHealth({
+  const result = await smitheryRegistry.service.healthCheck({
     retries: {
       strategy: "backoff",
       backoff: {
@@ -278,7 +274,7 @@ const smitheryRegistry = new SmitheryRegistry({
 });
 
 async function run() {
-  const result = await smitheryRegistry.system.checkHealth();
+  const result = await smitheryRegistry.service.healthCheck();
 
   console.log(result);
 }
@@ -313,16 +309,9 @@ const smitheryRegistry = new SmitheryRegistry({
 
 async function run() {
   try {
-    const result = await smitheryRegistry.servers.list({
-      page: 1,
-      pageSize: 10,
-      q: "search term",
-      profile: "my-profile",
-    });
+    const result = await smitheryRegistry.service.healthCheck();
 
-    for await (const page of result) {
-      console.log(page);
-    }
+    console.log(result);
   } catch (error) {
     // The base class for HTTP error responses
     if (error instanceof errors.SmitheryRegistryError) {
@@ -332,7 +321,7 @@ async function run() {
       console.log(error.headers);
 
       // Depending on the method different errors may be thrown
-      if (error instanceof errors.ErrorT) {
+      if (error instanceof errors.HealthError) {
         console.log(error.data$.error); // string
       }
     }
@@ -347,7 +336,7 @@ run();
 **Primary error:**
 * [`SmitheryRegistryError`](./src/models/errors/smitheryregistryerror.ts): The base class for HTTP error responses.
 
-<details><summary>Less common errors (8)</summary>
+<details><summary>Less common errors (12)</summary>
 
 <br />
 
@@ -360,8 +349,12 @@ run();
 
 
 **Inherit from [`SmitheryRegistryError`](./src/models/errors/smitheryregistryerror.ts)**:
-* [`ErrorT`](./src/models/errors/errort.ts): Applicable to 6 of 8 methods.*
-* [`UplinkError`](./src/models/errors/uplinkerror.ts): Unauthorized - Missing API key. Applicable to 1 of 8 methods.*
+* [`DeploymentError`](./src/models/errors/deploymenterror.ts): Applicable to 4 of 9 methods.*
+* [`ServersListError`](./src/models/errors/serverslisterror.ts): Bad request. Applicable to 1 of 9 methods.*
+* [`UplinkError`](./src/models/errors/uplinkerror.ts): Unauthorized - Missing API key. Applicable to 1 of 9 methods.*
+* [`RuntimeLogsError`](./src/models/errors/runtimelogserror.ts): Forbidden. Applicable to 1 of 9 methods.*
+* [`RegistryError`](./src/models/errors/registryerror.ts): Server not found. Status code `404`. Applicable to 1 of 9 methods.*
+* [`HealthError`](./src/models/errors/healtherror.ts): Service unhealthy. Status code `500`. Applicable to 1 of 9 methods.*
 * [`ResponseValidationError`](./src/models/errors/responsevalidationerror.ts): Type mismatch between the data returned from the server and the structure expected by the SDK. See `error.rawValue` for the raw value and `error.pretty()` for a nicely formatted multi-line string.
 
 </details>
@@ -384,7 +377,7 @@ const smitheryRegistry = new SmitheryRegistry({
 });
 
 async function run() {
-  const result = await smitheryRegistry.system.checkHealth();
+  const result = await smitheryRegistry.service.healthCheck();
 
   console.log(result);
 }

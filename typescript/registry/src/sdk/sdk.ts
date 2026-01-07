@@ -3,25 +3,19 @@
  */
 
 import { ClientSDK } from "../lib/sdks.js";
-import { Config } from "./config.js";
 import { Servers } from "./servers.js";
-import { System } from "./system.js";
+import { Service } from "./service.js";
 import { Uplink } from "./uplink.js";
 
 export class SmitheryRegistry extends ClientSDK {
-  private _system?: System;
-  get system(): System {
-    return (this._system ??= new System(this._options));
+  private _service?: Service;
+  get service(): Service {
+    return (this._service ??= new Service(this._options));
   }
 
   private _servers?: Servers;
   get servers(): Servers {
     return (this._servers ??= new Servers(this._options));
-  }
-
-  private _config?: Config;
-  get config(): Config {
-    return (this._config ??= new Config(this._options));
   }
 
   private _uplink?: Uplink;

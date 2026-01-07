@@ -46,7 +46,7 @@ export function serversList(
   PageIterator<
     Result<
       operations.GetServersResponse,
-      | errors.ErrorT
+      | errors.ServersListError
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -75,7 +75,7 @@ async function $do(
     PageIterator<
       Result<
         operations.GetServersResponse,
-        | errors.ErrorT
+        | errors.ServersListError
         | SmitheryRegistryError
         | ResponseValidationError
         | ConnectionError
@@ -104,9 +104,10 @@ async function $do(
   const path = pathToFunc("/servers")();
 
   const query = encodeFormQuery({
+    "#/components/schemas/ServersListQuery":
+      payload["#/components/schemas/ServersListQuery"],
     "page": payload.page,
     "pageSize": payload.pageSize,
-    "profile": payload.profile,
     "q": payload.q,
   });
 
@@ -176,7 +177,7 @@ async function $do(
 
   const [result, raw] = await M.match<
     operations.GetServersResponse,
-    | errors.ErrorT
+    | errors.ServersListError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -187,7 +188,7 @@ async function $do(
     | SDKValidationError
   >(
     M.json(200, operations.GetServersResponse$inboundSchema, { key: "Result" }),
-    M.jsonErr([400, 401, 422], errors.ErrorT$inboundSchema),
+    M.jsonErr([400, 401, 422], errors.ServersListError$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });
@@ -205,7 +206,7 @@ async function $do(
     next: Paginator<
       Result<
         operations.GetServersResponse,
-        | errors.ErrorT
+        | errors.ServersListError
         | SmitheryRegistryError
         | ResponseValidationError
         | ConnectionError
@@ -220,12 +221,20 @@ async function $do(
   } => {
     const page = request?.page ?? 1;
     const nextPage = page + 1;
+    const numPages = dlv(responseData, "pagination.totalPages");
+    if (typeof numPages !== "number" || numPages <= page) {
+      return { next: () => null };
+    }
 
     if (!responseData) {
       return { next: () => null };
     }
-    const results = dlv(responseData, "data.resultArray");
+    const results = dlv(responseData, "servers");
     if (!Array.isArray(results) || !results.length) {
+      return { next: () => null };
+    }
+    const limit = request?.pageSize ?? 10;
+    if (results.length < limit) {
       return { next: () => null };
     }
 

@@ -15,6 +15,7 @@ let value: ServersListResponse = {
       verified: true,
       useCount: 42,
       remote: true,
+      isDeployed: true,
       createdAt: "1722390988610",
       homepage: "https://smithery.ai/server/smithery/hello-world",
     },
@@ -30,7 +31,7 @@ let value: ServersListResponse = {
 
 ## Fields
 
-| Field                                                                                          | Type                                                                                           | Required                                                                                       | Description                                                                                    |
-| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `servers`                                                                                      | [components.ServersListResponseServer](../../models/components/serverslistresponseserver.md)[] | :heavy_check_mark:                                                                             | N/A                                                                                            |
-| `pagination`                                                                                   | [components.Pagination](../../models/components/pagination.md)                                 | :heavy_check_mark:                                                                             | N/A                                                                                            |
+| Field                                                                  | Type                                                                   | Required                                                               | Description                                                            |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `servers`                                                              | [components.ServerSummary](../../models/components/serversummary.md)[] | :heavy_check_mark:                                                     | N/A                                                                    |
+| `pagination`                                                           | [components.Pagination](../../models/components/pagination.md)         | :heavy_check_mark:                                                     | N/A                                                                    |

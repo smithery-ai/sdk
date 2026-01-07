@@ -20,7 +20,9 @@ let value: Server = {
     {
       name: "get_weather",
       description: "Get current weather",
-      inputSchema: {},
+      inputSchema: {
+        type: "object",
+      },
     },
   ],
 };
@@ -38,4 +40,4 @@ let value: Server = {
 | `deploymentUrl`                                                        | *string*                                                               | :heavy_check_mark:                                                     | N/A                                                                    | https://api.example.com                                                |
 | `connections`                                                          | *components.Connection*[]                                              | :heavy_check_mark:                                                     | N/A                                                                    |                                                                        |
 | `security`                                                             | [components.ServerSecurity](../../models/components/serversecurity.md) | :heavy_check_mark:                                                     | N/A                                                                    |                                                                        |
-| `tools`                                                                | [components.Tool](../../models/components/tool.md)[]                   | :heavy_check_mark:                                                     | N/A                                                                    |                                                                        |
+| `tools`                                                                | [components.ServerTool](../../models/components/servertool.md)[]       | :heavy_check_mark:                                                     | N/A                                                                    |                                                                        |

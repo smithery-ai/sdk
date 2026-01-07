@@ -27,19 +27,19 @@ import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * Get a server by ID
+ * Get a server by qualified name
  *
  * @remarks
- * Get a single server by its qualified name or ID
+ * Get a single server by its qualified name. The qualified name can be either 'name' (unnamespaced) or 'namespace/name' (namespaced).
  */
 export function serversGet(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByIdRequest,
+  request: operations.GetServersByNamespaceByNameRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
     components.Server,
-    | errors.ErrorT
+    | errors.RegistryError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -59,13 +59,13 @@ export function serversGet(
 
 async function $do(
   client: SmitheryRegistryCore,
-  request: operations.GetServersByIdRequest,
+  request: operations.GetServersByNamespaceByNameRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
       components.Server,
-      | errors.ErrorT
+      | errors.RegistryError
       | SmitheryRegistryError
       | ResponseValidationError
       | ConnectionError
@@ -80,7 +80,8 @@ async function $do(
 > {
   const parsed = safeParse(
     request,
-    (value) => operations.GetServersByIdRequest$outboundSchema.parse(value),
+    (value) =>
+      operations.GetServersByNamespaceByNameRequest$outboundSchema.parse(value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -90,13 +91,17 @@ async function $do(
   const body = null;
 
   const pathParams = {
-    id: encodeSimple("id", payload.id, {
+    name: encodeSimple("name", payload.name, {
+      explode: false,
+      charEncoding: "percent",
+    }),
+    namespace: encodeSimple("namespace", payload.namespace, {
       explode: false,
       charEncoding: "percent",
     }),
   };
 
-  const path = pathToFunc("/servers/{id}")(pathParams);
+  const path = pathToFunc("/servers/{namespace}/{name}")(pathParams);
 
   const headers = new Headers(compactMap({
     Accept: "application/json",
@@ -109,7 +114,7 @@ async function $do(
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "getServersById",
+    operationID: "getServersByNamespaceByName",
     oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,
@@ -148,7 +153,7 @@ async function $do(
 
   const doResult = await client._do(req, {
     context,
-    errorCodes: ["404", "4XX", "500", "5XX"],
+    errorCodes: ["404", "4XX", "5XX"],
     retryConfig: context.retryConfig,
     retryCodes: context.retryCodes,
   });
@@ -163,7 +168,7 @@ async function $do(
 
   const [result] = await M.match<
     components.Server,
-    | errors.ErrorT
+    | errors.RegistryError
     | SmitheryRegistryError
     | ResponseValidationError
     | ConnectionError
@@ -174,8 +179,7 @@ async function $do(
     | SDKValidationError
   >(
     M.json(200, components.Server$inboundSchema),
-    M.jsonErr(404, errors.ErrorT$inboundSchema),
-    M.jsonErr(500, errors.ErrorT$inboundSchema),
+    M.jsonErr(404, errors.RegistryError$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

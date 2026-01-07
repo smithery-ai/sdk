@@ -6,39 +6,21 @@ import * as z from "zod/v3";
 import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
+import {
+  HttpConnection,
+  HttpConnection$inboundSchema,
+} from "./httpconnection.js";
+import {
+  ServerSecurity,
+  ServerSecurity$inboundSchema,
+} from "./serversecurity.js";
+import { ServerTool, ServerTool$inboundSchema } from "./servertool.js";
+import {
+  StdioConnection,
+  StdioConnection$inboundSchema,
+} from "./stdioconnection.js";
 
-export type ConnectionHTTP = {
-  type?: "http" | undefined;
-  deploymentUrl: string;
-  configSchema?: any | undefined;
-};
-
-export type ConnectionStdio = {
-  type?: "stdio" | undefined;
-  bundleUrl?: string | undefined;
-  runtime?: string | undefined;
-  stdioFunction?: string | undefined;
-  configSchema?: any | undefined;
-};
-
-export type Connection = ConnectionHTTP | ConnectionStdio;
-
-export type ServerSecurity = {
-  scanPassed: boolean;
-};
-
-export type Properties = {};
-
-export type InputSchema = {
-  type?: "object" | undefined;
-  properties?: Properties | undefined;
-};
-
-export type Tool = {
-  name: string;
-  description: string | null;
-  inputSchema: InputSchema;
-};
+export type Connection = StdioConnection | HttpConnection;
 
 export type Server = {
   qualifiedName: string;
@@ -47,64 +29,17 @@ export type Server = {
   iconUrl: string | null;
   remote: boolean;
   deploymentUrl: string | null;
-  connections: Array<ConnectionHTTP | ConnectionStdio>;
+  connections: Array<StdioConnection | HttpConnection>;
   security: ServerSecurity | null;
-  tools: Array<Tool> | null;
+  tools: Array<ServerTool> | null;
 };
-
-/** @internal */
-export const ConnectionHTTP$inboundSchema: z.ZodType<
-  ConnectionHTTP,
-  z.ZodTypeDef,
-  unknown
-> = z.object({
-  type: z.literal("http").default("http").optional(),
-  deploymentUrl: z.string(),
-  configSchema: z.any().optional(),
-});
-
-export function connectionHTTPFromJSON(
-  jsonString: string,
-): SafeParseResult<ConnectionHTTP, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => ConnectionHTTP$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'ConnectionHTTP' from JSON`,
-  );
-}
-
-/** @internal */
-export const ConnectionStdio$inboundSchema: z.ZodType<
-  ConnectionStdio,
-  z.ZodTypeDef,
-  unknown
-> = z.object({
-  type: z.literal("stdio").default("stdio").optional(),
-  bundleUrl: z.string().optional(),
-  runtime: z.string().optional(),
-  stdioFunction: z.string().optional(),
-  configSchema: z.any().optional(),
-});
-
-export function connectionStdioFromJSON(
-  jsonString: string,
-): SafeParseResult<ConnectionStdio, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => ConnectionStdio$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'ConnectionStdio' from JSON`,
-  );
-}
 
 /** @internal */
 export const Connection$inboundSchema: z.ZodType<
   Connection,
   z.ZodTypeDef,
   unknown
-> = z.union([
-  z.lazy(() => ConnectionHTTP$inboundSchema),
-  z.lazy(() => ConnectionStdio$inboundSchema),
-]);
+> = z.union([StdioConnection$inboundSchema, HttpConnection$inboundSchema]);
 
 export function connectionFromJSON(
   jsonString: string,
@@ -113,80 +48,6 @@ export function connectionFromJSON(
     jsonString,
     (x) => Connection$inboundSchema.parse(JSON.parse(x)),
     `Failed to parse 'Connection' from JSON`,
-  );
-}
-
-/** @internal */
-export const ServerSecurity$inboundSchema: z.ZodType<
-  ServerSecurity,
-  z.ZodTypeDef,
-  unknown
-> = z.object({
-  scanPassed: z.boolean(),
-});
-
-export function serverSecurityFromJSON(
-  jsonString: string,
-): SafeParseResult<ServerSecurity, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => ServerSecurity$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'ServerSecurity' from JSON`,
-  );
-}
-
-/** @internal */
-export const Properties$inboundSchema: z.ZodType<
-  Properties,
-  z.ZodTypeDef,
-  unknown
-> = z.object({});
-
-export function propertiesFromJSON(
-  jsonString: string,
-): SafeParseResult<Properties, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => Properties$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'Properties' from JSON`,
-  );
-}
-
-/** @internal */
-export const InputSchema$inboundSchema: z.ZodType<
-  InputSchema,
-  z.ZodTypeDef,
-  unknown
-> = z.object({
-  type: z.literal("object").default("object").optional(),
-  properties: z.lazy(() => Properties$inboundSchema).optional(),
-});
-
-export function inputSchemaFromJSON(
-  jsonString: string,
-): SafeParseResult<InputSchema, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => InputSchema$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'InputSchema' from JSON`,
-  );
-}
-
-/** @internal */
-export const Tool$inboundSchema: z.ZodType<Tool, z.ZodTypeDef, unknown> = z
-  .object({
-    name: z.string(),
-    description: z.nullable(z.string()),
-    inputSchema: z.lazy(() => InputSchema$inboundSchema),
-  });
-
-export function toolFromJSON(
-  jsonString: string,
-): SafeParseResult<Tool, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => Tool$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'Tool' from JSON`,
   );
 }
 
@@ -200,13 +61,10 @@ export const Server$inboundSchema: z.ZodType<Server, z.ZodTypeDef, unknown> = z
     remote: z.boolean(),
     deploymentUrl: z.nullable(z.string()),
     connections: z.array(
-      z.union([
-        z.lazy(() => ConnectionHTTP$inboundSchema),
-        z.lazy(() => ConnectionStdio$inboundSchema),
-      ]),
+      z.union([StdioConnection$inboundSchema, HttpConnection$inboundSchema]),
     ),
-    security: z.nullable(z.lazy(() => ServerSecurity$inboundSchema)),
-    tools: z.nullable(z.array(z.lazy(() => Tool$inboundSchema))),
+    security: z.nullable(ServerSecurity$inboundSchema),
+    tools: z.nullable(z.array(ServerTool$inboundSchema)),
   });
 
 export function serverFromJSON(

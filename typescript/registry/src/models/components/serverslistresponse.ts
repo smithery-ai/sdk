@@ -6,79 +6,13 @@ import * as z from "zod/v3";
 import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
-
-export type ServersListResponseServer = {
-  qualifiedName: string;
-  displayName: string | null;
-  description: string | null;
-  iconUrl: string | null;
-  verified: boolean;
-  useCount: number;
-  remote: boolean;
-  createdAt: string;
-  homepage: string;
-};
-
-export type Pagination = {
-  currentPage: number;
-  pageSize: number;
-  totalPages: number;
-  totalCount: number;
-};
+import { Pagination, Pagination$inboundSchema } from "./pagination.js";
+import { ServerSummary, ServerSummary$inboundSchema } from "./serversummary.js";
 
 export type ServersListResponse = {
-  servers: Array<ServersListResponseServer>;
+  servers: Array<ServerSummary>;
   pagination: Pagination;
 };
-
-/** @internal */
-export const ServersListResponseServer$inboundSchema: z.ZodType<
-  ServersListResponseServer,
-  z.ZodTypeDef,
-  unknown
-> = z.object({
-  qualifiedName: z.string(),
-  displayName: z.nullable(z.string()),
-  description: z.nullable(z.string()),
-  iconUrl: z.nullable(z.string()),
-  verified: z.boolean(),
-  useCount: z.number(),
-  remote: z.boolean(),
-  createdAt: z.string(),
-  homepage: z.string(),
-});
-
-export function serversListResponseServerFromJSON(
-  jsonString: string,
-): SafeParseResult<ServersListResponseServer, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => ServersListResponseServer$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'ServersListResponseServer' from JSON`,
-  );
-}
-
-/** @internal */
-export const Pagination$inboundSchema: z.ZodType<
-  Pagination,
-  z.ZodTypeDef,
-  unknown
-> = z.object({
-  currentPage: z.number(),
-  pageSize: z.number(),
-  totalPages: z.number(),
-  totalCount: z.number(),
-});
-
-export function paginationFromJSON(
-  jsonString: string,
-): SafeParseResult<Pagination, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => Pagination$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'Pagination' from JSON`,
-  );
-}
 
 /** @internal */
 export const ServersListResponse$inboundSchema: z.ZodType<
@@ -86,8 +20,8 @@ export const ServersListResponse$inboundSchema: z.ZodType<
   z.ZodTypeDef,
   unknown
 > = z.object({
-  servers: z.array(z.lazy(() => ServersListResponseServer$inboundSchema)),
-  pagination: z.lazy(() => Pagination$inboundSchema),
+  servers: z.array(ServerSummary$inboundSchema),
+  pagination: Pagination$inboundSchema,
 });
 
 export function serversListResponseFromJSON(
