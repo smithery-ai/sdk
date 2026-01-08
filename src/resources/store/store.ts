@@ -1,39 +1,44 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '../../resource';
-import { isRequestOptions } from '../../core';
-import * as Core from '../../core';
+import { APIResource } from '../../core/resource';
 import * as Shared from '../shared';
 import * as OrderAPI from './order';
 import { Order } from './order';
+import { APIPromise } from '../../core/api-promise';
+import { RequestOptions } from '../../internal/request-options';
 
 export class Store extends APIResource {
   order: OrderAPI.Order = new OrderAPI.Order(this._client);
 
   /**
    * Place a new order in the store
+   *
+   * @example
+   * ```ts
+   * const order = await client.store.createOrder();
+   * ```
    */
-  createOrder(body?: StoreCreateOrderParams, options?: Core.RequestOptions): Core.APIPromise<Shared.Order>;
-  createOrder(options?: Core.RequestOptions): Core.APIPromise<Shared.Order>;
   createOrder(
-    body: StoreCreateOrderParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<Shared.Order> {
-    if (isRequestOptions(body)) {
-      return this.createOrder({}, body);
-    }
+    body: StoreCreateOrderParams | null | undefined = {},
+    options?: RequestOptions,
+  ): APIPromise<Shared.Order> {
     return this._client.post('/store/order', { body, ...options });
   }
 
   /**
    * Returns a map of status codes to quantities
+   *
+   * @example
+   * ```ts
+   * const response = await client.store.inventory();
+   * ```
    */
-  inventory(options?: Core.RequestOptions): Core.APIPromise<StoreInventoryResponse> {
+  inventory(options?: RequestOptions): APIPromise<StoreInventoryResponse> {
     return this._client.get('/store/inventory', options);
   }
 }
 
-export type StoreInventoryResponse = Record<string, number>;
+export type StoreInventoryResponse = { [key: string]: number };
 
 export interface StoreCreateOrderParams {
   id?: number;

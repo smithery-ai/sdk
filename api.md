@@ -16,13 +16,13 @@ Types:
 Methods:
 
 - <code title="post /pet">client.pets.<a href="./src/resources/pets.ts">create</a>({ ...params }) -> Pet</code>
-- <code title="get /pet/{petId}">client.pets.<a href="./src/resources/pets.ts">retrieve</a>(petId) -> Pet</code>
+- <code title="get /pet/{petId}">client.pets.<a href="./src/resources/pets.ts">retrieve</a>(petID) -> Pet</code>
 - <code title="put /pet">client.pets.<a href="./src/resources/pets.ts">update</a>({ ...params }) -> Pet</code>
-- <code title="delete /pet/{petId}">client.pets.<a href="./src/resources/pets.ts">delete</a>(petId) -> void</code>
+- <code title="delete /pet/{petId}">client.pets.<a href="./src/resources/pets.ts">delete</a>(petID) -> void</code>
 - <code title="get /pet/findByStatus">client.pets.<a href="./src/resources/pets.ts">findByStatus</a>({ ...params }) -> PetFindByStatusResponse</code>
 - <code title="get /pet/findByTags">client.pets.<a href="./src/resources/pets.ts">findByTags</a>({ ...params }) -> PetFindByTagsResponse</code>
-- <code title="post /pet/{petId}">client.pets.<a href="./src/resources/pets.ts">updateById</a>(petId, { ...params }) -> void</code>
-- <code title="post /pet/{petId}/uploadImage">client.pets.<a href="./src/resources/pets.ts">uploadImage</a>(petId, { ...params }) -> APIResponse</code>
+- <code title="post /pet/{petId}">client.pets.<a href="./src/resources/pets.ts">updateByID</a>(petID, { ...params }) -> void</code>
+- <code title="post /pet/{petId}/uploadImage">client.pets.<a href="./src/resources/pets.ts">uploadImage</a>(petID, image, { ...params }) -> APIResponse</code>
 
 # Store
 
@@ -39,8 +39,8 @@ Methods:
 
 Methods:
 
-- <code title="get /store/order/{orderId}">client.store.order.<a href="./src/resources/store/order.ts">retrieve</a>(orderId) -> Order</code>
-- <code title="delete /store/order/{orderId}">client.store.order.<a href="./src/resources/store/order.ts">deleteOrder</a>(orderId) -> void</code>
+- <code title="get /store/order/{orderId}">client.store.order.<a href="./src/resources/store/order.ts">retrieve</a>(orderID) -> Order</code>
+- <code title="delete /store/order/{orderId}">client.store.order.<a href="./src/resources/store/order.ts">deleteOrder</a>(orderID) -> void</code>
 
 # User
 

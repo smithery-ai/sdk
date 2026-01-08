@@ -8,7 +8,6 @@ const config: JestConfigWithTsJest = {
   },
   moduleNameMapper: {
     '^smithery$': '<rootDir>/src/index.ts',
-    '^smithery/_shims/auto/(.*)$': '<rootDir>/src/_shims/auto/$1-node',
     '^smithery/(.*)$': '<rootDir>/src/$1',
   },
   modulePathIgnorePatterns: [
@@ -16,6 +15,7 @@ const config: JestConfigWithTsJest = {
     '<rootDir>/dist/',
     '<rootDir>/deno/',
     '<rootDir>/deno_tests/',
+    '<rootDir>/packages/',
   ],
   testPathIgnorePatterns: ['scripts'],
 };

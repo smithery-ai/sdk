@@ -1,7 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import Petstore from 'smithery';
-import { Response } from 'node-fetch';
 
 const client = new Petstore({
   apiKey: 'My API Key',
@@ -20,13 +19,6 @@ describe('resource store', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('createOrder: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.store.createOrder({ path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Petstore.NotFoundError,
-    );
-  });
-
   test('createOrder: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
@@ -37,7 +29,7 @@ describe('resource store', () => {
           petId: 198772,
           quantity: 7,
           shipDate: '2019-12-27T18:11:19.117Z',
-          status: 'placed',
+          status: 'approved',
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -53,12 +45,5 @@ describe('resource store', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('inventory: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.store.inventory({ path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Petstore.NotFoundError,
-    );
   });
 });

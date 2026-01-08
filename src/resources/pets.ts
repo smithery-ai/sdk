@@ -1,119 +1,144 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '../resource';
-import { isRequestOptions } from '../core';
-import * as Core from '../core';
-import { type BlobLike } from '../uploads';
+import { APIResource } from '../core/resource';
+import { APIPromise } from '../core/api-promise';
+import { buildHeaders } from '../internal/headers';
+import { RequestOptions } from '../internal/request-options';
+import { path } from '../internal/utils/path';
 
 export class Pets extends APIResource {
   /**
    * Add a new pet to the store
+   *
+   * @example
+   * ```ts
+   * const pet = await client.pets.create({
+   *   name: 'doggie',
+   *   photoUrls: ['string'],
+   * });
+   * ```
    */
-  create(body: PetCreateParams, options?: Core.RequestOptions): Core.APIPromise<Pet> {
+  create(body: PetCreateParams, options?: RequestOptions): APIPromise<Pet> {
     return this._client.post('/pet', { body, ...options });
   }
 
   /**
    * Returns a single pet
+   *
+   * @example
+   * ```ts
+   * const pet = await client.pets.retrieve(0);
+   * ```
    */
-  retrieve(petId: number, options?: Core.RequestOptions): Core.APIPromise<Pet> {
-    return this._client.get(`/pet/${petId}`, options);
+  retrieve(petID: number, options?: RequestOptions): APIPromise<Pet> {
+    return this._client.get(path`/pet/${petID}`, options);
   }
 
   /**
    * Update an existing pet by Id
+   *
+   * @example
+   * ```ts
+   * const pet = await client.pets.update({
+   *   name: 'doggie',
+   *   photoUrls: ['string'],
+   * });
+   * ```
    */
-  update(body: PetUpdateParams, options?: Core.RequestOptions): Core.APIPromise<Pet> {
+  update(body: PetUpdateParams, options?: RequestOptions): APIPromise<Pet> {
     return this._client.put('/pet', { body, ...options });
   }
 
   /**
    * delete a pet
+   *
+   * @example
+   * ```ts
+   * await client.pets.delete(0);
+   * ```
    */
-  delete(petId: number, options?: Core.RequestOptions): Core.APIPromise<void> {
-    return this._client.delete(`/pet/${petId}`, {
+  delete(petID: number, options?: RequestOptions): APIPromise<void> {
+    return this._client.delete(path`/pet/${petID}`, {
       ...options,
-      headers: { Accept: '*/*', ...options?.headers },
+      headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
     });
   }
 
   /**
    * Multiple status values can be provided with comma separated strings
+   *
+   * @example
+   * ```ts
+   * const pets = await client.pets.findByStatus();
+   * ```
    */
   findByStatus(
-    query?: PetFindByStatusParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<PetFindByStatusResponse>;
-  findByStatus(options?: Core.RequestOptions): Core.APIPromise<PetFindByStatusResponse>;
-  findByStatus(
-    query: PetFindByStatusParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<PetFindByStatusResponse> {
-    if (isRequestOptions(query)) {
-      return this.findByStatus({}, query);
-    }
+    query: PetFindByStatusParams | null | undefined = {},
+    options?: RequestOptions,
+  ): APIPromise<PetFindByStatusResponse> {
     return this._client.get('/pet/findByStatus', { query, ...options });
   }
 
   /**
    * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3
    * for testing.
+   *
+   * @example
+   * ```ts
+   * const pets = await client.pets.findByTags();
+   * ```
    */
   findByTags(
-    query?: PetFindByTagsParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<PetFindByTagsResponse>;
-  findByTags(options?: Core.RequestOptions): Core.APIPromise<PetFindByTagsResponse>;
-  findByTags(
-    query: PetFindByTagsParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<PetFindByTagsResponse> {
-    if (isRequestOptions(query)) {
-      return this.findByTags({}, query);
-    }
+    query: PetFindByTagsParams | null | undefined = {},
+    options?: RequestOptions,
+  ): APIPromise<PetFindByTagsResponse> {
     return this._client.get('/pet/findByTags', { query, ...options });
   }
 
   /**
    * Updates a pet in the store with form data
+   *
+   * @example
+   * ```ts
+   * await client.pets.updateByID(0);
+   * ```
    */
-  updateById(
-    petId: number,
-    params?: PetUpdateByIDParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<void>;
-  updateById(petId: number, options?: Core.RequestOptions): Core.APIPromise<void>;
-  updateById(
-    petId: number,
-    params: PetUpdateByIDParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<void> {
-    if (isRequestOptions(params)) {
-      return this.updateById(petId, {}, params);
-    }
-    const { name, status } = params;
-    return this._client.post(`/pet/${petId}`, {
+  updateByID(
+    petID: number,
+    params: PetUpdateByIDParams | null | undefined = {},
+    options?: RequestOptions,
+  ): APIPromise<void> {
+    const { name, status } = params ?? {};
+    return this._client.post(path`/pet/${petID}`, {
       query: { name, status },
       ...options,
-      headers: { Accept: '*/*', ...options?.headers },
+      headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
     });
   }
 
   /**
    * uploads an image
+   *
+   * @example
+   * ```ts
+   * const apiResponse = await client.pets.uploadImage(
+   *   0,
+   *   fs.createReadStream('path/to/file'),
+   * );
+   * ```
    */
   uploadImage(
-    petId: number,
-    params: PetUploadImageParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<APIResponse> {
-    const { image, additionalMetadata } = params;
-    return this._client.post(`/pet/${petId}/uploadImage`, {
-      query: { additionalMetadata },
+    petID: number,
+    image: string | ArrayBuffer | ArrayBufferView | Blob | DataView,
+    params: PetUploadImageParams | null | undefined = {},
+    options?: RequestOptions,
+  ): APIPromise<APIResponse> {
+    const { additionalMetadata } = params ?? {};
+    return this._client.post(path`/pet/${petID}/uploadImage`, {
       body: image,
+      query: { additionalMetadata },
       ...options,
-      headers: { 'Content-Type': 'application/octet-stream', ...options?.headers },
-      __binaryRequest: true,
+      headers: buildHeaders([{ 'Content-Type': 'application/octet-stream' }, options?.headers]),
     });
   }
 }
@@ -250,11 +275,6 @@ export interface PetUpdateByIDParams {
 }
 
 export interface PetUploadImageParams {
-  /**
-   * Body param:
-   */
-  image: string | ArrayBufferView | ArrayBuffer | BlobLike;
-
   /**
    * Query param: Additional Metadata
    */

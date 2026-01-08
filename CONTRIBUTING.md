@@ -1,13 +1,13 @@
 ## Setting up the environment
 
-This repository uses [`yarn@v1`](https://classic.yarnpkg.com/lang/en/docs/install).
+This repository uses [`pnpm`](https://pnpm.io/).
 Other package managers may work but are not officially supported for development.
 
 To set up the repository, run:
 
 ```sh
-$ yarn
-$ yarn build
+$ pnpm install
+$ pnpm build
 ```
 
 This will install all the required dependencies and build output files to `dist/`.
@@ -32,7 +32,7 @@ All files in the `examples/` directory are not modified by the generator and can
 ```sh
 $ chmod +x examples/<your-example>.ts
 # run the example against your api
-$ yarn tsn -T examples/<your-example>.ts
+$ pnpm tsn -T examples/<your-example>.ts
 ```
 
 ## Using the repository from source
@@ -42,15 +42,15 @@ If you’d like to use the repository from source, you can either install from g
 To install via git:
 
 ```sh
-$ npm install git+ssh://git@github.com:stainless-sdks/smithery-node.git
+$ npm install git+ssh://git@github.com:stainless-sdks/smithery-typescript.git
 ```
 
 Alternatively, to link a local copy of the repo:
 
 ```sh
 # Clone
-$ git clone https://www.github.com/stainless-sdks/smithery-node
-$ cd smithery-node
+$ git clone https://www.github.com/stainless-sdks/smithery-typescript
+$ cd smithery-typescript
 
 # With yarn
 $ yarn link
@@ -72,7 +72,7 @@ $ npx prism mock path/to/your/openapi.yml
 ```
 
 ```sh
-$ yarn run test
+$ pnpm run test
 ```
 
 ## Linting and formatting
@@ -83,11 +83,11 @@ This repository uses [prettier](https://www.npmjs.com/package/prettier) and
 To lint:
 
 ```sh
-$ yarn lint
+$ pnpm lint
 ```
 
 To format and fix all lint issues automatically:
 
 ```sh
-$ yarn fix
+$ pnpm fix
 ```

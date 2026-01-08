@@ -1,17 +1,15 @@
 {
   "include": ["src", "tests", "examples"],
-  "exclude": ["src/_shims/**/*-deno.ts"],
+  "exclude": [],
   "compilerOptions": {
     "target": "es2020",
     "lib": ["es2020"],
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "baseUrl": "./",
     "paths": {
-      "smithery/_shims/auto/*": ["src/_shims/auto/*-node"],
-      "smithery/*": ["src/*"],
-      "smithery": ["src/index.ts"]
+      "smithery/*": ["./src/*"],
+      "smithery": ["./src/index.ts"]
     },
     "noEmit": true,
 
@@ -32,7 +30,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-		"isolatedModules": false,
+    "isolatedModules": false,
 
     "skipLibCheck": true
   }
