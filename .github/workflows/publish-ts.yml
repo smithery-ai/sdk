@@ -3,7 +3,7 @@ name: Release TypeScript SDK
 on:
   push:
     tags:
-      - 'typescript/sdk/v*'
+      - 'v*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,10 +12,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: typescript/sdk
 
     steps:
       - uses: actions/checkout@v4
@@ -28,11 +24,10 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
-          cache-dependency-path: 'typescript/sdk/pnpm-lock.yaml'
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
-      - run: pnpm add -D @biomejs/cli-linux-x64  # biome platform binary for linux ci
+      - run: pnpm add -D @biomejs/cli-linux-x64
       - run: pnpm run check
 
   publish:
@@ -42,10 +37,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-
-    defaults:
-      run:
-        working-directory: typescript/sdk
 
     steps:
       - uses: actions/checkout@v4
@@ -59,9 +50,9 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
-          cache-dependency-path: 'typescript/sdk/pnpm-lock.yaml'
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
       - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

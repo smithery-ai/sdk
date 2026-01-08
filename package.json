@@ -13,10 +13,6 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
-		},
-		"./bundle": {
-			"types": "./dist/bundle/index.d.ts",
-			"default": "./dist/bundle/index.js"
 		}
 	},
 	"files": [

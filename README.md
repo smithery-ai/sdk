@@ -1,20 +1,86 @@
 # Smithery SDK
 
-[![npm version](https://img.shields.io/npm/v/%40smithery%2Fsdk?style=flat-square)](https://www.npmjs.com/package/@smithery/sdk) 
-[![npm version](https://img.shields.io/npm/v/%40smithery%2Fregistry?style=flat-square)](https://www.npmjs.com/package/@smithery/registry) 
-[![PyPI - Version](https://img.shields.io/pypi/v/smithery?style=flat-square)](https://pypi.org/project/smithery/)
+TypeScript types for building MCP servers on the Smithery hosted runtime.
 
+Docs: https://smithery.ai/docs/build
 
-Smithery SDK provides utilities to make it easier for you to develop and deploy [Model Context Protocols](https://modelcontextprotocol.io/) (MCPs) with Smithery.
+## Installation
 
-To find our registry of MCPs, visit [https://smithery.ai/](https://smithery.ai/).
+```bash
+npm install @smithery/sdk
+```
 
-## Languages
+## Usage
 
-### TypeScript
-- [Registry](typescript/registry/README.md) — find and connect to MCP servers in the registry
-- [SDK](typescript/sdk/README.md) — build and deploy MCP servers to the registry
+The SDK provides types for the Smithery runtime context that your MCP server receives when deployed.
 
-### Python
-- [SDK](python/README.md) — FastMCP servers with smithery session configuration support
-- [Scaffold](python/scaffold/) — ready-to-use MCP server template
+```typescript
+import type {
+  ServerModule,
+  ServerContext,
+  Session,
+} from "@smithery/sdk"
+import { z } from "zod"
+
+// Define your configuration schema
+export const configSchema = z.object({
+  apiKey: z.string(),
+})
+
+// Create your server
+export default const createServer = async (context: ServerContext<z.infer<typeof configSchema>>) => {
+  const { config, env } = context
+
+  // Access user configuration
+  console.log(config.apiKey)
+
+  // Access environment variables
+  console.log(env.MY_SECRET)
+
+  // For stateful servers, access session storage
+  if ("session" in context) {
+    await context.session.set("key", "value")
+    const value = await context.session.get("key")
+  }
+
+  // Return your MCP server instance
+  return new Server({ name: "my-server", version: "1.0.0" }, { capabilities: {} })
+}
+
+```
+
+## Types
+
+### `ServerContext<TConfig>`
+
+The context object passed to your server factory function:
+
+- `config: TConfig` - User-provided configuration (validated against your `configSchema`)
+- `env: Record<string, string | undefined>` - Environment variables
+- `session?: Session` - Session storage (only for stateful servers)
+
+### `Session`
+
+Key-value storage scoped to the user session:
+
+- `get<T>(key: string): Promise<T | undefined>`
+- `set(key: string, value: unknown): Promise<void>`
+- `delete(key: string): Promise<void>`
+
+### `ServerModule<TConfig>`
+
+The expected exports from your server entry point:
+
+- `default: CreateServerFn<TConfig>` - Factory function that creates your MCP server
+- `configSchema?: z.ZodSchema<TConfig>` - Zod schema for configuration validation
+- `createSandboxServer?: CreateSandboxServerFn` - Optional function for deployment scanning
+- `stateful?: boolean` - Whether the server maintains state between requests (default: `false`)
+
+## Documentation
+
+For complete documentation, see:
+- [Quickstart Guide](https://smithery.ai/docs/build/quickstart)
+
+## License
+
+MIT
