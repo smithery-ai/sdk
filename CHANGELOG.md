@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/smithery-ai/sdk/compare/v4.2.1...v4.1.0) (2026-02-26)
+
+
+### Reverts
+
+* restore registry-url needed for OIDC ([#223](https://github.com/smithery-ai/sdk/issues/223)) ([2f32d0b](https://github.com/smithery-ai/sdk/commit/2f32d0b7233e4ec1c686e22d3a40bda9fc6fa4b4))
+
 ## [4.2.1](https://github.com/smithery-ai/sdk/compare/v4.2.0...v4.2.1) (2026-02-26)
 
 
