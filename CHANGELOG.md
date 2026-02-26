@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/smithery-ai/sdk/compare/v4.1.0...v4.1.0) (2026-02-26)
+
+
+### Bug Fixes
+
+* use Node 24 for npm OIDC trusted publishing ([e03be0a](https://github.com/smithery-ai/sdk/commit/e03be0a98108a3c8d45667d9a9daccc518151ea3))
+
 ## [4.1.0](https://github.com/smithery-ai/sdk/compare/v4.0.1...v4.1.0) (2026-02-26)
 
 
