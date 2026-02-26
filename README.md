@@ -1,5 +1,7 @@
 # Smithery SDK
 
+[![npm version](https://img.shields.io/npm/v/@smithery/sdk)](https://www.npmjs.com/package/@smithery/sdk)
+
 TypeScript types for building MCP servers on the Smithery hosted runtime.
 
 Docs: https://smithery.ai/docs/build
