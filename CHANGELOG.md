@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.1](https://github.com/smithery-ai/sdk/compare/v4.2.0...v4.2.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* remove registry-url from npm publish workflow to enable OIDC auth ([#221](https://github.com/smithery-ai/sdk/issues/221)) ([3a8ed52](https://github.com/smithery-ai/sdk/commit/3a8ed52956015fc1ed175cdfb14b21f4690e5b7a))
+
 ## [4.2.0](https://github.com/smithery-ai/sdk/compare/v4.0.1...v4.2.0) (2026-02-26)
 
 
