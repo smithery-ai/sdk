@@ -1,4 +1,5 @@
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import type { Notification } from "@modelcontextprotocol/sdk/types.js"
 import type { z } from "zod"
 
 export type Session = {
@@ -80,7 +81,17 @@ export type StatelessHttpContext = {
 export type StatefulHttpContext = {
 	env: Record<string, string | undefined>
 	sessions: {
-		send(sessionId: string, message: unknown): Promise<void>
+		/**
+		 * Send a notification directly to the connected client (via `transport.send()`),
+		 * bypassing the server's notification handler chain.
+		 * Use this for webhook → client notification routing.
+		 */
+		notify(sessionId: string, notification: Notification): Promise<void>
+		/**
+		 * Inject a raw JSON-RPC message into the server's handler chain for processing.
+		 * The server's registered request/notification handlers will be invoked.
+		 */
+		dispatch(sessionId: string, message: unknown): Promise<void>
 	}
 }
 
