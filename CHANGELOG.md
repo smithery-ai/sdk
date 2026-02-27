@@ -1,5 +1,22 @@
 # Changelog
 
+## [4.2.0](https://github.com/smithery-ai/sdk/compare/v4.1.0...v4.2.0) (2026-02-27)
+
+
+### Features
+
+* update StatefulHttpContext with notify/dispatch methods ([#229](https://github.com/smithery-ai/sdk/issues/229)) ([3e83433](https://github.com/smithery-ai/sdk/commit/3e83433bff0c7763bc99c89d4e0dd85a027c87a5))
+
+
+### Bug Fixes
+
+* use Node 24 for npm OIDC trusted publishing ([66a61a7](https://github.com/smithery-ai/sdk/commit/66a61a7bac5cdd9b2432bc1adcddb55507d7c9c0))
+
+
+### Documentation
+
+* add npm version badge to README ([2ed2b28](https://github.com/smithery-ai/sdk/commit/2ed2b28549bef730f60c12b5048695c1de06a81f))
+
 ## [4.1.0](https://github.com/smithery-ai/sdk/compare/v4.0.1...v4.1.0) (2026-02-26)
 
 
