@@ -1,5 +1,5 @@
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js"
-import type { Notification } from "@modelcontextprotocol/sdk/types.js"
+
 import type { z } from "zod"
 
 export type Session = {
@@ -20,6 +20,11 @@ export type StatefulServerContext<TConfig = unknown> = {
 	session: Session
 	env: Record<string, string | undefined>
 	accessToken?: string
+	/**
+	 * Register a handler for messages sent via `sessions.send()`.
+	 * This enables callback-based message passing outside the MCP protocol.
+	 */
+	onMessage: (handler: (message: unknown) => unknown | Promise<unknown>) => void
 }
 
 export type ServerContext<TConfig = unknown> =
@@ -84,16 +89,10 @@ export type StatefulHttpContext = {
 	env: Record<string, string | undefined>
 	sessions: {
 		/**
-		 * Send a notification directly to the connected client (via `transport.send()`),
-		 * bypassing the server's notification handler chain.
-		 * Use this for webhook → client notification routing.
+		 * Send an arbitrary message to the session's registered `onMessage` handler.
+		 * Returns the handler's response, or undefined if no handler is registered.
 		 */
-		notify(sessionId: string, notification: Notification): Promise<void>
-		/**
-		 * Inject a raw JSON-RPC message into the server's handler chain for processing.
-		 * The server's registered request/notification handlers will be invoked.
-		 */
-		dispatch(sessionId: string, message: unknown): Promise<void>
+		send(sessionId: string, message: unknown): Promise<unknown>
 	}
 }
 
