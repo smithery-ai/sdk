@@ -12,12 +12,14 @@ export type Session = {
 export type StatelessServerContext<TConfig = unknown> = {
 	config: TConfig
 	env: Record<string, string | undefined>
+	accessToken?: string
 }
 
 export type StatefulServerContext<TConfig = unknown> = {
 	config: TConfig
 	session: Session
 	env: Record<string, string | undefined>
+	accessToken?: string
 }
 
 export type ServerContext<TConfig = unknown> =
