@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.2.1](https://github.com/smithery-ai/sdk/compare/v4.2.0...v4.2.1) (2026-02-28)
+
+
+### Chores
+
+* add accessToken to server context types ([#232](https://github.com/smithery-ai/sdk/issues/232)) ([9baea81](https://github.com/smithery-ai/sdk/commit/9baea81c9f4b6b80fed83240f2d7f17591744f09))
+* remove package-lock.json ([#230](https://github.com/smithery-ai/sdk/issues/230)) ([dee9ad9](https://github.com/smithery-ai/sdk/commit/dee9ad9da46b947d10558a8458baa0f0c6189b69))
+
 ## [4.2.0](https://github.com/smithery-ai/sdk/compare/v4.1.0...v4.2.0) (2026-02-27)
 
 
